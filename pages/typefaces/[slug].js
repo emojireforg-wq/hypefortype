@@ -156,14 +156,13 @@ export default function FontPage({ font }) {
           .nav-buy:hover { opacity:.85; }
 
           /* LAYOUT */
-          .page-layout { display:grid; grid-template-columns:1fr 300px; min-height:calc(100vh - 48px); }
+          .page-layout { display:grid; grid-template-columns:1fr 300px; }
 
           /* LEFT CANVAS */
           .canvas {
             border-right:1px solid ${C.border};
             display:flex; flex-direction:column;
             transition: background .3s;
-            min-height: calc(100vh - 48px);
           }
           .canvas-toolbar {
             display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
@@ -188,10 +187,18 @@ export default function FontPage({ font }) {
 
           /* Live display area */
           .canvas-stage {
-            flex:1; padding:clamp(1.8rem,4vw,3rem);
+            height: 340px;
+            padding:clamp(1.8rem,4vw,3rem);
             display:flex; align-items:center; justify-content:center; overflow:hidden;
             position:relative; cursor:text;
           }
+          .canvas-textarea {
+            position:absolute; inset:0; opacity:0; cursor:text;
+            resize:none; border:none; outline:none; background:transparent;
+            width:100%; height:100%; padding:clamp(1.8rem,4vw,3rem);
+            font-size:inherit; z-index:5;
+          }
+          .canvas-textarea:focus { opacity:0; }
           .canvas-headline-text {
             width:100%; line-height:.92; letter-spacing:-.02em; word-break:break-word;
             transition: font-size .08s, letter-spacing .08s, line-height .08s;
@@ -200,14 +207,12 @@ export default function FontPage({ font }) {
             width:100%; max-width:60ch;
             transition: font-size .08s, line-height .08s;
           }
-          .canvas-edit-bar {
-            display:flex; align-items:center; gap:.6rem;
-            border-top:1px solid ${C.border}; padding:10px 1.4rem;
-            flex-shrink:0;
+.canvas-click-hint {
+            position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+            font-family:${C.sm}; font-size:9px; color:${C.text4}; letter-spacing:.12em;
+            text-transform:uppercase; pointer-events:none; transition:opacity .2s;
+            white-space:nowrap;
           }
-          .canvas-edit-label { font-family:${C.sm}; font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:${C.accent}; flex-shrink:0; }
-          .canvas-edit-input { flex:1; background:transparent; border:none; outline:none; font-family:${C.sg}; font-size:13px; color:${C.text2}; caret-color:${C.accent}; }
-          .canvas-edit-input::placeholder { color:${C.text4}; }
 
           /* Meta strip */
           .meta-strip { display:flex; border-top:1px solid ${C.border}; flex-shrink:0; }
@@ -353,14 +358,28 @@ export default function FontPage({ font }) {
             ))}
           </div>
 
-          {/* Stage */}
-          <div className="canvas-stage" onClick={() => { if (!focusedGlyph) document.querySelector('.canvas-edit-input')?.focus(); }}>
+          {/* Stage — entire area is clickable/typeable */}
+          <div className="canvas-stage"
+            onClick={e => { if (!focusedGlyph) e.currentTarget.querySelector('textarea')?.focus(); }}>
+
+            {/* Invisible textarea captures all typing */}
+            <textarea
+              className="canvas-textarea"
+              value={previewText}
+              onChange={e => setPreviewText(e.target.value)}
+              maxLength={80}
+              spellCheck={false}
+              autoComplete="off"
+            />
+
+            {/* Visible rendered text */}
             {viewMode === 'body' ? (
               <div className="canvas-body-text" style={{
                 fontFamily, fontWeight: style.weight,
                 fontSize: Math.min(fontSize, 22) + 'px',
                 lineHeight: lineHeight + 0.5,
                 color: textColor,
+                pointerEvents: 'none',
               }}>
                 {previewText.trim() || LOREM}
               </div>
@@ -372,22 +391,16 @@ export default function FontPage({ font }) {
                 letterSpacing: letterSpacing + '%',
                 lineHeight: lineHeight,
                 color: textColor,
+                pointerEvents: 'none',
               }}>
-                {displayText}
+                {previewText || font.name}
               </div>
             )}
-          </div>
 
-          {/* Edit bar */}
-          <div className="canvas-edit-bar">
-            <span className="canvas-edit-label">↑ Type</span>
-            <input className="canvas-edit-input"
-              value={previewText}
-              onChange={e => setPreviewText(e.target.value)}
-              placeholder={font.name}
-              maxLength={80}
-              style={{ color: textColor === '#000000' || textColor === '#0d1117' ? C.text2 : textColor }}
-            />
+            {/* Click hint — hides when text entered */}
+            {!previewText && (
+              <div className="canvas-click-hint">Click to type</div>
+            )}
           </div>
 
           {/* Meta strip */}
