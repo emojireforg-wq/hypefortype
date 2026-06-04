@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "upload-fonts": "BLOB_READ_WRITE_TOKEN=vercel_blob_rw_MmcWcrUYsifSbaQ7_FScTB8rSxZPsmpP30NSLZ6Qvt0bOaO node upload-fonts.js"
   },
   "dependencies": {
     "next": "14.2.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "@vercel/blob": "0.27.1",
     "@paypal/checkout-server-sdk": "1.0.3",
     "uuid": "9.0.1",
     "nodemailer": "6.9.13",
