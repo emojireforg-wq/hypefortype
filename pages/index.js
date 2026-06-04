@@ -29,6 +29,9 @@ export default function Home() {
         <title>HypeForType — Type Foundry</title>
         <meta name="description" content="28 distinctive typefaces for designers, brands, and studios. Desktop, Web, App and Broadcast licenses." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {fonts.map(f => f.styles.map(s => (
+          <style key={`${f.slug}-${s.file}`}>{`@font-face{font-family:'${f.name}';src:url('/fonts/${f.slug}/${encodeURIComponent(s.file)}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
+        )))}
       </Head>
 
       <Nav />
