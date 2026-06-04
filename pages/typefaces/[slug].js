@@ -104,7 +104,8 @@ export default function FontPage({ font }) {
         ))}
         <style>{`
           * { box-sizing: border-box; margin: 0; padding: 0; }
-          body { background: #fafaf8; color: #0a0a0a; font-family: 'Inter', sans-serif; }
+          body, html { background: #fafaf8 !important; color: #0a0a0a !important; font-family: 'Inter', sans-serif !important; }
+          :root { --bg: #fafaf8 !important; --bg2: #f2f1eb !important; --white: #0a0a0a !important; --border: #e8e7e2 !important; }
 
           /* ── Nav ── */
           .fp-nav {
