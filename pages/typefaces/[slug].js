@@ -479,7 +479,7 @@ export default function FontPage({ font }) {
       {/* ABC TICKER */}
       <div className="abc-ticker">
         <div className="abc-track">
-          {[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'].split('').map((ch,i) => (
+          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map((ch,i) => (
             <span key={i} className="abc-char" style={{ fontFamily, fontWeight: style.weight }}>{ch}</span>
           ))}
         </div>
