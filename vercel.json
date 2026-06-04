@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "functions": {
-    "api/paypal-create.js": { "maxDuration": 30 },
-    "api/paypal-capture.js": { "maxDuration": 30 },
-    "api/download.js": { "maxDuration": 30 },
-    "api/trial.js": { "maxDuration": 30 }
-  }
+  "version": 2
 }
