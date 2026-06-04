@@ -34,7 +34,7 @@ export default function Nav({ buyLabel, onBuy }) {
           <Link key={n}
             href={n === 'Typefaces' ? '/' : '/' + n.toLowerCase()}
             style={{
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Space Grotesk', sans-serif",
               fontSize: '11px', fontWeight: 500,
               letterSpacing: '.1em', textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.3)',
@@ -53,7 +53,7 @@ export default function Nav({ buyLabel, onBuy }) {
       <div style={{ display: 'flex', alignItems: 'stretch', borderLeft: '1px solid var(--border)' }}>
         {buyLabel && onBuy ? (
           <button onClick={onBuy} style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Space Grotesk', sans-serif",
             fontSize: '11px', fontWeight: 700,
             letterSpacing: '.1em', textTransform: 'uppercase',
             color: '#fff', background: 'var(--blue)',
@@ -66,7 +66,7 @@ export default function Nav({ buyLabel, onBuy }) {
           </button>
         ) : (
           <Link href="/cart" style={{
-            fontFamily: "'Inter', sans-serif",
+            fontFamily: "'Space Grotesk', sans-serif",
             fontSize: '11px', fontWeight: 700,
             letterSpacing: '.1em', textTransform: 'uppercase',
             color: '#fff', background: 'var(--blue)',

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @font-face { font-family: 'Determination'; src: url('/fonts/ui/determination.ttf') format('truetype'); font-weight: normal; font-display: swap; }
 @font-face { font-family: 'DigitalDisco'; src: url('/fonts/ui/DigitalDisco.ttf') format('truetype'); font-weight: normal; font-display: swap; }
@@ -12,7 +12,7 @@
   --white:  #f2f1eb;
   --dim:    #3a3a4a;
   --border: rgba(255,255,255,0.06);
-  --inter:  'Inter', sans-serif;
+  --inter:  'Space Grotesk', sans-serif;
   --det:    'Determination', monospace;
   --dd:     'DigitalDisco', monospace;
 }

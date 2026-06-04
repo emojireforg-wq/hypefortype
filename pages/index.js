@@ -105,7 +105,7 @@ export default function Home() {
             margin-bottom: 1.8rem;
           }
           .hero-eyebrow span {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             font-weight: 500;
             letter-spacing: .14em;
@@ -134,7 +134,7 @@ export default function Home() {
             gap: 1.5rem;
           }
           .hero-desc {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 13px;
             color: rgba(255,255,255,0.35);
             line-height: 1.7;
@@ -147,7 +147,7 @@ export default function Home() {
             flex-wrap: wrap;
           }
           .btn-primary {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 12px;
             font-weight: 700;
             letter-spacing: .1em;
@@ -161,7 +161,7 @@ export default function Home() {
           }
           .btn-primary:hover { opacity: 0.8; }
           .btn-ghost {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 12px;
             font-weight: 500;
             letter-spacing: .1em;
@@ -193,7 +193,7 @@ export default function Home() {
             backdrop-filter: blur(8px);
           }
           .preview-label {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: .18em;
@@ -206,7 +206,7 @@ export default function Home() {
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 13px;
             color: rgba(255,255,255,0.5);
             width: 100%;
@@ -234,7 +234,7 @@ export default function Home() {
             margin-bottom: .4rem;
           }
           .stat-label {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             font-weight: 500;
             letter-spacing: .1em;
@@ -255,7 +255,7 @@ export default function Home() {
             white-space: nowrap;
           }
           .ticker-item {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: .16em;
@@ -276,7 +276,7 @@ export default function Home() {
           }
           .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
           .pill {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: .1em;
@@ -291,7 +291,7 @@ export default function Home() {
           .pill:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
           .pill.active { background: var(--blue); border-color: var(--blue); color: #fff; }
           .filter-count {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             color: rgba(255,255,255,0.18);
             letter-spacing: .06em;
@@ -308,7 +308,7 @@ export default function Home() {
             background: var(--bg2);
           }
           .grid-head span {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 10px;
             font-weight: 600;
             letter-spacing: .12em;
@@ -370,7 +370,7 @@ export default function Home() {
             align-items: center;
           }
           .badge-new {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 9px; font-weight: 700;
             letter-spacing: .08em; text-transform: uppercase;
             padding: 2px 6px;
@@ -378,7 +378,7 @@ export default function Home() {
             color: #fff;
           }
           .badge-pro {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 9px; font-weight: 600;
             letter-spacing: .08em; text-transform: uppercase;
             padding: 2px 6px;
@@ -386,24 +386,24 @@ export default function Home() {
             color: rgba(255,255,255,0.2);
           }
           .row-styles {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             color: rgba(255,255,255,0.18);
           }
           .row-cat {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px; font-weight: 500;
             letter-spacing: .06em; text-transform: uppercase;
             color: rgba(255,255,255,0.2);
           }
           .row-price {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 13px; font-weight: 600;
             color: rgba(255,255,255,0.3);
             transition: color .15s;
           }
           .row-cta {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 10px; font-weight: 700;
             letter-spacing: .1em; text-transform: uppercase;
             background: var(--blue);
@@ -431,7 +431,7 @@ export default function Home() {
             background: var(--bg2);
           }
           .footer-copy {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             color: rgba(255,255,255,0.15);
             letter-spacing: .06em;
@@ -447,7 +447,7 @@ export default function Home() {
             padding: 1.4rem 2rem;
           }
           .footer-link {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px; font-weight: 500;
             letter-spacing: .1em; text-transform: uppercase;
             color: rgba(255,255,255,0.18);
@@ -455,7 +455,7 @@ export default function Home() {
           }
           .footer-link:hover { color: var(--white); }
           .footer-loc {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             color: rgba(255,255,255,0.15);
             letter-spacing: .06em;
@@ -490,7 +490,7 @@ export default function Home() {
             maxLength={40}
             placeholder="Type to preview all fonts below..."
           />
-          <span style={{ fontFamily: "'DigitalDisco', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.12)', letterSpacing: '.1em', flexShrink: 0 }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.12)', letterSpacing: '.1em', flexShrink: 0 }}>
             {clock}
           </span>
         </div>

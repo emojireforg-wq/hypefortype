@@ -106,7 +106,7 @@ export default function FontPage({ font }) {
   const slab = (label, value) => (
     <div style={{ borderRight: `1px solid ${C.border}`, padding: '0 1.4rem', display:'flex', flexDirection:'column', gap:4 }}>
       <span style={{ fontFamily:"'Determination',monospace", fontSize:'1.5rem', color: C.text1, lineHeight:1 }}>{value}</span>
-      <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color: C.text4 }}>{label}</span>
+      <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color: C.text4 }}>{label}</span>
     </div>
   );
 
@@ -120,9 +120,9 @@ export default function FontPage({ font }) {
           <style key={s.file}>{`@font-face{font-family:'${font.name}';src:url('/fonts/${font.slug}/${encodeURIComponent(s.file)}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
         ))}
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-          html, body { background: ${C.bg} !important; color: ${C.text1} !important; font-family: 'Inter', sans-serif !important; -webkit-font-smoothing: antialiased; }
+          html, body { background: ${C.bg} !important; color: ${C.text1} !important; font-family: 'Space Grotesk', sans-serif !important; -webkit-font-smoothing: antialiased; }
 
           /* ── Scrollbar ── */
           ::-webkit-scrollbar { width: 4px; }
@@ -146,7 +146,7 @@ export default function FontPage({ font }) {
           }
           .nav-logo:hover { color: ${C.white}; }
           .nav-back {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500;
             letter-spacing: .08em; text-transform: uppercase;
             color: ${C.text4}; padding: 0 1.2rem;
             border-right: 1px solid ${C.border};
@@ -154,12 +154,12 @@ export default function FontPage({ font }) {
           }
           .nav-back:hover { color: ${C.text1}; }
           .nav-title {
-            font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;
             color: ${C.text2}; padding: 0 1.4rem;
             display: flex; align-items: center; flex: 1;
           }
           .nav-trial {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600;
             letter-spacing: .08em; text-transform: uppercase;
             color: ${C.blueLight}; padding: 0 1.4rem;
             border-left: 1px solid ${C.border};
@@ -169,7 +169,7 @@ export default function FontPage({ font }) {
           }
           .nav-trial:hover { color: ${C.white}; }
           .nav-buy {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
             letter-spacing: .1em; text-transform: uppercase;
             color: #fff; background: ${C.accent};
             padding: 0 1.6rem; display: flex; align-items: center;
@@ -198,7 +198,7 @@ export default function FontPage({ font }) {
             pointer-events: none; user-select: none;
           }
           .hero-eyebrow {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
             letter-spacing: .18em; text-transform: uppercase;
             color: ${C.blueLight}; margin-bottom: .8rem;
           }
@@ -217,12 +217,12 @@ export default function FontPage({ font }) {
             position: relative; z-index: 1;
           }
           .hero-edit-label {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
             letter-spacing: .14em; text-transform: uppercase; color: ${C.accent}; flex-shrink: 0;
           }
           .hero-edit-input {
             flex: 1; background: transparent; border: none; outline: none;
-            font-family: 'Inter', sans-serif; font-size: 13px; color: ${C.text2};
+            font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: ${C.text2};
             caret-color: ${C.accent};
           }
           .hero-edit-input::placeholder { color: ${C.text4}; }
@@ -242,11 +242,11 @@ export default function FontPage({ font }) {
             flex-shrink: 0;
           }
           .gp-title {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
             letter-spacing: .18em; text-transform: uppercase; color: ${C.text1};
           }
           .gp-ver {
-            font-family: 'DigitalDisco', monospace; font-size: 10px;
+            font-family: 'Space Mono', monospace; font-size: 10px;
             color: ${C.text4}; letter-spacing: .1em;
           }
           .gp-scroll { flex: 1; overflow-y: auto; padding: 0 18px; }
@@ -257,8 +257,8 @@ export default function FontPage({ font }) {
           .gp-row-head {
             display: flex; justify-content: space-between; margin-bottom: 10px;
           }
-          .gp-lbl { font-family: 'Inter', sans-serif; font-size: 11px; color: ${C.text3}; font-weight: 500; }
-          .gp-val { font-family: 'Inter', sans-serif; font-size: 11px; color: ${C.text1}; font-weight: 600; }
+          .gp-lbl { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: ${C.text3}; font-weight: 500; }
+          .gp-val { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: ${C.text1}; font-weight: 600; }
           .gp-slider {
             width: 100%; height: 2px; -webkit-appearance: none; appearance: none;
             background: ${C.border}; outline: none; border-radius: 1px; cursor: pointer;
@@ -272,13 +272,13 @@ export default function FontPage({ font }) {
             display: flex; justify-content: space-between; margin-top: 5px;
           }
           .gp-range-labels span {
-            font-family: 'Inter', sans-serif; font-size: 10px; color: ${C.text4};
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px; color: ${C.text4};
           }
           .gp-weights {
             display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
           }
           .gp-wbtn {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500;
             padding: 7px 8px; border: 1px solid ${C.border};
             background: transparent; color: ${C.text3};
             cursor: pointer; text-align: left; transition: all .15s; border-radius: 2px;
@@ -289,7 +289,7 @@ export default function FontPage({ font }) {
             display: flex; border: 1px solid ${C.border}; margin-bottom: 10px;
           }
           .gp-gtab {
-            flex: 1; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+            flex: 1; font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600;
             letter-spacing: .06em; text-transform: uppercase;
             padding: 6px 4px; background: transparent;
             color: ${C.text4}; border: none; cursor: pointer; transition: all .15s;
@@ -344,7 +344,7 @@ export default function FontPage({ font }) {
             border-bottom: 1px solid ${C.border};
           }
           .section-title {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
             letter-spacing: .18em; text-transform: uppercase;
             color: ${C.blueLight}; margin-bottom: 1.4rem;
           }
@@ -385,7 +385,7 @@ export default function FontPage({ font }) {
           .weight-row.on { background: ${C.surface2}; }
           .weight-row:last-child { border-bottom: none; }
           .weight-name {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500;
             letter-spacing: .08em; text-transform: uppercase; color: ${C.text3};
           }
           .weight-sample {
@@ -395,7 +395,7 @@ export default function FontPage({ font }) {
           }
           .weight-row:hover .weight-sample { color: ${C.white}; }
           .weight-num {
-            font-family: 'DigitalDisco', monospace; font-size: 10px;
+            font-family: 'Space Mono', monospace; font-size: 10px;
             color: ${C.text4}; letter-spacing: .1em;
           }
 
@@ -411,7 +411,7 @@ export default function FontPage({ font }) {
           .buy-right { padding: clamp(2rem,4vw,3rem); }
           .license-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2rem; }
           .lic-tab {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600;
             letter-spacing: .08em; text-transform: uppercase;
             padding: 7px 14px; border: 1px solid ${C.border};
             background: transparent; color: ${C.text3}; cursor: pointer; transition: all .15s;
@@ -424,7 +424,7 @@ export default function FontPage({ font }) {
             color: ${C.white}; margin-bottom: .4rem;
           }
           .price-desc {
-            font-family: 'Inter', sans-serif; font-size: 12px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px;
             color: ${C.text3}; margin-bottom: 2rem;
           }
           .trust-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2rem; }
@@ -434,11 +434,11 @@ export default function FontPage({ font }) {
             flex-shrink: 0; margin-top: 5px; box-shadow: 0 0 6px rgba(151,71,255,0.6);
           }
           .trust-text {
-            font-family: 'Inter', sans-serif; font-size: 12px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px;
             color: ${C.text3}; line-height: 1.55;
           }
           .trial-btn {
-            width: 100%; font-family: 'Inter', sans-serif;
+            width: 100%; font-family: 'Space Grotesk', sans-serif;
             font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
             padding: 13px; border: 1px solid ${C.border};
             background: transparent; color: ${C.text3}; cursor: pointer; transition: all .15s;
@@ -446,7 +446,7 @@ export default function FontPage({ font }) {
           }
           .trial-btn:hover { border-color: ${C.accent}; color: ${C.blueLight}; }
           .trial-note {
-            font-family: 'Inter', sans-serif; font-size: 11px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px;
             color: ${C.text4}; text-align: center;
           }
 
@@ -457,12 +457,12 @@ export default function FontPage({ font }) {
             background: ${C.surface}; border-top: 1px solid ${C.border};
           }
           .fp-footer span {
-            font-family: 'Inter', sans-serif; font-size: 11px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px;
             color: ${C.text4}; letter-spacing: .06em; text-transform: uppercase;
           }
           .fp-footer-links { display: flex; gap: 1.5rem; }
           .fp-footer a {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500;
             letter-spacing: .08em; text-transform: uppercase;
             color: ${C.text4}; text-decoration: none; transition: color .15s;
           }
@@ -528,7 +528,7 @@ export default function FontPage({ font }) {
               <span style={{ fontFamily:"'Determination',monospace", fontSize:'1.5rem', color:C.text1, lineHeight:1 }}>
                 {font.pro ? 'Pro' : font.hot ? 'New' : 'Retail'}
               </span>
-              <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>Status</span>
+              <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>Status</span>
             </div>
           </div>
         </div>
@@ -618,12 +618,12 @@ export default function FontPage({ font }) {
           ['Family', font.isFamily ? 'Yes' : 'Single'],
         ].map(([k,v]) => (
           <div key={k} style={{ borderRight:`1px solid ${C.border}`, padding:'1rem 1.6rem', display:'flex', flexDirection:'column', gap:4 }}>
-            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:12, fontWeight:600, color:C.text2 }}>{v}</span>
-            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>{k}</span>
+            <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:12, fontWeight:600, color:C.text2 }}>{v}</span>
+            <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>{k}</span>
           </div>
         ))}
         <div style={{ flex:1, padding:'1rem 1.6rem', display:'flex', alignItems:'center' }}>
-          <p style={{ fontFamily:"'Inter',sans-serif", fontSize:12, color:C.text3, lineHeight:1.6, maxWidth:'60ch' }}>{font.description}</p>
+          <p style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:12, color:C.text3, lineHeight:1.6, maxWidth:'60ch' }}>{font.description}</p>
         </div>
       </div>
 
@@ -683,7 +683,7 @@ export default function FontPage({ font }) {
           <div className="price-display">£{tiers[selectedLicense].price}</div>
           <div className="price-desc">{tiers[selectedLicense].desc}</div>
           <div ref={paypalRef} style={{ minHeight:44 }}>
-            {purchasing && <span style={{ fontFamily:"'Inter',sans-serif", fontSize:13, color:C.text3 }}>Processing...</span>}
+            {purchasing && <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:13, color:C.text3 }}>Processing...</span>}
           </div>
         </div>
 
