@@ -1,37 +1,68 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import { fonts, pricing } from '../../lib/fonts';
 import { useState, useRef, useEffect } from 'react';
 import Script from 'next/script';
 
-const dd = "'DigitalDisco', monospace";
-const det = "'Determination', monospace";
-const border = '1px solid var(--border)';
-
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
+// Kanji sets per font category for decorative use
+const KANJI = {
+  Japanese:    ['字','体','形','美','力','光','影','道','心','空','時','夢'],
+  'Japanese Pro': ['字','体','形','美','力','光','影','道','心','空','時','夢'],
+  'Rounded Pro': ['丸','柔','美','和','円','温','優','軽','雅','清'],
+  Display:     ['力','威','大','烈','猛','剛','強','爆','激','迫'],
+  Handmade:    ['手','書','心','情','感','想','詩','文','筆','艺'],
+  Pro:         ['業','技','匠','精','達','完','熟','巧','工','術'],
+  default:     ['美','形','字','体','光','道','心','夢','力','空'],
+};
+
+function getKanji(tags) {
+  for (const tag of tags) {
+    if (KANJI[tag]) return KANJI[tag];
+  }
+  return KANJI.default;
+}
+
+// Specimen images — only for nanami-rounded-pro right now
+const SPECIMENS = {
+  'nanami-rounded-pro': [
+    '/specimens/nanami-rounded-pro-1.jpg',
+    '/specimens/nanami-rounded-pro-2.jpg',
+    '/specimens/nanami-rounded-pro-3.jpg',
+    '/specimens/nanami-rounded-pro-4.jpg',
+    '/specimens/nanami-rounded-pro-5.jpg',
+    '/specimens/nanami-rounded-pro-6.jpg',
+  ],
+};
+
 const glyphSets = {
-  uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-  lowercase: 'abcdefghijklmnopqrstuvwxyz'.split(''),
-  numerals:  '0123456789'.split(''),
-  punctuation: '.,;:!?\'"-—…()[]{}«»/\\@#$%&*'.split(''),
-  accents: 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
+  uppercase:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  lowercase:   'abcdefghijklmnopqrstuvwxyz'.split(''),
+  numerals:    '0123456789'.split(''),
+  punctuation: '.,;:!?\'"-—…()[]{}@#$%&*'.split(''),
+  accents:     'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
 };
 
 export default function FontPage({ font }) {
-  const [activeStyle, setActiveStyle] = useState(0);
-  const [previewText, setPreviewText] = useState('');
-  const [heroSize, setHeroSize] = useState(9);
-  const [selectedLicense, setSelectedLicense] = useState('desktop');
-  const [glyphSet, setGlyphSet] = useState('uppercase');
-  const [paypalReady, setPaypalReady] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState('');
+  const [activeStyle,      setActiveStyle]      = useState(0);
+  const [previewText,      setPreviewText]       = useState('');
+  const [fontSize,         setFontSize]          = useState(72);
+  const [letterSpacing,    setLetterSpacing]     = useState(0);
+  const [selectedLicense,  setSelectedLicense]   = useState('desktop');
+  const [glyphSet,         setGlyphSet]          = useState('uppercase');
+  const [activeSpecimen,   setActiveSpecimen]    = useState(0);
+  const [paypalReady,      setPaypalReady]       = useState(false);
+  const [purchasing,       setPurchasing]        = useState(false);
   const paypalRef = useRef(null);
-  const tiers = pricing[font.isFamily ? 'family' : 'single'];
 
-  const displayText = previewText.trim() || font.name;
+  const tiers      = pricing[font.isFamily ? 'family' : 'single'];
+  const style      = font.styles[activeStyle];
   const fontFamily = `'${font.name}', monospace`;
+  const displayText = previewText.trim() || font.name;
+  const kanji      = getKanji(font.tags);
+  const specimens  = SPECIMENS[font.slug] || [];
 
   useEffect(() => {
     if (!paypalReady || !paypalRef.current) return;
@@ -55,13 +86,10 @@ export default function FontPage({ font }) {
           body: JSON.stringify({ orderId: data.orderID, fontSlug: font.slug, licenseTier: selectedLicense }),
         });
         const result = await res.json();
-        if (result.success) {
-          setDownloadUrl(result.downloadUrl);
-          window.location.href = `/download?token=${result.token}`;
-        }
+        if (result.success) window.location.href = `/download?token=${result.token}`;
         setPurchasing(false);
       },
-      style: { layout:'horizontal', color:'black', shape:'rect', label:'buynow', height:40, tagline:false },
+      style: { layout: 'horizontal', color: 'black', shape: 'rect', label: 'buynow', height: 40, tagline: false },
     }).render(paypalRef.current);
   }, [paypalReady, selectedLicense, font]);
 
@@ -71,217 +99,711 @@ export default function FontPage({ font }) {
         <title>{font.name} — HypeForType</title>
         <meta name="description" content={font.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Embed actual font files from /public/fonts/ */}
         {font.styles.map(s => (
-          <style key={s.file}>{`@font-face{font-family:'${font.name}';src:url('/fonts/${font.slug}/${s.file}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
+          <style key={s.file}>{`@font-face{font-family:'${font.name}';src:url('/fonts/${font.slug}/${encodeURIComponent(s.file)}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
         ))}
+        <style>{`
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { background: #fafaf8; color: #0a0a0a; font-family: 'Inter', sans-serif; }
+
+          /* ── Nav ── */
+          .fp-nav {
+            position: sticky; top: 0; z-index: 100;
+            display: grid; grid-template-columns: auto 1fr auto auto;
+            align-items: stretch; height: 52px;
+            border-bottom: 1px solid #e8e7e2;
+            background: rgba(250,250,248,0.9);
+            backdrop-filter: blur(10px);
+          }
+          .fp-nav-logo {
+            font-family: 'Determination', monospace;
+            font-size: .9rem; letter-spacing: .06em; text-transform: uppercase;
+            color: #0a0a0a; padding: 0 1.4rem;
+            border-right: 1px solid #e8e7e2;
+            display: flex; align-items: center; text-decoration: none;
+          }
+          .fp-nav-back {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            letter-spacing: .08em; text-transform: uppercase;
+            color: #aaa; padding: 0 1.2rem;
+            display: flex; align-items: center; gap: .5rem;
+            text-decoration: none; transition: color .15s;
+            border-right: 1px solid #e8e7e2;
+          }
+          .fp-nav-back:hover { color: #0a0a0a; }
+          .fp-nav-title {
+            font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+            color: #0a0a0a; padding: 0 1.4rem;
+            display: flex; align-items: center; flex: 1;
+          }
+          .fp-nav-trial {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            letter-spacing: .08em; text-transform: uppercase;
+            color: #0a0a0a; padding: 0 1.4rem;
+            display: flex; align-items: center;
+            border-left: 1px solid #e8e7e2;
+            text-decoration: none; transition: color .15s; cursor: pointer;
+            background: none; border-top: none; border-bottom: none; border-right: none;
+          }
+          .fp-nav-trial:hover { color: #1A1AFF; }
+          .fp-nav-buy {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase;
+            color: #fff; background: #1A1AFF;
+            padding: 0 1.6rem; display: flex; align-items: center;
+            text-decoration: none; transition: opacity .15s;
+          }
+          .fp-nav-buy:hover { opacity: .85; }
+
+          /* ── Hero ── */
+          .fp-hero {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            border-bottom: 1px solid #e8e7e2;
+            min-height: 520px;
+          }
+          .fp-hero-left {
+            padding: clamp(2.5rem,5vw,4rem);
+            border-right: 1px solid #e8e7e2;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            position: relative; overflow: hidden;
+          }
+          .fp-hero-kanji {
+            position: absolute; top: -0.1em; right: -0.05em;
+            font-size: clamp(12rem,22vw,20rem);
+            line-height: 1; color: rgba(26,26,255,0.04);
+            pointer-events: none; user-select: none;
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+          }
+          .fp-eyebrow {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .18em; text-transform: uppercase; color: #1A1AFF;
+            margin-bottom: 1rem;
+          }
+          .fp-hero-name {
+            font-size: clamp(3.5rem, 9vw, 8rem);
+            line-height: .92; letter-spacing: -.02em;
+            color: #0a0a0a; margin-bottom: 1.2rem;
+          }
+          .fp-hero-desc {
+            font-family: 'Inter', sans-serif; font-size: 13px;
+            color: #666; line-height: 1.7; max-width: 48ch;
+            margin-bottom: 2rem;
+          }
+          .fp-meta-row {
+            display: flex; gap: 2rem; flex-wrap: wrap;
+          }
+          .fp-meta-item { }
+          .fp-meta-val {
+            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+            color: #0a0a0a;
+          }
+          .fp-meta-key {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500;
+            letter-spacing: .1em; text-transform: uppercase; color: #aaa;
+            margin-top: 2px;
+          }
+
+          /* ── Glyph Panel ── */
+          .glyph-panel {
+            background: #0a0a0a; color: #f2f1eb;
+            display: flex; flex-direction: column;
+          }
+          .gp-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-between; align-items: center;
+          }
+          .gp-title {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .18em; text-transform: uppercase; color: #fff;
+          }
+          .gp-version {
+            font-family: 'DigitalDisco', monospace; font-size: 10px;
+            color: rgba(255,255,255,0.25); letter-spacing: .1em;
+          }
+          .gp-body { padding: 0 20px; flex: 1; overflow-y: auto; }
+          .gp-row {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+          }
+          .gp-row-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+          }
+          .gp-label {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            color: rgba(255,255,255,0.5);
+          }
+          .gp-value {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            color: #fff;
+          }
+          .gp-slider {
+            width: 100%; height: 2px;
+            -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.1);
+            outline: none; border-radius: 1px;
+          }
+          .gp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #1A1AFF; cursor: pointer;
+          }
+          .gp-slider-labels {
+            display: flex; justify-content: space-between; margin-top: 5px;
+          }
+          .gp-slider-labels span {
+            font-family: 'Inter', sans-serif; font-size: 10px;
+            color: rgba(255,255,255,0.2);
+          }
+          .gp-weights {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+            margin-top: 2px;
+          }
+          .gp-weight-btn {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            padding: 7px 10px; border: 1px solid rgba(255,255,255,0.08);
+            background: transparent; color: rgba(255,255,255,0.4);
+            cursor: pointer; text-align: left; transition: all .15s;
+          }
+          .gp-weight-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
+          .gp-weight-btn.active { background: #1A1AFF; border-color: #1A1AFF; color: #fff; }
+          .gp-glyphs {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+            margin-top: 8px;
+          }
+          .gp-glyph {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            font-size: 1.4rem; color: #fff; cursor: default;
+            transition: background .15s;
+          }
+          .gp-glyph:hover { background: rgba(26,26,255,0.2); }
+          .gp-glyph-tabs {
+            display: flex; gap: 0; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);
+          }
+          .gp-glyph-tab {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: 6px 10px; background: transparent;
+            color: rgba(255,255,255,0.3); border: none; cursor: pointer;
+            transition: all .15s; flex: 1;
+          }
+          .gp-glyph-tab.active { background: rgba(26,26,255,0.3); color: #fff; }
+          .gp-kanji-row {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;
+          }
+          .gp-kanji {
+            font-size: 1.6rem; color: rgba(255,255,255,0.15);
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            transition: color .2s; cursor: default;
+          }
+          .gp-kanji:hover { color: rgba(26,26,255,0.8); }
+
+          /* ── Interactive specimen ── */
+          .fp-specimen {
+            border-bottom: 1px solid #e8e7e2;
+            background: #fff;
+          }
+          .fp-specimen-toolbar {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 10px 1.4rem;
+            border-bottom: 1px solid #e8e7e2;
+            flex-wrap: wrap;
+          }
+          .fp-specimen-input {
+            flex: 1; min-width: 200px;
+            font-family: 'Inter', sans-serif; font-size: 13px;
+            border: none; outline: none; background: transparent;
+            color: #0a0a0a;
+          }
+          .fp-specimen-input::placeholder { color: #ccc; }
+          .fp-size-control {
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+          }
+          .fp-size-label {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            letter-spacing: .08em; text-transform: uppercase; color: #aaa;
+          }
+          .fp-size-slider {
+            width: 120px; height: 2px; -webkit-appearance: none; appearance: none;
+            background: #e0e0e0; outline: none; border-radius: 1px;
+          }
+          .fp-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 12px; height: 12px;
+            border-radius: 50%; background: #1A1AFF; cursor: pointer;
+          }
+          .fp-size-val {
+            font-family: 'DigitalDisco', monospace; font-size: 10px; color: #aaa;
+            width: 30px;
+          }
+          .fp-specimen-stage {
+            padding: clamp(2rem,5vw,4rem) clamp(1.4rem,4vw,3rem);
+            min-height: 200px;
+            display: flex; align-items: center;
+            overflow: hidden;
+          }
+          .fp-specimen-text {
+            line-height: .95; letter-spacing: -.01em;
+            color: #0a0a0a; word-break: break-word;
+            width: 100%;
+          }
+
+          /* ── Specimens grid ── */
+          .fp-specimens-section {
+            padding: clamp(2.5rem,5vw,4rem) clamp(1.4rem,4vw,3rem);
+            border-bottom: 1px solid #e8e7e2;
+          }
+          .fp-section-title {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .18em; text-transform: uppercase; color: #aaa;
+            margin-bottom: 1.6rem;
+          }
+          .fp-specimens-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+          }
+          .fp-specimen-card {
+            cursor: pointer; overflow: hidden;
+            border: 2px solid transparent; transition: border-color .15s;
+          }
+          .fp-specimen-card.active { border-color: #1A1AFF; }
+          .fp-specimen-card img {
+            width: 100%; display: block;
+            aspect-ratio: 4/3; object-fit: cover;
+            transition: transform .3s ease;
+          }
+          .fp-specimen-card:hover img { transform: scale(1.02); }
+          .fp-specimen-main {
+            margin-bottom: 1.2rem;
+            border: 1px solid #e8e7e2; overflow: hidden;
+          }
+          .fp-specimen-main img {
+            width: 100%; display: block;
+          }
+
+          /* ── Weights showcase ── */
+          .fp-weights {
+            border-bottom: 1px solid #e8e7e2;
+          }
+          .fp-weight-row {
+            display: grid; grid-template-columns: 120px 1fr auto;
+            align-items: center; gap: 1.5rem;
+            padding: 1rem clamp(1.4rem,4vw,3rem);
+            border-bottom: 1px solid #f0efe9;
+            cursor: pointer; transition: background .12s;
+          }
+          .fp-weight-row:hover { background: #f5f4f0; }
+          .fp-weight-row.active { background: #f5f4f0; }
+          .fp-weight-row:last-child { border-bottom: none; }
+          .fp-weight-name {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            letter-spacing: .08em; text-transform: uppercase; color: #aaa;
+          }
+          .fp-weight-sample {
+            font-size: clamp(1.4rem, 3vw, 2.8rem); line-height: 1;
+            color: #0a0a0a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+          }
+          .fp-weight-num {
+            font-family: 'DigitalDisco', monospace; font-size: 10px;
+            color: #ccc; letter-spacing: .1em; white-space: nowrap;
+          }
+
+          /* ── Buy section ── */
+          .fp-buy {
+            display: grid; grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid #e8e7e2;
+          }
+          .fp-buy-left {
+            padding: clamp(2rem,4vw,3.5rem);
+            border-right: 1px solid #e8e7e2;
+          }
+          .fp-license-tabs {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2rem;
+          }
+          .fp-license-tab {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: 8px 16px; border: 1px solid #e0dfd8;
+            background: transparent; color: #aaa; cursor: pointer; transition: all .15s;
+          }
+          .fp-license-tab:hover { border-color: #0a0a0a; color: #0a0a0a; }
+          .fp-license-tab.active { background: #0a0a0a; border-color: #0a0a0a; color: #fff; }
+          .fp-price-big {
+            font-family: 'Determination', monospace;
+            font-size: clamp(3rem,7vw,5.5rem); line-height: 1;
+            color: #0a0a0a; margin-bottom: .5rem;
+          }
+          .fp-license-desc {
+            font-family: 'Inter', sans-serif; font-size: 12px; color: #888;
+            margin-bottom: 2rem;
+          }
+          .fp-buy-right {
+            padding: clamp(2rem,4vw,3.5rem);
+            display: flex; flex-direction: column; justify-content: space-between;
+          }
+          .fp-trust-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2rem; }
+          .fp-trust-item {
+            display: flex; align-items: flex-start; gap: 10px;
+          }
+          .fp-trust-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #1A1AFF;
+            flex-shrink: 0; margin-top: 5px;
+          }
+          .fp-trust-text {
+            font-family: 'Inter', sans-serif; font-size: 12px; color: #666; line-height: 1.5;
+          }
+
+          /* ── Kanji strip ── */
+          .fp-kanji-strip {
+            overflow: hidden; padding: 1.2rem 0;
+            border-bottom: 1px solid #e8e7e2;
+            display: flex; gap: 0;
+          }
+          .fp-kanji-scroll {
+            display: flex; gap: 2.5rem;
+            animation: tickerScroll 20s linear infinite;
+            white-space: nowrap;
+          }
+          .fp-kanji-char {
+            font-size: 1.8rem; color: rgba(26,26,255,0.12);
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+          }
+
+          @keyframes tickerScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
+
+          /* ── Footer ── */
+          .fp-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.2rem clamp(1.4rem,4vw,3rem);
+            background: #fafaf8; border-top: 1px solid #e8e7e2;
+          }
+          .fp-footer-left {
+            font-family: 'Inter', sans-serif; font-size: 11px; color: #bbb;
+            letter-spacing: .06em; text-transform: uppercase;
+          }
+          .fp-footer-links { display: flex; gap: 1.5rem; }
+          .fp-footer-link {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            color: #bbb; letter-spacing: .08em; text-transform: uppercase;
+            text-decoration: none; transition: color .15s;
+          }
+          .fp-footer-link:hover { color: #0a0a0a; }
+        `}</style>
       </Head>
 
-      <Script src={`https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=GBP`} onReady={() => setPaypalReady(true)} />
+      <Script
+        src={`https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=GBP`}
+        onReady={() => setPaypalReady(true)}
+      />
 
-      {/* TOP NAV */}
-      <nav style={{ display:'grid', gridTemplateColumns:'auto 1fr auto', alignItems:'stretch', borderBottom:border, background:'var(--bg)', position:'sticky', top:0, zIndex:200 }}>
-        <Link href="/" style={{ fontFamily:det, fontSize:'clamp(.65rem,2vw,.9rem)', letterSpacing:'.08em', textTransform:'uppercase', color:'var(--white)', padding:'.7rem 1.2rem', borderRight:border, display:'flex', alignItems:'center' }}>HypeForType</Link>
-        <div style={{ fontFamily:dd, fontSize:'.44rem', letterSpacing:'.16em', textTransform:'uppercase', color:'var(--dim)', padding:'0 1.2rem', display:'flex', alignItems:'center', gap:'.5rem' }}>
-          <Link href="/" style={{ color:'#333' }}>← All Typefaces</Link>
-          <span style={{ color:'#1e1e1e' }}>/</span>
-          <span style={{ color:'#555' }}>{font.name}</span>
-        </div>
-        <div style={{ display:'flex', alignItems:'stretch', borderLeft:border }}>
-          <button onClick={() => window.location.href=`/api/trial?slug=${font.slug}`} style={{ fontFamily:dd, fontSize:'.44rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--dim)', padding:'0 1rem', border:'none', background:'transparent', borderRight:border, transition:'color .12s' }}
-            onMouseEnter={e=>e.target.style.color='var(--white)'} onMouseLeave={e=>e.target.style.color='var(--dim)'}>
-            Trial font
-          </button>
-          <button onClick={()=>document.getElementById('buy').scrollIntoView({behavior:'smooth'})} style={{ fontFamily:det, fontSize:'clamp(.44rem,1.2vw,.58rem)', letterSpacing:'.08em', textTransform:'uppercase', color:'var(--white)', background:'var(--blue)', border:'none', padding:'0 1.4rem', transition:'opacity .15s' }}
-            onMouseEnter={e=>e.target.style.opacity='.85'} onMouseLeave={e=>e.target.style.opacity='1'}>
-            Buy {font.name}
-          </button>
-        </div>
+      {/* ── NAV ─────────────────────────────────── */}
+      <nav className="fp-nav">
+        <Link href="/" className="fp-nav-logo">HypeForType</Link>
+        <Link href="/" className="fp-nav-back">← All Typefaces</Link>
+        <span className="fp-nav-title">{font.name}</span>
+        <button className="fp-nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
+          Free Trial
+        </button>
+        <a href="#buy" className="fp-nav-buy">Buy {font.name} →</a>
       </nav>
 
-      {/* STICKY SECTION NAV */}
-      <div style={{ borderBottom:border, display:'flex', alignItems:'stretch', position:'sticky', top:'37px', zIndex:190, background:'var(--bg)' }}>
-        {[['#styles','Styles'],['#try','Try'],['#info','Info'],['#buy','Buy'],['#glyphs','Glyphs']].map(([href,label])=>(
-          <a key={href} href={href} style={{ fontFamily:dd, fontSize:'.42rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)', padding:'.5rem 1.2rem', borderRight:border, textDecoration:'none', display:'flex', alignItems:'center', transition:'color .12s' }}
-            onMouseEnter={e=>e.target.style.color='var(--white)'} onMouseLeave={e=>e.target.style.color='var(--dim)'}>{label}</a>
-        ))}
-        <div style={{ marginLeft:'auto', fontFamily:dd, fontSize:'.42rem', letterSpacing:'.12em', textTransform:'uppercase', color:'var(--dim)', padding:'0 1.2rem', display:'flex', alignItems:'center', borderLeft:border }}>
-          {font.styles.length} {font.styles.length===1?'style':'styles'}
+      {/* ── HERO ────────────────────────────────── */}
+      <section className="fp-hero">
+
+        {/* Left — name + meta */}
+        <div className="fp-hero-left">
+          {/* Background kanji watermark */}
+          <div className="fp-hero-kanji">{kanji[0]}</div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div className="fp-eyebrow">{font.idx} — {font.tags.join(' · ')}</div>
+            <h1 className="fp-hero-name" style={{ fontFamily }}>{font.name}</h1>
+            <p className="fp-hero-desc">{font.description}</p>
+
+            <div className="fp-meta-row">
+              {[
+                [font.styles.length + (font.styles.length === 1 ? ' style' : ' styles'), 'Weights'],
+                [font.glyphCount + '+', 'Glyphs'],
+                [font.languages, 'Languages'],
+                [font.released, 'Released'],
+              ].map(([v, k]) => (
+                <div key={k} className="fp-meta-item">
+                  <div className="fp-meta-val">{v}</div>
+                  <div className="fp-meta-key">{k}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Kanji decoration row */}
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', position: 'relative', zIndex: 1 }}>
+            {kanji.slice(0, 6).map((k, i) => (
+              <span key={i} style={{
+                fontFamily: "'Hiragino Sans', 'Yu Gothic', sans-serif",
+                fontSize: '1.4rem',
+                color: i === 0 ? 'rgba(26,26,255,0.5)' : `rgba(26,26,255,${0.12 - i * 0.015})`,
+                transition: 'color .2s',
+              }}>{k}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — Glyph Panel */}
+        <div className="glyph-panel">
+          <div className="gp-header">
+            <span className="gp-title">Glyph Panel</span>
+            <span className="gp-version">V1.0</span>
+          </div>
+
+          <div className="gp-body">
+
+            {/* Weight selector */}
+            <div className="gp-row">
+              <div className="gp-row-head">
+                <span className="gp-label">Weight</span>
+                <span className="gp-value">{style.name} {style.weight}</span>
+              </div>
+              <div className="gp-weights">
+                {font.styles.map((s, i) => (
+                  <button key={i} className={`gp-weight-btn${activeStyle === i ? ' active' : ''}`}
+                    onClick={() => setActiveStyle(i)}
+                    style={{ fontFamily: `'${font.name}', monospace`, fontWeight: s.weight }}>
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Font size */}
+            <div className="gp-row">
+              <div className="gp-row-head">
+                <span className="gp-label">Size</span>
+                <span className="gp-value">{fontSize}px</span>
+              </div>
+              <input type="range" className="gp-slider"
+                min="24" max="180" value={fontSize}
+                onChange={e => setFontSize(+e.target.value)} />
+              <div className="gp-slider-labels"><span>24</span><span>180</span></div>
+            </div>
+
+            {/* Letter spacing */}
+            <div className="gp-row">
+              <div className="gp-row-head">
+                <span className="gp-label">Letter Spacing</span>
+                <span className="gp-value">{letterSpacing > 0 ? '+' : ''}{letterSpacing}%</span>
+              </div>
+              <input type="range" className="gp-slider"
+                min="-10" max="30" value={letterSpacing}
+                onChange={e => setLetterSpacing(+e.target.value)} />
+              <div className="gp-slider-labels"><span>−10</span><span>+30</span></div>
+            </div>
+
+            {/* Glyph inspector */}
+            <div className="gp-row">
+              <div className="gp-row-head" style={{ marginBottom: '8px' }}>
+                <span className="gp-label">Glyphs</span>
+              </div>
+              <div className="gp-glyph-tabs">
+                {Object.keys(glyphSets).map(k => (
+                  <button key={k} className={`gp-glyph-tab${glyphSet === k ? ' active' : ''}`}
+                    onClick={() => setGlyphSet(k)}>
+                    {k.slice(0, 3).toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              <div className="gp-glyphs">
+                {glyphSets[glyphSet].slice(0, 16).map((g, i) => (
+                  <div key={i} className="gp-glyph"
+                    style={{ fontFamily: `'${font.name}', monospace`, fontWeight: style.weight }}>
+                    {g}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Kanji decoration */}
+            <div className="gp-row">
+              <div className="gp-row-head">
+                <span className="gp-label">Kanji Mix</span>
+              </div>
+              <div className="gp-kanji-row">
+                {kanji.map((k, i) => (
+                  <span key={i} className="gp-kanji">{k}</span>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── INTERACTIVE SPECIMEN ─────────────────── */}
+      <section className="fp-specimen">
+        <div className="fp-specimen-toolbar">
+          <input className="fp-specimen-input"
+            value={previewText}
+            onChange={e => setPreviewText(e.target.value)}
+            placeholder={`Type to preview ${font.name}...`}
+          />
+          <div className="fp-size-control">
+            <span className="fp-size-label">Size</span>
+            <input type="range" className="fp-size-slider"
+              min="24" max="200" value={fontSize}
+              onChange={e => setFontSize(+e.target.value)} />
+            <span className="fp-size-val">{fontSize}</span>
+          </div>
+        </div>
+        <div className="fp-specimen-stage">
+          <div className="fp-specimen-text"
+            style={{
+              fontFamily,
+              fontWeight: style.weight,
+              fontSize: fontSize + 'px',
+              letterSpacing: letterSpacing + '%',
+            }}>
+            {displayText}
+          </div>
+        </div>
+      </section>
+
+      {/* ── KANJI STRIP ──────────────────────────── */}
+      <div className="fp-kanji-strip">
+        <div className="fp-kanji-scroll">
+          {[...kanji, ...kanji, ...kanji, ...kanji].map((k, i) => (
+            <span key={i} className="fp-kanji-char">{k}</span>
+          ))}
         </div>
       </div>
 
-      {/* HERO — giant editable type */}
-      <div style={{ borderBottom:border }}>
-        <div
-          contentEditable suppressContentEditableWarning
-          onInput={e => setPreviewText(e.currentTarget.textContent)}
-          style={{ fontFamily, fontSize:heroSize+'rem', fontWeight:font.styles[activeStyle]?.weight||'400', lineHeight:.88, color:'var(--white)', padding:'1.5rem 1.2rem .8rem', background:'transparent', outline:'none', width:'100%', caretColor:'var(--blue)', letterSpacing:'-.02em', display:'block', minHeight:'6rem', wordBreak:'break-word' }}>
-          {font.name}
+      {/* ── SPECIMEN IMAGES (if available) ───────── */}
+      {specimens.length > 0 && (
+        <section className="fp-specimens-section">
+          <div className="fp-section-title">Type Specimens</div>
+
+          {/* Main large specimen */}
+          <div className="fp-specimen-main">
+            <img
+              src={specimens[activeSpecimen]}
+              alt={`${font.name} specimen ${activeSpecimen + 1}`}
+            />
+          </div>
+
+          {/* Thumbnail grid */}
+          <div className="fp-specimens-grid">
+            {specimens.map((src, i) => (
+              <div key={i}
+                className={`fp-specimen-card${activeSpecimen === i ? ' active' : ''}`}
+                onClick={() => setActiveSpecimen(i)}>
+                <img src={src} alt={`${font.name} specimen ${i + 1}`} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── WEIGHTS SHOWCASE ─────────────────────── */}
+      <section className="fp-weights">
+        <div style={{ padding: '1rem clamp(1.4rem,4vw,3rem)', borderBottom: '1px solid #e8e7e2' }}>
+          <div className="fp-section-title" style={{ margin: 0 }}>All Weights</div>
         </div>
-        <div style={{ borderTop:border, padding:'.5rem 1.2rem', display:'flex', alignItems:'center', gap:'1.5rem', flexWrap:'wrap' }}>
-          {font.tags.map(t=><span key={t} style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--dim)' }}>{t}</span>)}
-          <div style={{ width:1, height:12, background:'var(--border)' }}/>
-          <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--blue)', opacity:.7 }}>{font.styles.length} {font.styles.length===1?'style':'styles'}</span>
-          <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:'.5rem' }}>
-            <span style={{ fontFamily:dd, fontSize:'.36rem', letterSpacing:'.1em', color:'#2a2a2a' }}>{Math.round(heroSize*8.5)}pt</span>
-            {['A−','A+'].map((l,i)=>(
-              <button key={l} onClick={()=>setHeroSize(s=>Math.max(2,Math.min(18,s+(i?1.5:-1.5))))} style={{ fontFamily:dd, fontSize:'.38rem', color:'var(--dim)', border:border, padding:'2px 6px', background:'transparent', transition:'all .12s' }}
-                onMouseEnter={e=>{e.target.style.color='var(--white)';e.target.style.borderColor='var(--blue)'}} onMouseLeave={e=>{e.target.style.color='var(--dim)';e.target.style.borderColor='var(--border)'}}>
-                {l}
+        {font.styles.map((s, i) => (
+          <div key={i}
+            className={`fp-weight-row${activeStyle === i ? ' active' : ''}`}
+            onClick={() => setActiveStyle(i)}>
+            <span className="fp-weight-name">{s.name}</span>
+            <span className="fp-weight-sample"
+              style={{ fontFamily, fontWeight: s.weight, fontStyle: s.oblique ? 'italic' : 'normal' }}>
+              {previewText.trim() || 'The quick brown fox'}
+            </span>
+            <span className="fp-weight-num">{s.weight}</span>
+          </div>
+        ))}
+      </section>
+
+      {/* ── BUY ──────────────────────────────────── */}
+      <section className="fp-buy" id="buy">
+        <div className="fp-buy-left">
+          <div className="fp-section-title" style={{ marginBottom: '1.5rem' }}>License & Purchase</div>
+
+          <div className="fp-license-tabs">
+            {Object.entries(tiers).map(([key, tier]) => (
+              <button key={key}
+                className={`fp-license-tab${selectedLicense === key ? ' active' : ''}`}
+                onClick={() => setSelectedLicense(key)}>
+                {tier.label}
               </button>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* STYLES / WEIGHTS */}
-      <div id="styles">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:border, padding:'.45rem 1.2rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.4rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)' }}>Weights &amp; Styles</span>
-          <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.12em', textTransform:'uppercase', color:'#2a2a2a' }}>Click to activate</span>
-        </div>
-        {font.styles.map((s, i) => (
-          <div key={i} onClick={()=>setActiveStyle(i)}
-            style={{ borderBottom:border, display:'grid', gridTemplateColumns:'130px 1fr auto', alignItems:'center', cursor:'pointer', background:activeStyle===i?'#0f0f14':'var(--bg)', transition:'background .1s' }}
-            onMouseEnter={e=>{ if(activeStyle!==i) e.currentTarget.style.background='#111'; }} onMouseLeave={e=>{ e.currentTarget.style.background=activeStyle===i?'#0f0f14':'var(--bg)'; }}>
-            <div style={{ padding:'.8rem 1.2rem', borderRight:border, display:'flex', flexDirection:'column', gap:4 }}>
-              <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.14em', textTransform:'uppercase', color:activeStyle===i?'var(--white)':'var(--dim)' }}>{s.name}</span>
-              <span style={{ fontFamily:dd, fontSize:'.32rem', letterSpacing:'.1em', color:'#2a2a2a' }}>{s.weight}</span>
-            </div>
-            <div style={{ padding:'.8rem 1.4rem', fontFamily, fontSize:'clamp(1.2rem,2.5vw,2rem)', fontWeight:s.weight, fontStyle:s.oblique?'italic':'normal', lineHeight:1, color:activeStyle===i?'var(--white)':'#666', overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', transition:'color .1s' }}>
-              {displayText}
-            </div>
-            <div style={{ padding:'.8rem 1.2rem', borderLeft:border, display:'flex', alignItems:'center' }}>
-              <div style={{ width:7, height:7, borderRadius:'50%', background:activeStyle===i?'var(--blue)':'var(--border)' }}/>
-            </div>
-          </div>
-        ))}
-      </div>
+          <div className="fp-price-big">£{tiers[selectedLicense].price}</div>
+          <div className="fp-license-desc">{tiers[selectedLicense].desc}</div>
 
-      {/* TRY — multi-size tester */}
-      <div id="try">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:border, borderTop:border, padding:'.45rem 1.2rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.4rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)' }}>Type Tester</span>
-          <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.12em', textTransform:'uppercase', color:'#2a2a2a' }}>Click any field and type</span>
-        </div>
-        {[{name:'Display',size:'3rem',pt:'72pt'},{name:'Headline',size:'1.8rem',pt:'36pt'},{name:'Body',size:'1rem',pt:'14pt'}].map(t=>(
-          <div key={t.name} style={{ borderBottom:border, display:'grid', gridTemplateColumns:'130px 1fr' }}>
-            <div style={{ padding:'.7rem 1.2rem', borderRight:border, display:'flex', flexDirection:'column', justifyContent:'center', gap:3 }}>
-              <span style={{ fontFamily:dd, fontSize:'.36rem', letterSpacing:'.12em', textTransform:'uppercase', color:'var(--dim)' }}>{t.name}</span>
-              <span style={{ fontFamily:dd, fontSize:'.32rem', letterSpacing:'.1em', color:'#2a2a2a' }}>{t.pt}</span>
-            </div>
-            <input type="text" placeholder={`Type to test ${font.name} at ${t.pt}...`}
-              style={{ background:'transparent', border:'none', outline:'none', color:'var(--white)', fontFamily, fontSize:t.size, fontWeight:font.styles[activeStyle]?.weight||'400', padding:'.7rem 1.2rem', width:'100%', caretColor:'var(--blue)' }}/>
-          </div>
-        ))}
-      </div>
-
-      {/* INFO */}
-      <div id="info">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:border, borderTop:border, padding:'.45rem 1.2rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.4rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)' }}>About {font.name}</span>
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', borderBottom:border }}>
-          <div style={{ padding:'1.4rem 1.2rem', borderRight:border }}>
-            <p style={{ fontFamily:dd, fontSize:'.52rem', lineHeight:1.9, color:'#555', letterSpacing:'.04em' }}>{font.description}</p>
-          </div>
-          <div style={{ padding:'1.4rem 1.2rem' }}>
-            {[['Designer','HypeForType'],['Styles',`${font.styles.length} ${font.styles.length===1?'style':'styles'}`],['Format','OTF · TTF · WOFF2'],['Glyphs',font.glyphCount.toLocaleString()],['OpenType',font.opentype],['Languages',font.languages],['Released',font.released]].map(([l,v])=>(
-              <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'.35rem 0', borderBottom:'1px solid #111' }}>
-                <span style={{ fontFamily:dd, fontSize:'.36rem', letterSpacing:'.14em', textTransform:'uppercase', color:'#2a2a2a' }}>{l}</span>
-                <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.08em', color:'var(--dim)' }}>{v}</span>
+          <div ref={paypalRef} style={{ minHeight: 44 }}>
+            {purchasing && (
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#666' }}>
+                Processing...
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* BUY */}
-      <div id="buy">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:border, borderTop:border, padding:'.45rem 1.2rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.4rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)' }}>Licensing</span>
-          <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.12em', textTransform:'uppercase', color:'#2a2a2a' }}>Select a license type</span>
-        </div>
-        <div style={{ padding:'1.4rem 1.2rem' }}>
-          {/* License tier selector */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:1, background:'var(--border)', marginBottom:'1.2rem' }}>
-            {Object.entries(tiers).map(([key, tier]) => (
-              <div key={key} onClick={()=>setSelectedLicense(key)} style={{ background:selectedLicense===key?'#0f0f14':'var(--bg)', padding:'1rem .8rem', cursor:'pointer', display:'flex', flexDirection:'column', gap:'.5rem', transition:'background .1s' }}
-                onMouseEnter={e=>{ if(selectedLicense!==key) e.currentTarget.style.background='#111'; }} onMouseLeave={e=>{ e.currentTarget.style.background=selectedLicense===key?'#0f0f14':'var(--bg)'; }}>
-                <span style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--dim)' }}>{tier.label}</span>
-                <span style={{ fontFamily:det, fontSize:'1.1rem', color:selectedLicense===key?'var(--white)':'#555', transition:'color .1s' }}>£{tier.price}</span>
-                <span style={{ fontFamily:dd, fontSize:'.32rem', letterSpacing:'.1em', textTransform:'uppercase', color:'#2a2a2a' }}>{tier.desc}</span>
-                <div style={{ width:7, height:7, borderRadius:'50%', background:selectedLicense===key?'var(--blue)':'var(--border)', marginTop:'auto' }}/>
-              </div>
-            ))}
-          </div>
-
-          {/* PayPal button */}
-          <div style={{ marginBottom:'.8rem' }}>
-            {purchasing ? (
-              <div style={{ fontFamily:dd, fontSize:'.44rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--dim)', padding:'12px 0' }}>Processing payment...</div>
-            ) : (
-              <div ref={paypalRef}/>
             )}
           </div>
+        </div>
 
-          <button onClick={()=>window.location.href=`/api/trial?slug=${font.slug}`} style={{ fontFamily:dd, fontSize:'.42rem', letterSpacing:'.14em', textTransform:'uppercase', color:'var(--dim)', background:'transparent', border:border, padding:'10px 1.4rem', transition:'all .15s', width:'100%', marginBottom:'.6rem' }}
-            onMouseEnter={e=>{e.target.style.color='var(--white)';e.target.style.borderColor='#333'}} onMouseLeave={e=>{e.target.style.color='var(--dim)';e.target.style.borderColor='var(--border)'}}>
-            Download Free Trial Font
-          </button>
-          <div style={{ fontFamily:dd, fontSize:'.34rem', letterSpacing:'.12em', textTransform:'uppercase', color:'#282828', textAlign:'center' }}>
-            Secure payment via PayPal · Instant download after purchase · License PDF included
+        <div className="fp-buy-right">
+          <div>
+            <div className="fp-section-title" style={{ marginBottom: '1.2rem' }}>What's included</div>
+            <div className="fp-trust-items">
+              {[
+                `${font.styles.length} font file${font.styles.length > 1 ? 's' : ''} (.otf / .ttf)`,
+                `${font.glyphCount}+ glyphs including Latin Extended`,
+                font.opentype !== 'Standard' ? `OpenType features: ${font.opentype}` : 'Full OpenType support',
+                'Instant download after purchase',
+                'Commercial use perpetual license',
+                'PayPal Secure checkout',
+              ].map((item, i) => (
+                <div key={i} className="fp-trust-item">
+                  <div className="fp-trust-dot" />
+                  <span className="fp-trust-text">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={() => window.location.href = `/api/trial?slug=${font.slug}`}
+              style={{
+                width: '100%', fontFamily: "'Inter', sans-serif",
+                fontSize: 12, fontWeight: 600, letterSpacing: '.08em',
+                textTransform: 'uppercase', padding: '13px',
+                border: '1px solid #e0dfd8', background: 'transparent',
+                color: '#666', cursor: 'pointer', transition: 'all .15s',
+                marginBottom: 8,
+              }}
+              onMouseEnter={e => { e.target.style.borderColor = '#0a0a0a'; e.target.style.color = '#0a0a0a'; }}
+              onMouseLeave={e => { e.target.style.borderColor = '#e0dfd8'; e.target.style.color = '#666'; }}>
+              Download Free Trial
+            </button>
+            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: '#bbb', textAlign: 'center' }}>
+              Trial fonts for mockups only · Not for commercial use
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* GLYPHS */}
-      <div id="glyphs">
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:border, borderTop:border, padding:'.45rem 1.2rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.4rem', letterSpacing:'.18em', textTransform:'uppercase', color:'var(--dim)' }}>Glyph Map — {font.glyphCount.toLocaleString()} glyphs</span>
-        </div>
-        <div style={{ display:'flex', alignItems:'stretch', borderBottom:border }}>
-          {Object.keys(glyphSets).map(k=>(
-            <button key={k} onClick={()=>setGlyphSet(k)} style={{ fontFamily:dd, fontSize:'.38rem', letterSpacing:'.14em', textTransform:'uppercase', color:glyphSet===k?'var(--white)':'var(--dim)', padding:'.5rem 1rem', border:'none', borderRight:border, background:glyphSet===k?'#111':'transparent', transition:'all .12s' }}>
-              {k.charAt(0).toUpperCase()+k.slice(1)}
-            </button>
+      {/* ── FOOTER ───────────────────────────────── */}
+      <footer className="fp-footer">
+        <span className="fp-footer-left">© 2026 HypeForType · {font.name}</span>
+        <div className="fp-footer-links">
+          {['Licensing','FAQ','Contact'].map(t => (
+            <Link key={t} href={'/' + t.toLowerCase()} className="fp-footer-link">{t}</Link>
           ))}
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(44px,1fr))' }}>
-          {glyphSets[glyphSet].map(ch=>(
-            <div key={ch} style={{ borderRight:border, borderBottom:border, padding:'10px 4px 6px', display:'flex', flexDirection:'column', alignItems:'center', gap:3, cursor:'default', transition:'background .1s' }}
-              onMouseEnter={e=>e.currentTarget.style.background='#111'} onMouseLeave={e=>e.currentTarget.style.background='var(--bg)'}>
-              <span style={{ fontFamily, fontSize:'1.2rem', lineHeight:1, color:'#666' }}>{ch}</span>
-              <span style={{ fontFamily:dd, fontSize:'.26rem', letterSpacing:'.05em', color:'#282828' }}>U+{ch.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* BOTTOM BUY BAR */}
-      <div style={{ borderTop:'2px solid var(--white)', padding:'1.2rem', display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--bg)', flexWrap:'wrap', gap:'1rem' }}>
-        <div style={{ fontFamily, fontSize:'clamp(1.5rem,4vw,2.5rem)', color:'var(--white)', letterSpacing:'-.01em' }}>{font.name}</div>
-        <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
-          <span style={{ fontFamily:dd, fontSize:'.44rem', letterSpacing:'.1em', textTransform:'uppercase', color:'var(--dim)' }}>
-            {tiers[selectedLicense].label} — £{tiers[selectedLicense].price}
-          </span>
-          <button onClick={()=>document.getElementById('buy').scrollIntoView({behavior:'smooth'})} style={{ fontFamily:det, fontSize:'.58rem', letterSpacing:'.08em', textTransform:'uppercase', color:'var(--white)', background:'var(--blue)', border:'none', padding:'12px 2rem', transition:'opacity .15s' }}
-            onMouseEnter={e=>e.target.style.opacity='.85'} onMouseLeave={e=>e.target.style.opacity='1'}>
-            Buy Now
-          </button>
-        </div>
-      </div>
-
-      {/* FOOTER */}
-      <footer style={{ borderTop:border, display:'grid', gridTemplateColumns:'1fr auto 1fr', background:'var(--bg2)' }}>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.22rem,.65vw,.34rem)', color:'#272727', letterSpacing:'.12em', textTransform:'uppercase', padding:'.8rem 1rem' }}>© 2026 HypeForType — All rights reserved</span>
-        <div style={{ borderLeft:border, borderRight:border, display:'flex', gap:'1rem', alignItems:'center', padding:'.8rem 1.2rem', flexWrap:'wrap' }}>
-          {['Licensing','FAQ','Privacy','Contact'].map(t=>(
-            <Link key={t} href={'/'+t.toLowerCase()} style={{ fontFamily:dd, fontSize:'clamp(.22rem,.65vw,.34rem)', color:'#2e2e2e', letterSpacing:'.14em', textTransform:'uppercase', transition:'color .12s' }}
-              onMouseEnter={e=>e.target.style.color='var(--blue)'} onMouseLeave={e=>e.target.style.color='#2e2e2e'}>{t}</Link>
-          ))}
-        </div>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.22rem,.65vw,.34rem)', color:'#272727', letterSpacing:'.12em', textTransform:'uppercase', padding:'.8rem 1rem', textAlign:'right' }}>London · Online</span>
       </footer>
     </>
   );
@@ -293,6 +815,5 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const font = fonts.find(f => f.slug === params.slug);
-  if (!font) return { notFound: true };
-  return { props: { font } };
+  return font ? { props: { font } } : { notFound: true };
 }
