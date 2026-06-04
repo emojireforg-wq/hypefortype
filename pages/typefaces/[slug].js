@@ -161,10 +161,12 @@ export default function FontPage({ font }) {
             display: grid;
             grid-template-columns: 1fr 340px;
             border-bottom: 1px solid #e8e7e2;
-            min-height: 520px;
+            min-height: 620px;
+            height: calc(100vh - 52px);
+            max-height: 820px;
           }
           .fp-hero-left {
-            padding: clamp(2.5rem,5vw,4rem);
+            padding: clamp(2rem,4vw,3rem);
             border-right: 1px solid #e8e7e2;
             display: flex; flex-direction: column;
             justify-content: space-between;
@@ -518,16 +520,57 @@ export default function FontPage({ font }) {
       {/* ── HERO ────────────────────────────────── */}
       <section className="fp-hero">
 
-        {/* Left — name + meta */}
+        {/* Left — LIVE TYPE CANVAS */}
         <div className="fp-hero-left">
-          {/* Background kanji watermark */}
           <div className="fp-hero-kanji">{kanji[0]}</div>
 
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div className="fp-eyebrow">{font.idx} — {font.tags.join(' · ')}</div>
-            <h1 className="fp-hero-name" style={{ fontFamily }}>{font.name}</h1>
-            <p className="fp-hero-desc">{font.description}</p>
+          </div>
 
+          {/* THE LIVE TYPE — controlled by the right panel */}
+          <div style={{
+            position: 'relative', zIndex: 1,
+            flex: 1, display: 'flex', alignItems: 'center',
+            padding: '2rem 0', overflow: 'hidden',
+          }}>
+            <div style={{
+              fontFamily,
+              fontWeight: style.weight,
+              fontStyle: style.oblique ? 'italic' : 'normal',
+              fontSize: fontSize + 'px',
+              letterSpacing: letterSpacing + '%',
+              lineHeight: .92,
+              color: '#0a0a0a',
+              wordBreak: 'break-word',
+              width: '100%',
+              transition: 'font-size .1s, letter-spacing .1s',
+            }}>
+              {displayText}
+            </div>
+          </div>
+
+          {/* Bottom — edit input + meta */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '.6rem',
+              borderTop: '1px solid #e8e7e2', paddingTop: '1rem', marginBottom: '1.2rem',
+            }}>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#1A1AFF', flexShrink: 0 }}>
+                ↑ Edit
+              </span>
+              <input
+                value={previewText}
+                onChange={e => setPreviewText(e.target.value)}
+                placeholder={font.name}
+                maxLength={60}
+                style={{
+                  flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                  fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#0a0a0a',
+                  caretColor: '#1A1AFF',
+                }}
+              />
+            </div>
             <div className="fp-meta-row">
               {[
                 [font.styles.length + (font.styles.length === 1 ? ' style' : ' styles'), 'Weights'],
@@ -541,18 +584,6 @@ export default function FontPage({ font }) {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Kanji decoration row */}
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', position: 'relative', zIndex: 1 }}>
-            {kanji.slice(0, 6).map((k, i) => (
-              <span key={i} style={{
-                fontFamily: "'Hiragino Sans', 'Yu Gothic', sans-serif",
-                fontSize: '1.4rem',
-                color: i === 0 ? 'rgba(26,26,255,0.5)' : `rgba(26,26,255,${0.12 - i * 0.015})`,
-                transition: 'color .2s',
-              }}>{k}</span>
-            ))}
           </div>
         </div>
 
@@ -645,34 +676,7 @@ export default function FontPage({ font }) {
         </div>
       </section>
 
-      {/* ── INTERACTIVE SPECIMEN ─────────────────── */}
-      <section className="fp-specimen">
-        <div className="fp-specimen-toolbar">
-          <input className="fp-specimen-input"
-            value={previewText}
-            onChange={e => setPreviewText(e.target.value)}
-            placeholder={`Type to preview ${font.name}...`}
-          />
-          <div className="fp-size-control">
-            <span className="fp-size-label">Size</span>
-            <input type="range" className="fp-size-slider"
-              min="24" max="200" value={fontSize}
-              onChange={e => setFontSize(+e.target.value)} />
-            <span className="fp-size-val">{fontSize}</span>
-          </div>
-        </div>
-        <div className="fp-specimen-stage">
-          <div className="fp-specimen-text"
-            style={{
-              fontFamily,
-              fontWeight: style.weight,
-              fontSize: fontSize + 'px',
-              letterSpacing: letterSpacing + '%',
-            }}>
-            {displayText}
-          </div>
-        </div>
-      </section>
+
 
       {/* ── KANJI STRIP ──────────────────────────── */}
       <div className="fp-kanji-strip">
