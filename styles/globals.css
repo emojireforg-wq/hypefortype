@@ -4,31 +4,31 @@
 @font-face { font-family: 'DigitalDisco'; src: url('/fonts/ui/DigitalDisco.ttf') format('truetype'); font-weight: normal; font-display: swap; }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
 :root {
-  --det: 'Determination', monospace;
-  --dd:  'DigitalDisco', monospace;
-  --int: 'Inter', sans-serif;
-  --blue:     #2D35FF;
-  --blue-mid: rgba(45,53,255,0.12);
-  --blue-brd: rgba(45,53,255,0.30);
-  --bg:    #0a0a0a;
-  --bg2:   #0d0d0d;
-  --panel: #f5f4f0;
-  --white: #f5f4f0;
-  --dim:   #555;
-  --border-dark: #1c1c1c;
-  --border-light: #e0dfd8;
+  --blue:   #1A1AFF;
+  --bg:     #08080f;
+  --bg2:    #0b0b14;
+  --white:  #f2f1eb;
+  --dim:    #3a3a4a;
+  --border: rgba(255,255,255,0.06);
+  --inter:  'Inter', sans-serif;
+  --det:    'Determination', monospace;
+  --dd:     'DigitalDisco', monospace;
 }
+
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--white); font-family: var(--int); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--inter);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
