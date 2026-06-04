@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { fonts, pricing } from '../../lib/fonts';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Script from 'next/script';
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
@@ -10,7 +10,6 @@ const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
 };
 
-// All glyphs shown in the panel - paginated in rows of 6
 const GLYPH_SETS = {
   UPP: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
   LOW: 'abcdefghijklmnopqrstuvwxyz'.split(''),
@@ -19,12 +18,24 @@ const GLYPH_SETS = {
   ACC: 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
 };
 
+const LICENSE_TYPES = [
+  { key: 'desktop',    label: 'Desktop',          icon: '🖥' },
+  { key: 'webfont',    label: 'Webfont',           icon: '🌐' },
+  { key: 'app',        label: 'App',               icon: '📱' },
+  { key: 'broadcast',  label: 'Broadcast',         icon: '📺' },
+  { key: 'brand',      label: 'Brand Font',        icon: '✦' },
+  { key: 'enterprise', label: 'Enterprise',        icon: '🏢' },
+  { key: 'enterprise-group', label: 'Group Enterprise', icon: '🏗' },
+];
+
+const DESKTOP_SEATS = [1, 2, 5, 10, 25, 50, 100];
+const WEB_PAGEVIEWS = ['10,000','50,000','100,000','250,000','500,000','1,000,000','Unlimited'];
+
 const LOREM = `Gentle curves meet geometric precision. Every terminal softens without apology. Every weight carries its own distinct gravity.`;
 
 const BG_SWATCHES   = ['#000000','#0a0a0f','#ffffff','#f5f4f0','#1a1a2e','#0d1117'];
 const TEXT_SWATCHES = ['#f2f1eb','#cbced3','#000000','#325eff','#ffffff','#9097a1'];
 
-// Extracted NBA blue: #325eff
 const C = {
   bg:      '#000000',
   surface: '#0a0a0f',
@@ -46,20 +57,29 @@ const C = {
 };
 
 export default function FontPage({ font }) {
-  const [activeStyle,      setActiveStyle]      = useState(0);
-  const [previewText,      setPreviewText]       = useState('');
-  const [fontSize,         setFontSize]          = useState(72);
-  const [letterSpacing,    setLetterSpacing]     = useState(0);
-  const [lineHeight,       setLineHeight]        = useState(1.0);
-  const [selectedLicense,  setSelectedLicense]   = useState('desktop');
-  const [glyphSet,         setGlyphSet]          = useState('UPP');
-  const [activeSpecimen,   setActiveSpecimen]    = useState(0);
-  const [viewMode,         setViewMode]          = useState('display');
-  const [bgColor,          setBgColor]           = useState('#000000');
-  const [textColor,        setTextColor]         = useState('#f2f1eb');
-  const [focusedGlyph,     setFocusedGlyph]      = useState(null);
-  const [paypalReady,      setPaypalReady]       = useState(false);
-  const [purchasing,       setPurchasing]        = useState(false);
+  const [activeStyle,     setActiveStyle]     = useState(0);
+  const [previewText,     setPreviewText]      = useState('');
+  const [fontSize,        setFontSize]         = useState(72);
+  const [letterSpacing,   setLetterSpacing]    = useState(0);
+  const [lineHeight,      setLineHeight]       = useState(1.0);
+  const [glyphSet,        setGlyphSet]         = useState('UPP');
+  const [activeSpecimen,  setActiveSpecimen]   = useState(0);
+  const [viewMode,        setViewMode]         = useState('display');
+  const [bgColor,         setBgColor]          = useState('#000000');
+  const [textColor,       setTextColor]        = useState('#f2f1eb');
+  const [focusedGlyph,    setFocusedGlyph]     = useState(null);
+
+  // License state
+  const [licenseType,     setLicenseType]      = useState('desktop');
+  const [desktopSeats,    setDesktopSeats]      = useState(1);
+  const [webPageviews,    setWebPageviews]      = useState('10,000');
+  // Weight selection: 'single' | 'full'
+  const [weightMode,      setWeightMode]        = useState('single');
+  // Which individual weights are selected (indices)
+  const [selectedWeights, setSelectedWeights]  = useState(new Set([0]));
+
+  const [paypalReady,     setPaypalReady]      = useState(false);
+  const [purchasing,      setPurchasing]       = useState(false);
   const inputRef  = useRef(null);
   const paypalRef = useRef(null);
 
@@ -71,20 +91,32 @@ export default function FontPage({ font }) {
   const prevFont   = fonts[(fontIdx - 1 + fonts.length) % fonts.length];
   const nextFont   = fonts[(fontIdx + 1) % fonts.length];
   const allGlyphs  = GLYPH_SETS[glyphSet];
-
-  // Default display: AaBbCcDd in the actual font
   const DEFAULT_DISPLAY = 'AaBbCcDd';
   const displayText = previewText || DEFAULT_DISPLAY;
+
+  const toggleWeight = (i) => {
+    if (weightMode === 'full') return;
+    setSelectedWeights(prev => {
+      const next = new Set(prev);
+      if (next.has(i) && next.size > 1) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  };
+
+  // Base price placeholder logic (will be replaced with real pricing)
+  const basePrice = tiers?.desktop?.price || 25;
+  const weightCount = weightMode === 'full' ? font.styles.length : selectedWeights.size;
+  const estimatedPrice = weightMode === 'full' ? tiers?.bundle?.price || (basePrice * 2) : basePrice * weightCount;
 
   useEffect(() => {
     if (!paypalReady || !paypalRef.current) return;
     paypalRef.current.innerHTML = '';
-    const tier = tiers[selectedLicense];
     window.paypal.Buttons({
       createOrder: async () => {
         const res = await fetch('/api/paypal-create', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: tier.price, description: `${font.name} — ${tier.label} License` }),
+          body: JSON.stringify({ amount: estimatedPrice, description: `${font.name} — ${licenseType} License` }),
         });
         return (await res.json()).orderId;
       },
@@ -92,7 +124,7 @@ export default function FontPage({ font }) {
         setPurchasing(true);
         const res = await fetch('/api/paypal-capture', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: data.orderID, fontSlug: font.slug, licenseTier: selectedLicense }),
+          body: JSON.stringify({ orderId: data.orderID, fontSlug: font.slug, licenseTier: licenseType }),
         });
         const result = await res.json();
         if (result.success) window.location.href = `/download?token=${result.token}`;
@@ -100,7 +132,9 @@ export default function FontPage({ font }) {
       },
       style: { layout:'horizontal', color:'black', shape:'rect', label:'buynow', height:40, tagline:false },
     }).render(paypalRef.current);
-  }, [paypalReady, selectedLicense, font]);
+  }, [paypalReady, licenseType, font, estimatedPrice]);
+
+  const currentLicense = LICENSE_TYPES.find(l => l.key === licenseType);
 
   return (
     <>
@@ -117,6 +151,7 @@ export default function FontPage({ font }) {
           html,body{background:#000!important;color:${C.t1}!important;font-family:${C.sg}!important;-webkit-font-smoothing:antialiased;}
           ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:${C.bdr}}
           a{text-decoration:none;color:inherit}button{cursor:pointer}
+          select,option{background:${C.surface};color:${C.t1};}
 
           /* NAV */
           .nav{position:sticky;top:0;z-index:200;display:grid;grid-template-columns:auto auto auto 1fr auto auto auto;height:48px;border-bottom:1px solid ${C.bdr};background:rgba(0,0,0,0.93);backdrop-filter:blur(12px);}
@@ -137,8 +172,6 @@ export default function FontPage({ font }) {
 
           /* CANVAS */
           .canvas{border-right:1px solid ${C.bdr};display:flex;flex-direction:column;transition:background .25s;}
-
-          /* Toolbar */
           .toolbar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:7px 1.2rem;border-bottom:1px solid ${C.bdr};background:rgba(0,0,0,0.5);flex-shrink:0;}
           .tb-lbl{font-family:${C.sm};font-size:9px;color:${C.t4};letter-spacing:.12em;text-transform:uppercase;}
           .tb-sep{width:1px;height:14px;background:${C.bdr};}
@@ -148,43 +181,16 @@ export default function FontPage({ font }) {
           .tb-sw{width:17px;height:17px;border:1px solid ${C.bdr};cursor:pointer;transition:all .15s;flex-shrink:0;}
           .tb-sw:hover,.tb-sw.on{border-color:${C.accent};box-shadow:${C.aGlow};}
 
-          /* Stage — the main typing area */
-          .stage-wrap{
-            position:relative;
-            height:280px;
-            flex-shrink:0;
-          }
-          /* The actual hidden input that receives typing */
-          .stage-input{
-            position:absolute;inset:0;
-            width:100%;height:100%;
-            background:transparent;border:none;outline:none;
-            resize:none;color:transparent;caret-color:${C.accent};
-            font-family:inherit;font-size:16px;
-            padding:clamp(1.5rem,3vw,2.5rem);
-            z-index:2;cursor:text;
-          }
-          /* The visual display layer */
-          .stage-display{
-            position:absolute;inset:0;
-            display:flex;align-items:center;justify-content:center;
-            padding:clamp(1.5rem,3vw,2.5rem);
-            pointer-events:none;overflow:hidden;
-          }
-          .stage-text{
-            width:100%;line-height:.92;letter-spacing:-.02em;
-            word-break:break-word;transition:font-size .08s,letter-spacing .08s,line-height .08s;
-          }
-          .stage-body-text{width:100%;max-width:58ch;transition:font-size .08s,line-height .08s;}
-          .stage-hint{
-            position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-            font-family:${C.sm};font-size:9px;color:${C.t4};letter-spacing:.12em;
-            text-transform:uppercase;pointer-events:none;white-space:nowrap;
-          }
+          /* Stage */
+          .stage-wrap{position:relative;height:280px;flex-shrink:0;}
+          .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:${C.accent};font-size:16px;padding:clamp(1.5rem,3vw,2.5rem);z-index:2;cursor:text;}
+          .stage-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1.5rem,3vw,2.5rem);pointer-events:none;overflow:hidden;}
+          .stage-text{width:100%;line-height:.92;letter-spacing:-.02em;word-break:break-word;transition:font-size .08s,letter-spacing .08s,line-height .08s;}
+          .stage-body{width:100%;max-width:58ch;transition:font-size .08s,line-height .08s;}
+          .stage-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:${C.sm};font-size:9px;color:${C.t4};letter-spacing:.12em;text-transform:uppercase;pointer-events:none;white-space:nowrap;}
 
-          /* Focused glyph overlay */
+          /* Focused glyph */
           .glyph-focus{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;cursor:pointer;}
-          .glyph-focus-char{line-height:1;}
           .glyph-focus-meta{font-family:${C.sm};font-size:10px;color:${C.t4};letter-spacing:.1em;margin-top:1rem;}
 
           /* Meta strip */
@@ -193,6 +199,27 @@ export default function FontPage({ font }) {
           .meta-cell:last-child{border-right:none;}
           .meta-val{font-family:${C.det};font-size:1.1rem;color:${C.t1};line-height:1;}
           .meta-key{font-family:${C.sg};font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${C.t4};}
+
+          /* ── GLYPH STRIP (horizontal, below canvas) ── */
+          .glyph-strip-section{border-bottom:1px solid ${C.bdr};background:${C.bg};}
+          .glyph-strip-toolbar{display:flex;align-items:center;gap:0;border-bottom:1px solid ${C.bdr};}
+          .glyph-strip-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;background:transparent;color:${C.t4};border:none;border-right:1px solid ${C.bdr};cursor:pointer;transition:all .15s;}
+          .glyph-strip-tab:hover{color:${C.t2};}
+          .glyph-strip-tab.on{background:${C.aDim};color:${C.accent};}
+          .glyph-strip-count{font-family:${C.sm};font-size:9px;color:${C.t4};padding:0 1rem;margin-left:auto;}
+          .glyph-strip-grid{
+            display:flex;flex-wrap:wrap;
+            padding:12px 16px;gap:4px;
+          }
+          .g-cell{
+            width:44px;height:44px;
+            display:flex;align-items:center;justify-content:center;
+            background:#000;border:1px solid #1c1c2e;
+            font-size:1.1rem;color:#fff;
+            cursor:pointer;transition:all .12s;flex-shrink:0;
+          }
+          .g-cell:hover{background:${C.aDim};border-color:${C.accent};transform:scale(1.1);}
+          .g-cell-hint{font-family:${C.sm};font-size:9px;color:${C.t4};padding:4px 16px 12px;width:100%;}
 
           /* PANEL */
           .panel{background:${C.surface};display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 48px);position:sticky;top:48px;}
@@ -204,39 +231,56 @@ export default function FontPage({ font }) {
           .ps-head{display:flex;justify-content:space-between;margin-bottom:9px;}
           .ps-lbl{font-family:${C.sg};font-size:11px;color:${C.t3};font-weight:500;}
           .ps-val{font-family:${C.sm};font-size:10px;color:${C.t1};}
-
-          /* Weight select */
           .w-select{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:12px;font-weight:500;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
           .w-select:focus{border-color:${C.accent};}
-
-          /* Sliders */
           .slider{width:100%;height:2px;-webkit-appearance:none;appearance:none;background:${C.bdr};outline:none;border-radius:1px;cursor:pointer;}
           .slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:${C.accent};cursor:pointer;box-shadow:${C.aGlow};}
           .rng-labels{display:flex;justify-content:space-between;margin-top:4px;}
           .rng-labels span{font-family:${C.sm};font-size:9px;color:${C.t4};}
 
-          /* Glyphs — compact 6-col grid showing ALL */
-          .g-tabs{display:flex;border:1px solid ${C.bdr};margin-bottom:8px;}
-          .g-tab{flex:1;font-family:${C.sg};font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:5px 2px;background:transparent;color:${C.t4};border:none;cursor:pointer;transition:all .15s;}
-          .g-tab:hover{color:${C.t2};}
-          .g-tab.on{background:${C.aDim};color:${C.accent};}
-          .g-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;}
-          .g-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${C.srf2};border:1px solid ${C.bdr};font-size:.95rem;color:${C.t1};cursor:pointer;transition:all .12s;border-radius:1px;}
-          .g-cell:hover{background:${C.aDim};border-color:${C.accent};color:#fff;transform:scale(1.08);}
+          /* ── LICENSE SECTION ── */
+          .license-section{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
+          .lic-section-title{font-family:${C.sg};font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${C.t3};margin-bottom:10px;}
 
-          /* Buy */
-          .panel-buy{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
-          .lic-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
-          .lic-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border:1px solid ${C.bdr};background:transparent;color:${C.t3};cursor:pointer;transition:all .15s;}
-          .lic-tab:hover{border-color:${C.bdrHi};color:${C.t1};}
-          .lic-tab.on{background:${C.aDim};border-color:${C.accent};color:${C.accent};}
-          .price-big{font-family:${C.det};font-size:2.6rem;color:${C.white};line-height:1;margin-bottom:4px;}
-          .price-desc{font-family:${C.sg};font-size:11px;color:${C.t3};margin-bottom:12px;}
-          .buy-btn{width:100%;font-family:${C.sg};font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:${C.accent};border:none;padding:12px;transition:opacity .15s;margin-bottom:6px;}
-          .buy-btn:hover{opacity:.85;}
-          .trial-btn{width:100%;font-family:${C.sg};font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${C.t3};background:transparent;border:1px solid ${C.bdr};padding:9px;transition:all .15s;margin-bottom:10px;}
+          /* License type dropdown */
+          .lic-dropdown-wrap{position:relative;margin-bottom:10px;}
+          .lic-dropdown{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:12px;font-weight:600;padding:9px 12px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+          .lic-dropdown.selected{border-color:${C.accent};background:${C.aDim};color:${C.accent};}
+          .lic-dropdown:focus{border-color:${C.accent};}
+          .lic-dropdown-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:${C.t4};pointer-events:none;font-size:10px;}
+
+          /* Sub-options */
+          .lic-sub{margin-top:8px;}
+          .lic-sub-label{font-family:${C.sg};font-size:10px;color:${C.t3};margin-bottom:5px;}
+          .lic-sub-select{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:11px;padding:7px 10px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+          .lic-sub-select:focus{border-color:${C.accent};}
+
+          /* Weight selection */
+          .weight-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;}
+          .wm-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:7px;border:1px solid ${C.bdr};background:transparent;color:${C.t4};cursor:pointer;transition:all .15s;text-align:center;}
+          .wm-tab:hover{border-color:${C.bdrHi};color:${C.t1};}
+          .wm-tab.on{background:${C.aDim};border-color:${C.accent};color:${C.accent};}
+          .weight-picker{display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto;}
+          .wp-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid ${C.bdr};cursor:pointer;transition:all .15s;}
+          .wp-item:hover{border-color:${C.bdrHi};}
+          .wp-item.on{background:${C.aDim};border-color:${C.accent};}
+          .wp-item-name{font-family:${C.sg};font-size:11px;font-weight:500;color:${C.t2};}
+          .wp-item-num{font-family:${C.sm};font-size:9px;color:${C.t4};}
+          .wp-item-check{width:14px;height:14px;border:1px solid ${C.bdr};background:transparent;transition:all .15s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+          .wp-item.on .wp-item-check{background:${C.accent};border-color:${C.accent};}
+          .wp-item.on .wp-item-name{color:${C.white};}
+
+          /* Price display */
+          .price-block{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
+          .price-context{font-family:${C.sg};font-size:10px;color:${C.t4};margin-bottom:6px;}
+          .price-big{font-family:${C.det};font-size:2.6rem;color:${C.white};line-height:1;margin-bottom:2px;}
+          .price-note{font-family:${C.sg};font-size:10px;color:${C.t4};margin-bottom:14px;font-style:italic;}
+
+          /* Paypal + trial */
+          .buy-actions{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
+          .trial-btn{width:100%;font-family:${C.sg};font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${C.t3};background:transparent;border:1px solid ${C.bdr};padding:9px;transition:all .15s;margin-top:6px;display:block;text-align:center;}
           .trial-btn:hover{border-color:${C.accent};color:${C.accent};}
-          .trust-list{display:flex;flex-direction:column;gap:7px;}
+          .trust-list{padding:12px 16px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid ${C.bdr};}
           .trust-item{display:flex;align-items:flex-start;gap:8px;}
           .trust-dot{width:4px;height:4px;border-radius:50%;background:${C.accent};flex-shrink:0;margin-top:5px;box-shadow:${C.aGlow};}
           .trust-txt{font-family:${C.sg};font-size:11px;color:${C.t3};line-height:1.5;}
@@ -291,13 +335,13 @@ export default function FontPage({ font }) {
       {/* MAIN GRID */}
       <div className="page-grid">
 
-        {/* LEFT — canvas */}
+        {/* LEFT CANVAS */}
         <div className="canvas" style={{ background: bgColor }}>
 
-          {/* Focused glyph fullscreen */}
+          {/* Fullscreen glyph */}
           {focusedGlyph && (
             <div className="glyph-focus" onClick={() => setFocusedGlyph(null)} style={{ background: bgColor + 'f2' }}>
-              <div className="glyph-focus-char" style={{ fontFamily, fontWeight: style.weight, fontSize: 'clamp(10rem,22vw,18rem)', color: textColor }}>
+              <div style={{ fontFamily, fontWeight: style.weight, fontSize:'clamp(10rem,22vw,18rem)', lineHeight:1, color: textColor }}>
                 {focusedGlyph}
               </div>
               <div className="glyph-focus-meta">
@@ -326,62 +370,32 @@ export default function FontPage({ font }) {
             ))}
           </div>
 
-          {/* Stage — click anywhere to type */}
+          {/* Stage */}
           <div className="stage-wrap" style={{ background: bgColor }}>
-            {/* Hidden input — captures all keystrokes */}
-            <textarea
-              ref={inputRef}
-              className="stage-input"
-              value={previewText}
-              onChange={e => setPreviewText(e.target.value)}
-              maxLength={80}
-              spellCheck={false}
-              autoComplete="off"
-              autoCorrect="off"
-            />
-
-            {/* Visual layer */}
+            <textarea ref={inputRef} className="stage-input" value={previewText} onChange={e => setPreviewText(e.target.value)} maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off" />
             <div className="stage-display">
               {viewMode === 'body' ? (
-                <div className="stage-body-text" style={{
-                  fontFamily, fontWeight: style.weight,
-                  fontSize: Math.min(fontSize, 20) + 'px',
-                  lineHeight: lineHeight + 0.6,
-                  color: textColor,
-                }}>
+                <div className="stage-body" style={{ fontFamily, fontWeight:style.weight, fontSize:Math.min(fontSize,20)+'px', lineHeight:lineHeight+0.6, color:textColor }}>
                   {previewText || LOREM}
                 </div>
               ) : (
-                <div className="stage-text" style={{
-                  fontFamily, fontWeight: style.weight,
-                  fontStyle: style.oblique ? 'italic' : 'normal',
-                  fontSize: (viewMode === 'headline' ? Math.max(fontSize, 64) : fontSize) + 'px',
-                  letterSpacing: letterSpacing + '%',
-                  lineHeight: lineHeight,
-                  color: textColor,
-                  textAlign: 'left',
-                }}>
+                <div className="stage-text" style={{ fontFamily, fontWeight:style.weight, fontStyle:style.oblique?'italic':'normal', fontSize:(viewMode==='headline'?Math.max(fontSize,64):fontSize)+'px', letterSpacing:letterSpacing+'%', lineHeight:lineHeight, color:textColor }}>
                   {displayText}
                 </div>
               )}
             </div>
-
-            {/* Hint */}
             {!previewText && <div className="stage-hint">Click anywhere to type</div>}
           </div>
 
           {/* Meta strip */}
           <div className="meta-strip">
             {[[font.styles.length,'Weights'],[font.glyphCount+'+','Glyphs'],[font.released,'Released'],[font.pro?'Pro':font.hot?'New':'Retail','Status']].map(([v,k]) => (
-              <div key={k} className="meta-cell">
-                <span className="meta-val">{v}</span>
-                <span className="meta-key">{k}</span>
-              </div>
+              <div key={k} className="meta-cell"><span className="meta-val">{v}</span><span className="meta-key">{k}</span></div>
             ))}
           </div>
         </div>
 
-        {/* RIGHT — panel */}
+        {/* RIGHT PANEL */}
         <div className="panel">
           <div className="panel-head">
             <span className="panel-title">Type Panel</span>
@@ -390,10 +404,7 @@ export default function FontPage({ font }) {
 
           {/* Weight */}
           <div className="ps">
-            <div className="ps-head">
-              <span className="ps-lbl">Weight</span>
-              <span className="ps-val">{style.name} · {style.weight}</span>
-            </div>
+            <div className="ps-head"><span className="ps-lbl">Weight</span><span className="ps-val">{style.name} · {style.weight}</span></div>
             <select className="w-select" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
               {font.styles.map((s,i) => <option key={i} value={i}>{s.name} · {s.weight}</option>)}
             </select>
@@ -420,67 +431,145 @@ export default function FontPage({ font }) {
             <div className="rng-labels"><span>0.5</span><span>2.5</span></div>
           </div>
 
-          {/* Glyphs — 6 columns, shows ALL, compact */}
-          <div className="ps">
-            <div className="ps-head">
-              <span className="ps-lbl">Glyphs</span>
-              <span className="ps-val">{font.glyphCount}+ total · {allGlyphs.length} shown</span>
+          {/* ── LICENSE & PURCHASE ── */}
+          <div className="license-section" id="buy">
+            <div className="lic-section-title">License Type</div>
+
+            {/* License dropdown */}
+            <div className="lic-dropdown-wrap">
+              <select className={`lic-dropdown selected`} value={licenseType} onChange={e => setLicenseType(e.target.value)}>
+                {LICENSE_TYPES.map(l => (
+                  <option key={l.key} value={l.key}>{l.icon}  {l.label}</option>
+                ))}
+              </select>
+              <span className="lic-dropdown-arrow">▾</span>
             </div>
-            <div className="g-tabs">
-              {Object.keys(GLYPH_SETS).map(k => (
-                <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>{k}</button>
-              ))}
-            </div>
-            <div className="g-grid">
-              {allGlyphs.map((g,i) => (
-                <div key={i} className="g-cell"
-                  style={{ fontFamily, fontWeight: style.weight }}
-                  onClick={() => setFocusedGlyph(g)} title={`U+${g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}`}>
-                  {g}
+
+            {/* Desktop sub-option: seats */}
+            {licenseType === 'desktop' && (
+              <div className="lic-sub">
+                <div className="lic-sub-label">Number of seats (installations)</div>
+                <div className="lic-dropdown-wrap">
+                  <select className="lic-sub-select" value={desktopSeats} onChange={e => setDesktopSeats(+e.target.value)}>
+                    {DESKTOP_SEATS.map(s => <option key={s} value={s}>{s} {s === 1 ? 'seat' : 'seats'}</option>)}
+                  </select>
+                  <span className="lic-dropdown-arrow">▾</span>
                 </div>
-              ))}
-            </div>
-            <div style={{ fontFamily:C.sm, fontSize:9, color:C.t4, marginTop:5, textAlign:'right' }}>
-              Click any glyph to enlarge
+              </div>
+            )}
+
+            {/* Webfont sub-option: pageviews */}
+            {licenseType === 'webfont' && (
+              <div className="lic-sub">
+                <div className="lic-sub-label">Monthly pageviews</div>
+                <div className="lic-dropdown-wrap">
+                  <select className="lic-sub-select" value={webPageviews} onChange={e => setWebPageviews(e.target.value)}>
+                    {WEB_PAGEVIEWS.map(p => <option key={p} value={p}>{p} pageviews/mo</option>)}
+                  </select>
+                  <span className="lic-dropdown-arrow">▾</span>
+                </div>
+              </div>
+            )}
+
+            {/* License description */}
+            <div style={{ fontFamily:C.sg, fontSize:11, color:C.t4, marginTop:8, lineHeight:1.5 }}>
+              {licenseType === 'desktop' && `For installation on up to ${desktopSeats} computer${desktopSeats > 1 ? 's' : ''}.`}
+              {licenseType === 'webfont' && `For use on websites serving up to ${webPageviews} pageviews/month.`}
+              {licenseType === 'app' && 'For embedding in a single mobile or desktop application.'}
+              {licenseType === 'broadcast' && 'For use in TV, film, streaming and broadcast productions.'}
+              {licenseType === 'brand' && 'For use as a primary brand typeface across all media.'}
+              {licenseType === 'enterprise' && 'Unlimited seats, domains and usage within one organisation.'}
+              {licenseType === 'enterprise-group' && 'Unlimited usage across multiple organisations or subsidiaries.'}
             </div>
           </div>
 
-          {/* BUY — in panel */}
-          <div className="panel-buy" id="buy">
-            <div className="ps-head" style={{ marginBottom:10 }}>
-              <span className="ps-lbl">License & Purchase</span>
+          {/* Weight selection */}
+          <div className="license-section">
+            <div className="lic-section-title">Weight Selection</div>
+            <div className="weight-mode-tabs">
+              <button className={`wm-tab${weightMode==='single'?' on':''}`} onClick={() => setWeightMode('single')}>
+                Individual
+              </button>
+              <button className={`wm-tab${weightMode==='full'?' on':''}`} onClick={() => setWeightMode('full')}>
+                Full Family
+              </button>
             </div>
-            <div className="lic-tabs">
-              {Object.entries(tiers).map(([key,tier]) => (
-                <button key={key} className={`lic-tab${selectedLicense===key?' on':''}`} onClick={() => setSelectedLicense(key)}>{tier.label}</button>
-              ))}
+            {weightMode === 'single' ? (
+              <div className="weight-picker">
+                {font.styles.map((s,i) => (
+                  <div key={i} className={`wp-item${selectedWeights.has(i)?' on':''}`} onClick={() => toggleWeight(i)}>
+                    <span className="wp-item-name" style={{ fontFamily, fontWeight:s.weight }}>{s.name}</span>
+                    <span className="wp-item-num">{s.weight}</span>
+                    <div className="wp-item-check">
+                      {selectedWeights.has(i) && <span style={{ color:'#fff', fontSize:9 }}>✓</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ fontFamily:C.sg, fontSize:11, color:C.t2, padding:'6px 0' }}>
+                All {font.styles.length} weights included — best value.
+              </div>
+            )}
+          </div>
+
+          {/* Price */}
+          <div className="price-block">
+            <div className="price-context">
+              {weightMode === 'full' ? `Full family · ${font.styles.length} weights` : `${weightCount} weight${weightCount>1?'s':''} · ${currentLicense?.label}`}
             </div>
-            <div className="price-big">£{tiers[selectedLicense].price}</div>
-            <div className="price-desc">{tiers[selectedLicense].desc}</div>
+            <div className="price-big">£{estimatedPrice}</div>
+            <div className="price-note">Pricing shown is indicative — final pricing coming soon</div>
+          </div>
+
+          {/* Actions */}
+          <div className="buy-actions">
             <div ref={paypalRef} style={{ minHeight:44 }}>
               {purchasing && <span style={{ fontFamily:C.sg, fontSize:12, color:C.t3 }}>Processing...</span>}
             </div>
             <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
               Free Trial Download
             </button>
-            <div className="trust-list">
-              {[`${font.styles.length} font files included`,`${font.glyphCount}+ glyphs`,'Instant download','Perpetual commercial license'].map((item,i) => (
-                <div key={i} className="trust-item">
-                  <div className="trust-dot" />
-                  <span className="trust-txt">{item}</span>
-                </div>
-              ))}
-            </div>
+          </div>
+
+          {/* Trust */}
+          <div className="trust-list">
+            {[`${font.styles.length} font files available`,`${font.glyphCount}+ glyphs`,'Instant download','Perpetual commercial license','PayPal Secure'].map((item,i) => (
+              <div key={i} className="trust-item">
+                <div className="trust-dot" />
+                <span className="trust-txt">{item}</span>
+              </div>
+            ))}
           </div>
 
         </div>
+      </div>
+
+      {/* ── GLYPH STRIP — full width horizontal below the grid ── */}
+      <div className="glyph-strip-section">
+        <div className="glyph-strip-toolbar">
+          {Object.keys(GLYPH_SETS).map(k => (
+            <button key={k} className={`glyph-strip-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
+              {k === 'UPP' ? 'Uppercase' : k === 'LOW' ? 'Lowercase' : k === 'NUM' ? 'Numerals' : k === 'PUN' ? 'Punctuation' : 'Accents'}
+            </button>
+          ))}
+          <span className="glyph-strip-count">{allGlyphs.length} glyphs</span>
+        </div>
+        <div className="glyph-strip-grid">
+          {allGlyphs.map((g,i) => (
+            <div key={i} className="g-cell" style={{ fontFamily, fontWeight:style.weight }} onClick={() => setFocusedGlyph(g)} title={`U+${g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}`}>
+              {g}
+            </div>
+          ))}
+        </div>
+        <div className="g-cell-hint">Click any glyph to enlarge · {font.glyphCount}+ total glyphs in this font</div>
       </div>
 
       {/* ABC TICKER */}
       <div className="abc-ticker">
         <div className="abc-track">
           {'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map((ch,i) => (
-            <span key={i} className="abc-char" style={{ fontFamily, fontWeight: style.weight }}>{ch}</span>
+            <span key={i} className="abc-char" style={{ fontFamily, fontWeight:style.weight }}>{ch}</span>
           ))}
         </div>
       </div>
@@ -516,7 +605,6 @@ export default function FontPage({ font }) {
         ))}
       </div>
 
-      {/* FOOTER */}
       <footer className="fp-ft">
         <span>© 2026 HypeForType · {font.name}</span>
         <div className="fp-ft-links">
