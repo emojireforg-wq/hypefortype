@@ -1,31 +1,25 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import Image from 'next/image';
 import { fonts, pricing } from '../../lib/fonts';
 import { useState, useRef, useEffect } from 'react';
 import Script from 'next/script';
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-// Kanji sets per font category for decorative use
 const KANJI = {
-  Japanese:    ['字','体','形','美','力','光','影','道','心','空','時','夢'],
-  'Japanese Pro': ['字','体','形','美','力','光','影','道','心','空','時','夢'],
+  Japanese:      ['字','体','形','美','力','光','影','道','心','空','時','夢'],
+  'Japanese Pro':['字','体','形','美','力','光','影','道','心','空','時','夢'],
   'Rounded Pro': ['丸','柔','美','和','円','温','優','軽','雅','清'],
-  Display:     ['力','威','大','烈','猛','剛','強','爆','激','迫'],
-  Handmade:    ['手','書','心','情','感','想','詩','文','筆','艺'],
-  Pro:         ['業','技','匠','精','達','完','熟','巧','工','術'],
-  default:     ['美','形','字','体','光','道','心','夢','力','空'],
+  Display:       ['力','威','大','烈','猛','剛','強','爆','激','迫'],
+  Handmade:      ['手','書','心','情','感','想','詩','文','筆','艺'],
+  Pro:           ['業','技','匠','精','達','完','熟','巧','工','術'],
+  default:       ['美','形','字','体','光','道','心','夢','力','空'],
 };
-
 function getKanji(tags) {
-  for (const tag of tags) {
-    if (KANJI[tag]) return KANJI[tag];
-  }
+  for (const t of tags) if (KANJI[t]) return KANJI[t];
   return KANJI.default;
 }
 
-// Specimen images — only for nanami-rounded-pro right now
 const SPECIMENS = {
   'nanami-rounded-pro': [
     '/specimens/nanami-rounded-pro-1.jpg',
@@ -37,24 +31,43 @@ const SPECIMENS = {
   ],
 };
 
-const glyphSets = {
-  uppercase:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-  lowercase:   'abcdefghijklmnopqrstuvwxyz'.split(''),
-  numerals:    '0123456789'.split(''),
-  punctuation: '.,;:!?\'"-—…()[]{}@#$%&*'.split(''),
-  accents:     'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
+const GLYPH_SETS = {
+  UPP: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  LOW: 'abcdefghijklmnopqrstuvwxyz'.split(''),
+  NUM: '0123456789'.split(''),
+  PUN: '.,;:!?\'"-—…()[]{}@#$%&*'.split(''),
+  ACC: 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
+};
+
+// ── Palette (extracted from NBA Top Shot) ──────────────────────────
+const C = {
+  bg:         '#000000',   // pure black body
+  surface:    '#0a0a0f',   // card/panel surface
+  surface2:   '#0f0f1a',   // slightly lighter surface
+  border:     '#1c1c2e',   // subtle border
+  borderBright:'#2a2a45',  // hover border
+  accent:     '#9747FF',   // neon violet — primary accent
+  accentDim:  'rgba(151,71,255,0.15)',
+  accentBorder:'rgba(151,71,255,0.35)',
+  blue:       '#101c50',   // button bg (deep navy)
+  blueLight:  '#b6ccfd',   // label text (periwinkle — "Rare" colour)
+  text1:      '#cbced3',   // primary title — near-white warm
+  text2:      '#b0b1b6',   // body description — mid grey
+  text3:      '#9097a1',   // meta/secondary — muted grey
+  text4:      '#4a4d56',   // dimmed/inactive
+  white:      '#f2f1eb',   // pure white moments
 };
 
 export default function FontPage({ font }) {
-  const [activeStyle,      setActiveStyle]      = useState(0);
-  const [previewText,      setPreviewText]       = useState('');
-  const [fontSize,         setFontSize]          = useState(72);
-  const [letterSpacing,    setLetterSpacing]     = useState(0);
-  const [selectedLicense,  setSelectedLicense]   = useState('desktop');
-  const [glyphSet,         setGlyphSet]          = useState('uppercase');
-  const [activeSpecimen,   setActiveSpecimen]    = useState(0);
-  const [paypalReady,      setPaypalReady]       = useState(false);
-  const [purchasing,       setPurchasing]        = useState(false);
+  const [activeStyle,    setActiveStyle]    = useState(0);
+  const [previewText,    setPreviewText]    = useState('');
+  const [fontSize,       setFontSize]       = useState(80);
+  const [letterSpacing,  setLetterSpacing]  = useState(0);
+  const [selectedLicense,setSelectedLicense]= useState('desktop');
+  const [glyphSet,       setGlyphSet]       = useState('UPP');
+  const [activeSpecimen, setActiveSpecimen] = useState(0);
+  const [paypalReady,    setPaypalReady]    = useState(false);
+  const [purchasing,     setPurchasing]     = useState(false);
   const paypalRef = useRef(null);
 
   const tiers      = pricing[font.isFamily ? 'family' : 'single'];
@@ -71,18 +84,15 @@ export default function FontPage({ font }) {
     window.paypal.Buttons({
       createOrder: async () => {
         const res = await fetch('/api/paypal-create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: tier.price, description: `${font.name} — ${tier.label} License` }),
         });
-        const data = await res.json();
-        return data.orderId;
+        return (await res.json()).orderId;
       },
       onApprove: async (data) => {
         setPurchasing(true);
         const res = await fetch('/api/paypal-capture', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId: data.orderID, fontSlug: font.slug, licenseTier: selectedLicense }),
         });
         const result = await res.json();
@@ -92,6 +102,13 @@ export default function FontPage({ font }) {
       style: { layout: 'horizontal', color: 'black', shape: 'rect', label: 'buynow', height: 40, tagline: false },
     }).render(paypalRef.current);
   }, [paypalReady, selectedLicense, font]);
+
+  const slab = (label, value) => (
+    <div style={{ borderRight: `1px solid ${C.border}`, padding: '0 1.4rem', display:'flex', flexDirection:'column', gap:4 }}>
+      <span style={{ fontFamily:"'Determination',monospace", fontSize:'1.5rem', color: C.text1, lineHeight:1 }}>{value}</span>
+      <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color: C.text4 }}>{label}</span>
+    </div>
+  );
 
   return (
     <>
@@ -103,572 +120,488 @@ export default function FontPage({ font }) {
           <style key={s.file}>{`@font-face{font-family:'${font.name}';src:url('/fonts/${font.slug}/${encodeURIComponent(s.file)}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
         ))}
         <style>{`
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body, html { background: #fafaf8 !important; color: #0a0a0a !important; font-family: 'Inter', sans-serif !important; }
-          :root { --bg: #fafaf8 !important; --bg2: #f2f1eb !important; --white: #0a0a0a !important; --border: #e8e7e2 !important; }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+          *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+          html, body { background: ${C.bg} !important; color: ${C.text1} !important; font-family: 'Inter', sans-serif !important; -webkit-font-smoothing: antialiased; }
+
+          /* ── Scrollbar ── */
+          ::-webkit-scrollbar { width: 4px; }
+          ::-webkit-scrollbar-track { background: ${C.bg}; }
+          ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 2px; }
 
           /* ── Nav ── */
-          .fp-nav {
-            position: sticky; top: 0; z-index: 100;
+          .nav {
+            position: sticky; top: 0; z-index: 200;
             display: grid; grid-template-columns: auto 1fr auto auto;
-            align-items: stretch; height: 52px;
-            border-bottom: 1px solid #e8e7e2;
-            background: rgba(250,250,248,0.9);
-            backdrop-filter: blur(10px);
+            height: 52px; border-bottom: 1px solid ${C.border};
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(12px);
           }
-          .fp-nav-logo {
-            font-family: 'Determination', monospace;
-            font-size: .9rem; letter-spacing: .06em; text-transform: uppercase;
-            color: #0a0a0a; padding: 0 1.4rem;
-            border-right: 1px solid #e8e7e2;
+          .nav-logo {
+            font-family: 'Determination', monospace; font-size: .9rem;
+            letter-spacing: .08em; text-transform: uppercase;
+            color: ${C.text1}; padding: 0 1.4rem;
+            border-right: 1px solid ${C.border};
             display: flex; align-items: center; text-decoration: none;
+            transition: color .15s;
           }
-          .fp-nav-back {
+          .nav-logo:hover { color: ${C.white}; }
+          .nav-back {
             font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
             letter-spacing: .08em; text-transform: uppercase;
-            color: #aaa; padding: 0 1.2rem;
-            display: flex; align-items: center; gap: .5rem;
-            text-decoration: none; transition: color .15s;
-            border-right: 1px solid #e8e7e2;
+            color: ${C.text4}; padding: 0 1.2rem;
+            border-right: 1px solid ${C.border};
+            display: flex; align-items: center; text-decoration: none; transition: color .15s;
           }
-          .fp-nav-back:hover { color: #0a0a0a; }
-          .fp-nav-title {
+          .nav-back:hover { color: ${C.text1}; }
+          .nav-title {
             font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
-            color: #0a0a0a; padding: 0 1.4rem;
+            color: ${C.text2}; padding: 0 1.4rem;
             display: flex; align-items: center; flex: 1;
           }
-          .fp-nav-trial {
+          .nav-trial {
             font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
             letter-spacing: .08em; text-transform: uppercase;
-            color: #0a0a0a; padding: 0 1.4rem;
-            display: flex; align-items: center;
-            border-left: 1px solid #e8e7e2;
-            text-decoration: none; transition: color .15s; cursor: pointer;
+            color: ${C.blueLight}; padding: 0 1.4rem;
+            border-left: 1px solid ${C.border};
+            display: flex; align-items: center; cursor: pointer;
             background: none; border-top: none; border-bottom: none; border-right: none;
+            transition: color .15s;
           }
-          .fp-nav-trial:hover { color: #1A1AFF; }
-          .fp-nav-buy {
+          .nav-trial:hover { color: ${C.white}; }
+          .nav-buy {
             font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
             letter-spacing: .1em; text-transform: uppercase;
-            color: #fff; background: #1A1AFF;
+            color: #fff; background: ${C.accent};
             padding: 0 1.6rem; display: flex; align-items: center;
             text-decoration: none; transition: opacity .15s;
           }
-          .fp-nav-buy:hover { opacity: .85; }
+          .nav-buy:hover { opacity: .85; }
 
           /* ── Hero ── */
-          .fp-hero {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            border-bottom: 1px solid #e8e7e2;
-            min-height: 620px;
-            height: calc(100vh - 52px);
-            max-height: 820px;
+          .hero {
+            display: grid; grid-template-columns: 1fr 320px;
+            border-bottom: 1px solid ${C.border};
+            height: calc(100vh - 52px); max-height: 840px; min-height: 560px;
           }
-          .fp-hero-left {
-            padding: clamp(2rem,4vw,3rem);
-            border-right: 1px solid #e8e7e2;
+          .hero-canvas {
+            padding: clamp(1.8rem,4vw,3rem);
+            border-right: 1px solid ${C.border};
             display: flex; flex-direction: column;
-            justify-content: space-between;
             position: relative; overflow: hidden;
+            background: ${C.bg};
           }
-          .fp-hero-kanji {
-            position: absolute; top: -0.1em; right: -0.05em;
-            font-size: clamp(12rem,22vw,20rem);
-            line-height: 1; color: rgba(26,26,255,0.04);
+          .hero-kanji-bg {
+            position: absolute; bottom: -0.1em; right: -0.02em;
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans CJK JP', sans-serif;
+            font-size: clamp(16rem,28vw,26rem); line-height: 1;
+            color: rgba(151,71,255,0.04);
             pointer-events: none; user-select: none;
-            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
           }
-          .fp-eyebrow {
+          .hero-eyebrow {
             font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: .18em; text-transform: uppercase; color: #1A1AFF;
-            margin-bottom: 1rem;
+            letter-spacing: .18em; text-transform: uppercase;
+            color: ${C.blueLight}; margin-bottom: .8rem;
           }
-          .fp-hero-name {
-            font-size: clamp(3.5rem, 9vw, 8rem);
+          .hero-live-text {
+            flex: 1; display: flex; align-items: center;
+            position: relative; z-index: 1; overflow: hidden;
+          }
+          .hero-type {
             line-height: .92; letter-spacing: -.02em;
-            color: #0a0a0a; margin-bottom: 1.2rem;
+            word-break: break-word; width: 100%;
+            transition: font-size .08s ease, letter-spacing .08s ease;
           }
-          .fp-hero-desc {
-            font-family: 'Inter', sans-serif; font-size: 13px;
-            color: #666; line-height: 1.7; max-width: 48ch;
-            margin-bottom: 2rem;
+          .hero-edit-bar {
+            display: flex; align-items: center; gap: .6rem;
+            border-top: 1px solid ${C.border}; padding-top: 1rem; margin-top: auto;
+            position: relative; z-index: 1;
           }
-          .fp-meta-row {
-            display: flex; gap: 2rem; flex-wrap: wrap;
+          .hero-edit-label {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .14em; text-transform: uppercase; color: ${C.accent}; flex-shrink: 0;
           }
-          .fp-meta-item { }
-          .fp-meta-val {
-            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-            color: #0a0a0a;
+          .hero-edit-input {
+            flex: 1; background: transparent; border: none; outline: none;
+            font-family: 'Inter', sans-serif; font-size: 13px; color: ${C.text2};
+            caret-color: ${C.accent};
           }
-          .fp-meta-key {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500;
-            letter-spacing: .1em; text-transform: uppercase; color: #aaa;
-            margin-top: 2px;
+          .hero-edit-input::placeholder { color: ${C.text4}; }
+          .hero-meta-row {
+            display: flex; margin-top: 1rem; border: 1px solid ${C.border};
           }
 
           /* ── Glyph Panel ── */
-          .glyph-panel {
-            background: #0a0a0a; color: #f2f1eb;
-            display: flex; flex-direction: column;
+          .gp {
+            background: ${C.surface}; display: flex; flex-direction: column;
+            overflow: hidden;
           }
-          .gp-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+          .gp-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid ${C.border};
             display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
           }
           .gp-title {
             font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: .18em; text-transform: uppercase; color: #fff;
+            letter-spacing: .18em; text-transform: uppercase; color: ${C.text1};
           }
-          .gp-version {
+          .gp-ver {
             font-family: 'DigitalDisco', monospace; font-size: 10px;
-            color: rgba(255,255,255,0.25); letter-spacing: .1em;
+            color: ${C.text4}; letter-spacing: .1em;
           }
-          .gp-body { padding: 0 20px; flex: 1; overflow-y: auto; }
+          .gp-scroll { flex: 1; overflow-y: auto; padding: 0 18px; }
           .gp-row {
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 0; border-bottom: 1px solid ${C.border};
           }
+          .gp-row:last-child { border-bottom: none; }
           .gp-row-head {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
+            display: flex; justify-content: space-between; margin-bottom: 10px;
           }
-          .gp-label {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-            color: rgba(255,255,255,0.5);
-          }
-          .gp-value {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-            color: #fff;
-          }
+          .gp-lbl { font-family: 'Inter', sans-serif; font-size: 11px; color: ${C.text3}; font-weight: 500; }
+          .gp-val { font-family: 'Inter', sans-serif; font-size: 11px; color: ${C.text1}; font-weight: 600; }
           .gp-slider {
-            width: 100%; height: 2px;
-            -webkit-appearance: none; appearance: none;
-            background: rgba(255,255,255,0.1);
-            outline: none; border-radius: 1px;
+            width: 100%; height: 2px; -webkit-appearance: none; appearance: none;
+            background: ${C.border}; outline: none; border-radius: 1px; cursor: pointer;
           }
           .gp-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none;
-            width: 14px; height: 14px; border-radius: 50%;
-            background: #1A1AFF; cursor: pointer;
+            -webkit-appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: ${C.accent}; cursor: pointer;
+            box-shadow: 0 0 8px rgba(151,71,255,0.6);
           }
-          .gp-slider-labels {
+          .gp-range-labels {
             display: flex; justify-content: space-between; margin-top: 5px;
           }
-          .gp-slider-labels span {
-            font-family: 'Inter', sans-serif; font-size: 10px;
-            color: rgba(255,255,255,0.2);
+          .gp-range-labels span {
+            font-family: 'Inter', sans-serif; font-size: 10px; color: ${C.text4};
           }
           .gp-weights {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-            margin-top: 2px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
           }
-          .gp-weight-btn {
+          .gp-wbtn {
             font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-            padding: 7px 10px; border: 1px solid rgba(255,255,255,0.08);
-            background: transparent; color: rgba(255,255,255,0.4);
-            cursor: pointer; text-align: left; transition: all .15s;
+            padding: 7px 8px; border: 1px solid ${C.border};
+            background: transparent; color: ${C.text3};
+            cursor: pointer; text-align: left; transition: all .15s; border-radius: 2px;
           }
-          .gp-weight-btn:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
-          .gp-weight-btn.active { background: #1A1AFF; border-color: #1A1AFF; color: #fff; }
+          .gp-wbtn:hover { border-color: ${C.borderBright}; color: ${C.text1}; }
+          .gp-wbtn.on { background: ${C.accentDim}; border-color: ${C.accent}; color: ${C.white}; }
+          .gp-glyph-tabs {
+            display: flex; border: 1px solid ${C.border}; margin-bottom: 10px;
+          }
+          .gp-gtab {
+            flex: 1; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+            letter-spacing: .06em; text-transform: uppercase;
+            padding: 6px 4px; background: transparent;
+            color: ${C.text4}; border: none; cursor: pointer; transition: all .15s;
+          }
+          .gp-gtab:hover { color: ${C.text2}; }
+          .gp-gtab.on { background: ${C.accentDim}; color: ${C.blueLight}; }
           .gp-glyphs {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-            margin-top: 8px;
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 4px;
           }
           .gp-glyph {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
-            font-size: 1.4rem; color: #fff; cursor: default;
-            transition: background .15s;
+            background: ${C.surface2}; border: 1px solid ${C.border};
+            font-size: 1.3rem; color: ${C.text1}; cursor: default;
+            transition: all .15s; border-radius: 2px;
           }
-          .gp-glyph:hover { background: rgba(26,26,255,0.2); }
-          .gp-glyph-tabs {
-            display: flex; gap: 0; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08);
-          }
-          .gp-glyph-tab {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-            letter-spacing: .08em; text-transform: uppercase;
-            padding: 6px 10px; background: transparent;
-            color: rgba(255,255,255,0.3); border: none; cursor: pointer;
-            transition: all .15s; flex: 1;
-          }
-          .gp-glyph-tab.active { background: rgba(26,26,255,0.3); color: #fff; }
-          .gp-kanji-row {
-            display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;
-          }
+          .gp-glyph:hover { background: ${C.accentDim}; border-color: ${C.accent}; }
+          .gp-kanji-row { display: flex; gap: 10px; flex-wrap: wrap; }
           .gp-kanji {
-            font-size: 1.6rem; color: rgba(255,255,255,0.15);
-            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-            transition: color .2s; cursor: default;
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans CJK JP', sans-serif;
+            font-size: 1.5rem; color: ${C.text4}; transition: color .2s; cursor: default;
           }
-          .gp-kanji:hover { color: rgba(26,26,255,0.8); }
+          .gp-kanji:hover { color: ${C.accent}; }
 
-          /* ── Interactive specimen ── */
-          .fp-specimen {
-            border-bottom: 1px solid #e8e7e2;
-            background: #fff;
-          }
-          .fp-specimen-toolbar {
-            display: flex; align-items: center; gap: 1rem;
-            padding: 10px 1.4rem;
-            border-bottom: 1px solid #e8e7e2;
-            flex-wrap: wrap;
-          }
-          .fp-specimen-input {
-            flex: 1; min-width: 200px;
-            font-family: 'Inter', sans-serif; font-size: 13px;
-            border: none; outline: none; background: transparent;
-            color: #0a0a0a;
-          }
-          .fp-specimen-input::placeholder { color: #ccc; }
-          .fp-size-control {
-            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-          }
-          .fp-size-label {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-            letter-spacing: .08em; text-transform: uppercase; color: #aaa;
-          }
-          .fp-size-slider {
-            width: 120px; height: 2px; -webkit-appearance: none; appearance: none;
-            background: #e0e0e0; outline: none; border-radius: 1px;
-          }
-          .fp-size-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 12px; height: 12px;
-            border-radius: 50%; background: #1A1AFF; cursor: pointer;
-          }
-          .fp-size-val {
-            font-family: 'DigitalDisco', monospace; font-size: 10px; color: #aaa;
-            width: 30px;
-          }
-          .fp-specimen-stage {
-            padding: clamp(2rem,5vw,4rem) clamp(1.4rem,4vw,3rem);
-            min-height: 200px;
-            display: flex; align-items: center;
-            overflow: hidden;
-          }
-          .fp-specimen-text {
-            line-height: .95; letter-spacing: -.01em;
-            color: #0a0a0a; word-break: break-word;
-            width: 100%;
+          /* ── Stats bar ── */
+          .stats-bar {
+            display: flex; border-bottom: 1px solid ${C.border};
+            background: ${C.surface};
           }
 
-          /* ── Specimens grid ── */
-          .fp-specimens-section {
-            padding: clamp(2.5rem,5vw,4rem) clamp(1.4rem,4vw,3rem);
-            border-bottom: 1px solid #e8e7e2;
+          /* ── Ticker / kanji strip ── */
+          .kanji-strip {
+            overflow: hidden; padding: 12px 0;
+            border-bottom: 1px solid ${C.border};
+            background: ${C.surface};
           }
-          .fp-section-title {
-            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
-            letter-spacing: .18em; text-transform: uppercase; color: #aaa;
-            margin-bottom: 1.6rem;
-          }
-          .fp-specimens-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-          }
-          .fp-specimen-card {
-            cursor: pointer; overflow: hidden;
-            border: 2px solid transparent; transition: border-color .15s;
-          }
-          .fp-specimen-card.active { border-color: #1A1AFF; }
-          .fp-specimen-card img {
-            width: 100%; display: block;
-            aspect-ratio: 4/3; object-fit: cover;
-            transition: transform .3s ease;
-          }
-          .fp-specimen-card:hover img { transform: scale(1.02); }
-          .fp-specimen-main {
-            margin-bottom: 1.2rem;
-            border: 1px solid #e8e7e2; overflow: hidden;
-          }
-          .fp-specimen-main img {
-            width: 100%; display: block;
-          }
-
-          /* ── Weights showcase ── */
-          .fp-weights {
-            border-bottom: 1px solid #e8e7e2;
-          }
-          .fp-weight-row {
-            display: grid; grid-template-columns: 120px 1fr auto;
-            align-items: center; gap: 1.5rem;
-            padding: 1rem clamp(1.4rem,4vw,3rem);
-            border-bottom: 1px solid #f0efe9;
-            cursor: pointer; transition: background .12s;
-          }
-          .fp-weight-row:hover { background: #f5f4f0; }
-          .fp-weight-row.active { background: #f5f4f0; }
-          .fp-weight-row:last-child { border-bottom: none; }
-          .fp-weight-name {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-            letter-spacing: .08em; text-transform: uppercase; color: #aaa;
-          }
-          .fp-weight-sample {
-            font-size: clamp(1.4rem, 3vw, 2.8rem); line-height: 1;
-            color: #0a0a0a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-          }
-          .fp-weight-num {
-            font-family: 'DigitalDisco', monospace; font-size: 10px;
-            color: #ccc; letter-spacing: .1em; white-space: nowrap;
-          }
-
-          /* ── Buy section ── */
-          .fp-buy {
-            display: grid; grid-template-columns: 1fr 1fr;
-            border-bottom: 1px solid #e8e7e2;
-          }
-          .fp-buy-left {
-            padding: clamp(2rem,4vw,3.5rem);
-            border-right: 1px solid #e8e7e2;
-          }
-          .fp-license-tabs {
-            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2rem;
-          }
-          .fp-license-tab {
-            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-            letter-spacing: .08em; text-transform: uppercase;
-            padding: 8px 16px; border: 1px solid #e0dfd8;
-            background: transparent; color: #aaa; cursor: pointer; transition: all .15s;
-          }
-          .fp-license-tab:hover { border-color: #0a0a0a; color: #0a0a0a; }
-          .fp-license-tab.active { background: #0a0a0a; border-color: #0a0a0a; color: #fff; }
-          .fp-price-big {
-            font-family: 'Determination', monospace;
-            font-size: clamp(3rem,7vw,5.5rem); line-height: 1;
-            color: #0a0a0a; margin-bottom: .5rem;
-          }
-          .fp-license-desc {
-            font-family: 'Inter', sans-serif; font-size: 12px; color: #888;
-            margin-bottom: 2rem;
-          }
-          .fp-buy-right {
-            padding: clamp(2rem,4vw,3.5rem);
-            display: flex; flex-direction: column; justify-content: space-between;
-          }
-          .fp-trust-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2rem; }
-          .fp-trust-item {
-            display: flex; align-items: flex-start; gap: 10px;
-          }
-          .fp-trust-dot {
-            width: 6px; height: 6px; border-radius: 50%; background: #1A1AFF;
-            flex-shrink: 0; margin-top: 5px;
-          }
-          .fp-trust-text {
-            font-family: 'Inter', sans-serif; font-size: 12px; color: #666; line-height: 1.5;
-          }
-
-          /* ── Kanji strip ── */
-          .fp-kanji-strip {
-            overflow: hidden; padding: 1.2rem 0;
-            border-bottom: 1px solid #e8e7e2;
-            display: flex; gap: 0;
-          }
-          .fp-kanji-scroll {
+          .kanji-track {
             display: flex; gap: 2.5rem;
-            animation: tickerScroll 20s linear infinite;
-            white-space: nowrap;
+            animation: ticker 18s linear infinite; white-space: nowrap;
           }
-          .fp-kanji-char {
-            font-size: 1.8rem; color: rgba(26,26,255,0.12);
-            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+          .kanji-char {
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans CJK JP', sans-serif;
+            font-size: 1.6rem; color: rgba(151,71,255,0.2);
           }
-
-          @keyframes tickerScroll {
+          @keyframes ticker {
             from { transform: translateX(0); }
             to   { transform: translateX(-50%); }
+          }
+
+          /* ── Specimens ── */
+          .specimens-section {
+            padding: clamp(2rem,4vw,3rem);
+            border-bottom: 1px solid ${C.border};
+          }
+          .section-title {
+            font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+            letter-spacing: .18em; text-transform: uppercase;
+            color: ${C.blueLight}; margin-bottom: 1.4rem;
+          }
+          .specimen-main {
+            margin-bottom: 1rem; border: 1px solid ${C.border}; overflow: hidden;
+          }
+          .specimen-main img { width: 100%; display: block; }
+          .specimen-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+          }
+          .specimen-thumb {
+            cursor: pointer; border: 2px solid transparent;
+            transition: border-color .15s; overflow: hidden;
+          }
+          .specimen-thumb.on { border-color: ${C.accent}; }
+          .specimen-thumb img {
+            width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover;
+            transition: transform .3s; filter: brightness(0.85);
+          }
+          .specimen-thumb:hover img { transform: scale(1.03); filter: brightness(1); }
+          .specimen-thumb.on img { filter: brightness(1); }
+
+          /* ── Weights ── */
+          .weights-section { border-bottom: 1px solid ${C.border}; }
+          .weights-head {
+            padding: 10px clamp(1.4rem,4vw,3rem);
+            border-bottom: 1px solid ${C.border};
+            background: ${C.surface};
+          }
+          .weight-row {
+            display: grid; grid-template-columns: 130px 1fr auto;
+            align-items: center; gap: 1.5rem;
+            padding: 1rem clamp(1.4rem,4vw,3rem);
+            border-bottom: 1px solid ${C.border};
+            cursor: pointer; transition: background .12s;
+          }
+          .weight-row:hover { background: ${C.surface}; }
+          .weight-row.on { background: ${C.surface2}; }
+          .weight-row:last-child { border-bottom: none; }
+          .weight-name {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+            letter-spacing: .08em; text-transform: uppercase; color: ${C.text3};
+          }
+          .weight-sample {
+            font-size: clamp(1.4rem,3vw,2.6rem); line-height: 1;
+            color: ${C.text1}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            transition: color .15s;
+          }
+          .weight-row:hover .weight-sample { color: ${C.white}; }
+          .weight-num {
+            font-family: 'DigitalDisco', monospace; font-size: 10px;
+            color: ${C.text4}; letter-spacing: .1em;
+          }
+
+          /* ── Buy ── */
+          .buy-section {
+            display: grid; grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid ${C.border};
+          }
+          .buy-left {
+            padding: clamp(2rem,4vw,3rem);
+            border-right: 1px solid ${C.border};
+          }
+          .buy-right { padding: clamp(2rem,4vw,3rem); }
+          .license-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2rem; }
+          .lic-tab {
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: 7px 14px; border: 1px solid ${C.border};
+            background: transparent; color: ${C.text3}; cursor: pointer; transition: all .15s;
+          }
+          .lic-tab:hover { border-color: ${C.borderBright}; color: ${C.text1}; }
+          .lic-tab.on { background: ${C.accentDim}; border-color: ${C.accent}; color: ${C.blueLight}; }
+          .price-display {
+            font-family: 'Determination', monospace;
+            font-size: clamp(3rem,6vw,5rem); line-height: 1;
+            color: ${C.white}; margin-bottom: .4rem;
+          }
+          .price-desc {
+            font-family: 'Inter', sans-serif; font-size: 12px;
+            color: ${C.text3}; margin-bottom: 2rem;
+          }
+          .trust-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2rem; }
+          .trust-item { display: flex; align-items: flex-start; gap: 10px; }
+          .trust-dot {
+            width: 5px; height: 5px; border-radius: 50%; background: ${C.accent};
+            flex-shrink: 0; margin-top: 5px; box-shadow: 0 0 6px rgba(151,71,255,0.6);
+          }
+          .trust-text {
+            font-family: 'Inter', sans-serif; font-size: 12px;
+            color: ${C.text3}; line-height: 1.55;
+          }
+          .trial-btn {
+            width: 100%; font-family: 'Inter', sans-serif;
+            font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            padding: 13px; border: 1px solid ${C.border};
+            background: transparent; color: ${C.text3}; cursor: pointer; transition: all .15s;
+            margin-bottom: 8px; display: block;
+          }
+          .trial-btn:hover { border-color: ${C.accent}; color: ${C.blueLight}; }
+          .trial-note {
+            font-family: 'Inter', sans-serif; font-size: 11px;
+            color: ${C.text4}; text-align: center;
           }
 
           /* ── Footer ── */
           .fp-footer {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.2rem clamp(1.4rem,4vw,3rem);
-            background: #fafaf8; border-top: 1px solid #e8e7e2;
+            background: ${C.surface}; border-top: 1px solid ${C.border};
           }
-          .fp-footer-left {
-            font-family: 'Inter', sans-serif; font-size: 11px; color: #bbb;
-            letter-spacing: .06em; text-transform: uppercase;
+          .fp-footer span {
+            font-family: 'Inter', sans-serif; font-size: 11px;
+            color: ${C.text4}; letter-spacing: .06em; text-transform: uppercase;
           }
           .fp-footer-links { display: flex; gap: 1.5rem; }
-          .fp-footer-link {
+          .fp-footer a {
             font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-            color: #bbb; letter-spacing: .08em; text-transform: uppercase;
-            text-decoration: none; transition: color .15s;
+            letter-spacing: .08em; text-transform: uppercase;
+            color: ${C.text4}; text-decoration: none; transition: color .15s;
           }
-          .fp-footer-link:hover { color: #0a0a0a; }
+          .fp-footer a:hover { color: ${C.text1}; }
         `}</style>
       </Head>
 
-      <Script
-        src={`https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=GBP`}
-        onReady={() => setPaypalReady(true)}
-      />
+      <Script src={`https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=GBP`} onReady={() => setPaypalReady(true)} />
 
       {/* ── NAV ─────────────────────────────────── */}
-      <nav className="fp-nav">
-        <Link href="/" className="fp-nav-logo">HypeForType</Link>
-        <Link href="/" className="fp-nav-back">← All Typefaces</Link>
-        <span className="fp-nav-title">{font.name}</span>
-        <button className="fp-nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
+      <nav className="nav">
+        <Link href="/" className="nav-logo">HypeForType</Link>
+        <Link href="/" className="nav-back">← All Typefaces</Link>
+        <span className="nav-title">{font.name}</span>
+        <button className="nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
           Free Trial
         </button>
-        <a href="#buy" className="fp-nav-buy">Buy {font.name} →</a>
+        <a href="#buy" className="nav-buy">Buy {font.name} →</a>
       </nav>
 
-      {/* ── HERO ────────────────────────────────── */}
-      <section className="fp-hero">
+      {/* ── HERO: live canvas + glyph panel ─────── */}
+      <section className="hero">
 
-        {/* Left — LIVE TYPE CANVAS */}
-        <div className="fp-hero-left">
-          <div className="fp-hero-kanji">{kanji[0]}</div>
+        {/* LEFT — live type canvas */}
+        <div className="hero-canvas">
+          <div className="hero-kanji-bg">{kanji[0]}</div>
 
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div className="fp-eyebrow">{font.idx} — {font.tags.join(' · ')}</div>
+          <div style={{ position:'relative', zIndex:1, marginBottom:'.8rem' }}>
+            <div className="hero-eyebrow">{font.idx} — {font.tags.join(' · ')}</div>
           </div>
 
-          {/* THE LIVE TYPE — controlled by the right panel */}
-          <div style={{
-            position: 'relative', zIndex: 1,
-            flex: 1, display: 'flex', alignItems: 'center',
-            padding: '2rem 0', overflow: 'hidden',
-          }}>
-            <div style={{
+          {/* THE LIVE TYPE */}
+          <div className="hero-live-text">
+            <div className="hero-type" style={{
               fontFamily,
               fontWeight: style.weight,
               fontStyle: style.oblique ? 'italic' : 'normal',
               fontSize: fontSize + 'px',
               letterSpacing: letterSpacing + '%',
-              lineHeight: .92,
-              color: '#0a0a0a',
-              wordBreak: 'break-word',
-              width: '100%',
-              transition: 'font-size .1s, letter-spacing .1s',
+              color: C.white,
             }}>
               {displayText}
             </div>
           </div>
 
-          {/* Bottom — edit input + meta */}
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '.6rem',
-              borderTop: '1px solid #e8e7e2', paddingTop: '1rem', marginBottom: '1.2rem',
-            }}>
-              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#1A1AFF', flexShrink: 0 }}>
-                ↑ Edit
+          {/* Edit input */}
+          <div className="hero-edit-bar">
+            <span className="hero-edit-label">↑ Edit</span>
+            <input className="hero-edit-input"
+              value={previewText}
+              onChange={e => setPreviewText(e.target.value)}
+              placeholder={font.name}
+              maxLength={60}
+            />
+          </div>
+
+          {/* Meta slabs */}
+          <div className="hero-meta-row">
+            {slab('Weights', font.styles.length)}
+            {slab('Glyphs', font.glyphCount + '+')}
+            {slab('Released', font.released)}
+            <div style={{ padding:'0 1.4rem', display:'flex', flexDirection:'column', gap:4 }}>
+              <span style={{ fontFamily:"'Determination',monospace", fontSize:'1.5rem', color:C.text1, lineHeight:1 }}>
+                {font.pro ? 'Pro' : font.hot ? 'New' : 'Retail'}
               </span>
-              <input
-                value={previewText}
-                onChange={e => setPreviewText(e.target.value)}
-                placeholder={font.name}
-                maxLength={60}
-                style={{
-                  flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                  fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#0a0a0a',
-                  caretColor: '#1A1AFF',
-                }}
-              />
-            </div>
-            <div className="fp-meta-row">
-              {[
-                [font.styles.length + (font.styles.length === 1 ? ' style' : ' styles'), 'Weights'],
-                [font.glyphCount + '+', 'Glyphs'],
-                [font.languages, 'Languages'],
-                [font.released, 'Released'],
-              ].map(([v, k]) => (
-                <div key={k} className="fp-meta-item">
-                  <div className="fp-meta-val">{v}</div>
-                  <div className="fp-meta-key">{k}</div>
-                </div>
-              ))}
+              <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>Status</span>
             </div>
           </div>
         </div>
 
-        {/* Right — Glyph Panel */}
-        <div className="glyph-panel">
-          <div className="gp-header">
+        {/* RIGHT — glyph panel */}
+        <div className="gp">
+          <div className="gp-head">
             <span className="gp-title">Glyph Panel</span>
-            <span className="gp-version">V1.0</span>
+            <span className="gp-ver">V1.0</span>
           </div>
+          <div className="gp-scroll">
 
-          <div className="gp-body">
-
-            {/* Weight selector */}
+            {/* Weight */}
             <div className="gp-row">
               <div className="gp-row-head">
-                <span className="gp-label">Weight</span>
-                <span className="gp-value">{style.name} {style.weight}</span>
+                <span className="gp-lbl">Weight</span>
+                <span className="gp-val">{style.name} · {style.weight}</span>
               </div>
               <div className="gp-weights">
-                {font.styles.map((s, i) => (
-                  <button key={i} className={`gp-weight-btn${activeStyle === i ? ' active' : ''}`}
+                {font.styles.map((s,i) => (
+                  <button key={i} className={`gp-wbtn${activeStyle===i?' on':''}`}
                     onClick={() => setActiveStyle(i)}
-                    style={{ fontFamily: `'${font.name}', monospace`, fontWeight: s.weight }}>
+                    style={{ fontFamily, fontWeight: s.weight }}>
                     {s.name}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Font size */}
+            {/* Size */}
             <div className="gp-row">
               <div className="gp-row-head">
-                <span className="gp-label">Size</span>
-                <span className="gp-value">{fontSize}px</span>
+                <span className="gp-lbl">Size</span>
+                <span className="gp-val">{fontSize}px</span>
               </div>
-              <input type="range" className="gp-slider"
-                min="24" max="180" value={fontSize}
-                onChange={e => setFontSize(+e.target.value)} />
-              <div className="gp-slider-labels"><span>24</span><span>180</span></div>
+              <input type="range" className="gp-slider" min="20" max="200" value={fontSize} onChange={e => setFontSize(+e.target.value)} />
+              <div className="gp-range-labels"><span>20</span><span>200</span></div>
             </div>
 
-            {/* Letter spacing */}
+            {/* Letter Spacing */}
             <div className="gp-row">
               <div className="gp-row-head">
-                <span className="gp-label">Letter Spacing</span>
-                <span className="gp-value">{letterSpacing > 0 ? '+' : ''}{letterSpacing}%</span>
+                <span className="gp-lbl">Letter Spacing</span>
+                <span className="gp-val">{letterSpacing > 0 ? '+' : ''}{letterSpacing}%</span>
               </div>
-              <input type="range" className="gp-slider"
-                min="-10" max="30" value={letterSpacing}
-                onChange={e => setLetterSpacing(+e.target.value)} />
-              <div className="gp-slider-labels"><span>−10</span><span>+30</span></div>
+              <input type="range" className="gp-slider" min="-10" max="30" value={letterSpacing} onChange={e => setLetterSpacing(+e.target.value)} />
+              <div className="gp-range-labels"><span>−10</span><span>+30</span></div>
             </div>
 
-            {/* Glyph inspector */}
+            {/* Glyphs */}
             <div className="gp-row">
-              <div className="gp-row-head" style={{ marginBottom: '8px' }}>
-                <span className="gp-label">Glyphs</span>
+              <div className="gp-row-head">
+                <span className="gp-lbl">Glyphs</span>
               </div>
               <div className="gp-glyph-tabs">
-                {Object.keys(glyphSets).map(k => (
-                  <button key={k} className={`gp-glyph-tab${glyphSet === k ? ' active' : ''}`}
-                    onClick={() => setGlyphSet(k)}>
-                    {k.slice(0, 3).toUpperCase()}
-                  </button>
+                {Object.keys(GLYPH_SETS).map(k => (
+                  <button key={k} className={`gp-gtab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>{k}</button>
                 ))}
               </div>
               <div className="gp-glyphs">
-                {glyphSets[glyphSet].slice(0, 16).map((g, i) => (
-                  <div key={i} className="gp-glyph"
-                    style={{ fontFamily: `'${font.name}', monospace`, fontWeight: style.weight }}>
-                    {g}
-                  </div>
+                {GLYPH_SETS[glyphSet].slice(0,16).map((g,i) => (
+                  <div key={i} className="gp-glyph" style={{ fontFamily, fontWeight: style.weight }}>{g}</div>
                 ))}
               </div>
             </div>
 
-            {/* Kanji decoration */}
+            {/* Kanji */}
             <div className="gp-row">
               <div className="gp-row-head">
-                <span className="gp-label">Kanji Mix</span>
+                <span className="gp-lbl">Kanji Mix</span>
               </div>
               <div className="gp-kanji-row">
-                {kanji.map((k, i) => (
-                  <span key={i} className="gp-kanji">{k}</span>
-                ))}
+                {kanji.map((k,i) => <span key={i} className="gp-kanji">{k}</span>)}
               </div>
             </div>
 
@@ -676,137 +609,118 @@ export default function FontPage({ font }) {
         </div>
       </section>
 
+      {/* ── STATS BAR ───────────────────────────── */}
+      <div className="stats-bar">
+        {[
+          ['Languages', font.languages],
+          ['OpenType', font.opentype],
+          ['Styles', font.styles.length + ' weights'],
+          ['Family', font.isFamily ? 'Yes' : 'Single'],
+        ].map(([k,v]) => (
+          <div key={k} style={{ borderRight:`1px solid ${C.border}`, padding:'1rem 1.6rem', display:'flex', flexDirection:'column', gap:4 }}>
+            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:12, fontWeight:600, color:C.text2 }}>{v}</span>
+            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:10, fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:C.text4 }}>{k}</span>
+          </div>
+        ))}
+        <div style={{ flex:1, padding:'1rem 1.6rem', display:'flex', alignItems:'center' }}>
+          <p style={{ fontFamily:"'Inter',sans-serif", fontSize:12, color:C.text3, lineHeight:1.6, maxWidth:'60ch' }}>{font.description}</p>
+        </div>
+      </div>
 
-
-      {/* ── KANJI STRIP ──────────────────────────── */}
-      <div className="fp-kanji-strip">
-        <div className="fp-kanji-scroll">
-          {[...kanji, ...kanji, ...kanji, ...kanji].map((k, i) => (
-            <span key={i} className="fp-kanji-char">{k}</span>
+      {/* ── KANJI STRIP ─────────────────────────── */}
+      <div className="kanji-strip">
+        <div className="kanji-track">
+          {[...kanji,...kanji,...kanji,...kanji].map((k,i) => (
+            <span key={i} className="kanji-char">{k}</span>
           ))}
         </div>
       </div>
 
-      {/* ── SPECIMEN IMAGES (if available) ───────── */}
+      {/* ── SPECIMEN IMAGES ─────────────────────── */}
       {specimens.length > 0 && (
-        <section className="fp-specimens-section">
-          <div className="fp-section-title">Type Specimens</div>
-
-          {/* Main large specimen */}
-          <div className="fp-specimen-main">
-            <img
-              src={specimens[activeSpecimen]}
-              alt={`${font.name} specimen ${activeSpecimen + 1}`}
-            />
+        <div className="specimens-section">
+          <div className="section-title">Type Specimens</div>
+          <div className="specimen-main">
+            <img src={specimens[activeSpecimen]} alt={`${font.name} specimen ${activeSpecimen+1}`} />
           </div>
-
-          {/* Thumbnail grid */}
-          <div className="fp-specimens-grid">
-            {specimens.map((src, i) => (
-              <div key={i}
-                className={`fp-specimen-card${activeSpecimen === i ? ' active' : ''}`}
-                onClick={() => setActiveSpecimen(i)}>
-                <img src={src} alt={`${font.name} specimen ${i + 1}`} />
+          <div className="specimen-grid">
+            {specimens.map((src,i) => (
+              <div key={i} className={`specimen-thumb${activeSpecimen===i?' on':''}`} onClick={() => setActiveSpecimen(i)}>
+                <img src={src} alt={`${font.name} specimen ${i+1}`} />
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
 
-      {/* ── WEIGHTS SHOWCASE ─────────────────────── */}
-      <section className="fp-weights">
-        <div style={{ padding: '1rem clamp(1.4rem,4vw,3rem)', borderBottom: '1px solid #e8e7e2' }}>
-          <div className="fp-section-title" style={{ margin: 0 }}>All Weights</div>
+      {/* ── ALL WEIGHTS ─────────────────────────── */}
+      <div className="weights-section">
+        <div className="weights-head">
+          <div className="section-title" style={{ margin:0 }}>All Weights</div>
         </div>
-        {font.styles.map((s, i) => (
-          <div key={i}
-            className={`fp-weight-row${activeStyle === i ? ' active' : ''}`}
-            onClick={() => setActiveStyle(i)}>
-            <span className="fp-weight-name">{s.name}</span>
-            <span className="fp-weight-sample"
-              style={{ fontFamily, fontWeight: s.weight, fontStyle: s.oblique ? 'italic' : 'normal' }}>
+        {font.styles.map((s,i) => (
+          <div key={i} className={`weight-row${activeStyle===i?' on':''}`} onClick={() => setActiveStyle(i)}>
+            <span className="weight-name">{s.name}</span>
+            <span className="weight-sample" style={{ fontFamily, fontWeight:s.weight, fontStyle:s.oblique?'italic':'normal' }}>
               {previewText.trim() || 'The quick brown fox'}
             </span>
-            <span className="fp-weight-num">{s.weight}</span>
+            <span className="weight-num">{s.weight}</span>
           </div>
         ))}
-      </section>
+      </div>
 
-      {/* ── BUY ──────────────────────────────────── */}
-      <section className="fp-buy" id="buy">
-        <div className="fp-buy-left">
-          <div className="fp-section-title" style={{ marginBottom: '1.5rem' }}>License & Purchase</div>
-
-          <div className="fp-license-tabs">
+      {/* ── BUY ─────────────────────────────────── */}
+      <div className="buy-section" id="buy">
+        <div className="buy-left">
+          <div className="section-title">License & Purchase</div>
+          <div className="license-tabs">
             {Object.entries(tiers).map(([key, tier]) => (
-              <button key={key}
-                className={`fp-license-tab${selectedLicense === key ? ' active' : ''}`}
-                onClick={() => setSelectedLicense(key)}>
+              <button key={key} className={`lic-tab${selectedLicense===key?' on':''}`} onClick={() => setSelectedLicense(key)}>
                 {tier.label}
               </button>
             ))}
           </div>
-
-          <div className="fp-price-big">£{tiers[selectedLicense].price}</div>
-          <div className="fp-license-desc">{tiers[selectedLicense].desc}</div>
-
-          <div ref={paypalRef} style={{ minHeight: 44 }}>
-            {purchasing && (
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#666' }}>
-                Processing...
-              </div>
-            )}
+          <div className="price-display">£{tiers[selectedLicense].price}</div>
+          <div className="price-desc">{tiers[selectedLicense].desc}</div>
+          <div ref={paypalRef} style={{ minHeight:44 }}>
+            {purchasing && <span style={{ fontFamily:"'Inter',sans-serif", fontSize:13, color:C.text3 }}>Processing...</span>}
           </div>
         </div>
 
-        <div className="fp-buy-right">
+        <div className="buy-right">
           <div>
-            <div className="fp-section-title" style={{ marginBottom: '1.2rem' }}>What's included</div>
-            <div className="fp-trust-items">
+            <div className="section-title">What's Included</div>
+            <div className="trust-list">
               {[
-                `${font.styles.length} font file${font.styles.length > 1 ? 's' : ''} (.otf / .ttf)`,
+                `${font.styles.length} font file${font.styles.length>1?'s':''} (.otf / .ttf)`,
                 `${font.glyphCount}+ glyphs including Latin Extended`,
-                font.opentype !== 'Standard' ? `OpenType features: ${font.opentype}` : 'Full OpenType support',
+                font.opentype !== 'Standard' ? `OpenType: ${font.opentype}` : 'Full OpenType support',
                 'Instant download after purchase',
                 'Commercial use perpetual license',
                 'PayPal Secure checkout',
-              ].map((item, i) => (
-                <div key={i} className="fp-trust-item">
-                  <div className="fp-trust-dot" />
-                  <span className="fp-trust-text">{item}</span>
+              ].map((item,i) => (
+                <div key={i} className="trust-item">
+                  <div className="trust-dot" />
+                  <span className="trust-text">{item}</span>
                 </div>
               ))}
             </div>
           </div>
-
           <div>
-            <button
-              onClick={() => window.location.href = `/api/trial?slug=${font.slug}`}
-              style={{
-                width: '100%', fontFamily: "'Inter', sans-serif",
-                fontSize: 12, fontWeight: 600, letterSpacing: '.08em',
-                textTransform: 'uppercase', padding: '13px',
-                border: '1px solid #e0dfd8', background: 'transparent',
-                color: '#666', cursor: 'pointer', transition: 'all .15s',
-                marginBottom: 8,
-              }}
-              onMouseEnter={e => { e.target.style.borderColor = '#0a0a0a'; e.target.style.color = '#0a0a0a'; }}
-              onMouseLeave={e => { e.target.style.borderColor = '#e0dfd8'; e.target.style.color = '#666'; }}>
+            <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
               Download Free Trial
             </button>
-            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: '#bbb', textAlign: 'center' }}>
-              Trial fonts for mockups only · Not for commercial use
-            </div>
+            <p className="trial-note">For mockups only · Not for commercial use</p>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── FOOTER ───────────────────────────────── */}
+      {/* ── FOOTER ──────────────────────────────── */}
       <footer className="fp-footer">
-        <span className="fp-footer-left">© 2026 HypeForType · {font.name}</span>
+        <span>© 2026 HypeForType · {font.name}</span>
         <div className="fp-footer-links">
           {['Licensing','FAQ','Contact'].map(t => (
-            <Link key={t} href={'/' + t.toLowerCase()} className="fp-footer-link">{t}</Link>
+            <Link key={t} href={'/'+t.toLowerCase()}>{t}</Link>
           ))}
         </div>
       </footer>
@@ -817,7 +731,6 @@ export default function FontPage({ font }) {
 export async function getStaticPaths() {
   return { paths: fonts.map(f => ({ params: { slug: f.slug } })), fallback: false };
 }
-
 export async function getStaticProps({ params }) {
   const font = fonts.find(f => f.slug === params.slug);
   return font ? { props: { font } } : { notFound: true };
