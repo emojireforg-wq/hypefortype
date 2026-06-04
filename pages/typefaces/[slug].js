@@ -189,7 +189,7 @@ export default function FontPage({ font }) {
           /* Live display area */
           .canvas-stage {
             flex:1; padding:clamp(1.8rem,4vw,3rem);
-            display:flex; align-items:center; overflow:hidden;
+            display:flex; align-items:center; justify-content:center; overflow:hidden;
             position:relative; cursor:text;
           }
           .canvas-headline-text {
@@ -293,7 +293,7 @@ export default function FontPage({ font }) {
           /* Kanji ticker */
           .kanji-strip { overflow:hidden; padding:10px 0; border-top:1px solid ${C.border}; }
           .kanji-track { display:flex; gap:2rem; animation:tickr 18s linear infinite; white-space:nowrap; }
-          .kanji-char { font-family:'Hiragino Sans','Yu Gothic','Noto Sans CJK JP',sans-serif; font-size:1.5rem; color:rgba(50,94,255,0.2); }
+          .kanji-char { font-size:2rem; color:rgba(50,94,255,0.25); }
           @keyframes tickr { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
           /* Footer */
@@ -468,7 +468,8 @@ export default function FontPage({ font }) {
               ))}
             </div>
             <div className="glyph-grid">
-              {currentGlyphs.slice(0,16).map((g,i) => (
+            <div className="glyph-grid" style={{ maxHeight: 300, overflowY: "auto" }}>
+              {currentGlyphs.map((g,i) => (
                 <div key={i} className="glyph-cell"
                   style={{ fontFamily, fontWeight: style.weight }}
                   onClick={() => setFocusedGlyph(g)}>
@@ -476,26 +477,13 @@ export default function FontPage({ font }) {
                 </div>
               ))}
             </div>
-            {currentGlyphs.length > 16 && (
-              <div style={{ fontFamily: C.sg, fontSize: 10, color: C.text4, marginTop: 6, textAlign: 'center' }}>
-                +{currentGlyphs.length - 16} more · click any glyph to enlarge
-              </div>
+            <div style={{ fontFamily: C.sm, fontSize: 9, color: C.text4, marginTop: 5, textAlign: "right" }}>
+              {currentGlyphs.length} glyphs · click to enlarge
+            </div>
             )}
           </div>
 
-          {/* Kanji mix */}
-          <div className="panel-section">
-            <div className="ps-head"><span className="ps-lbl">Kanji Mix</span></div>
-            <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-              {kanji.map((k,i) => (
-                <span key={i} style={{ fontFamily:"'Hiragino Sans','Yu Gothic',sans-serif", fontSize:'1.4rem', color: i===0 ? C.accent : C.text4, transition:'color .2s', cursor:'default' }}
-                  onMouseEnter={e => e.target.style.color = C.accent}
-                  onMouseLeave={e => e.target.style.color = i===0 ? C.accent : C.text4}>
-                  {k}
-                </span>
-              ))}
-            </div>
-          </div>
+
 
           {/* BUY — in panel, visible near fold */}
           <div className="panel-buy" id="buy">
@@ -537,11 +525,11 @@ export default function FontPage({ font }) {
 
       {/* ── BELOW FOLD ──────────────── */}
 
-      {/* Kanji ticker */}
+      {/* Font ticker — ABC in the actual font */}
       <div className="kanji-strip">
         <div className="kanji-track">
-          {[...kanji,...kanji,...kanji,...kanji].map((k,i) => (
-            <span key={i} className="kanji-char">{k}</span>
+          {[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].split('').map((ch,i) => (
+            <span key={i} className="kanji-char" style={{ fontFamily, fontWeight: style.weight, fontSize: '2rem', color: 'rgba(50,94,255,0.25)', letterSpacing: '.05em' }}>{ch}</span>
           ))}
         </div>
       </div>
