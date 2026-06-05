@@ -254,17 +254,17 @@ export default function FontPage({ font }) {
             overflow-y:auto;max-height:calc(100vh - 44px);
             position:sticky;top:44px;border-left:1px solid ${DIVIDER};
           }
-          .ps{padding:14px 16px;border-bottom:1px solid ${DIVIDER};}
+          .ps{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
           .ps-lbl{
-            font-family:${DET};font-size:.72rem;font-weight:700;
+            font-family:${DET};font-size:.85rem;font-weight:700;
             letter-spacing:.1em;text-transform:uppercase;
-            color:#fff;margin-bottom:10px;
+            color:#fff;margin-bottom:16px;display:block;
             text-decoration:underline;text-decoration-color:${BLUE};
-            text-underline-offset:3px;
+            text-underline-offset:4px;
           }
-          .ps-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-          .ps-slider-lbl{font-family:${SG};font-size:11px;color:#fff;width:56px;flex-shrink:0;}
-          .ps-slider-val{font-family:${DET};font-size:.65rem;color:#fff;width:40px;text-align:right;flex-shrink:0;}
+          .ps-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+          .ps-slider-lbl{font-family:${SG};font-size:13px;color:#fff;width:62px;flex-shrink:0;}
+          .ps-slider-val{font-family:${DET};font-size:.72rem;color:#fff;width:46px;text-align:right;flex-shrink:0;}
 
           /* Dropdown */
           .dd-wrap{position:relative;margin-bottom:8px;}
@@ -299,9 +299,9 @@ export default function FontPage({ font }) {
             margin-top:6px;
           }
           .dd-sub:focus{border-color:${BLUE};}
-          .dd-lbl{font-family:${SG};font-size:11px;color:#fff;margin-bottom:5px;margin-top:10px;}
-          .dd-lbl span{color:#335eff;font-family:${SG};}
-          .dd-hint{font-family:${SM};font-size:10px;color:#555;margin-top:6px;letter-spacing:.06em;}
+          .dd-lbl{font-family:${SG};font-size:13px;font-weight:600;color:#fff;margin-bottom:6px;margin-top:14px;}
+          .dd-lbl span{color:#335eff;font-family:${SG};font-weight:400;}
+          .dd-hint{font-family:${SM};font-size:10px;color:#555;margin-top:8px;letter-spacing:.06em;line-height:1.5;}
 
           /* Slider */
           .slider{
@@ -314,22 +314,22 @@ export default function FontPage({ font }) {
           }
 
           /* Tools */
-          .tools-row{display:flex;gap:10px;align-items:center;margin-top:6px;}
+          .tools-row{display:flex;gap:16px;align-items:flex-end;margin-top:10px;}
           .tool-btn{
-            width:40px;height:40px;background:transparent;border:1px solid ${DIVIDER};
+            background:transparent;border:none;
             display:flex;align-items:center;justify-content:center;
-            cursor:pointer;transition:border-color .15s;padding:6px;
+            cursor:pointer;transition:opacity .15s;padding:0;
           }
-          .tool-btn:hover{border-color:${BLUE};}
-          .tool-btn.on{border-color:${BLUE};background:${BLUE_DIM};}
-          .tool-btn img,.tool-btn svg{width:100%;height:100%;object-fit:contain;}
+          .tool-btn:hover{opacity:.7;}
+          .tool-btn.on{opacity:1;}
+          .tool-btn img{object-fit:contain;display:block;}
 
           /* Weight mode */
           .wm-tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:8px;border:1px solid ${BLUE};}
           .wm-tab{
-            font-family:${DET};font-size:.7rem;font-weight:700;
+            font-family:${DET};font-size:.75rem;font-weight:700;
             letter-spacing:.08em;text-transform:uppercase;
-            padding:8px;background:transparent;color:#555;
+            padding:12px 8px;background:transparent;color:#555;
             border:none;cursor:pointer;transition:all .15s;text-align:center;
           }
           .wm-tab:first-child{border-right:1px solid ${BLUE};}
@@ -339,30 +339,30 @@ export default function FontPage({ font }) {
           .wp-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;}
           .wp-row{
             display:flex;align-items:center;justify-content:space-between;
-            padding:8px 10px;border:1px solid ${DIVIDER};cursor:pointer;transition:all .15s;
+            padding:14px 14px;border:1px solid ${DIVIDER};cursor:pointer;transition:all .15s;
           }
           .wp-row:hover{border-color:#444;}
           .wp-row.on{border-color:${BLUE};background:${BLUE_DIM};}
-          .wp-name{font-family:${SG};font-size:11px;color:#aaa;}
+          .wp-name{font-family:${SG};font-size:13px;color:#aaa;}
           .wp-row.on .wp-name{color:#fff;}
           .wp-check{
-            width:22px;height:22px;border:1px solid #333;
+            width:30px;height:30px;border:1px solid #333;
             display:flex;align-items:center;justify-content:center;
-            flex-shrink:0;transition:all .15s;border-radius:2px;
+            flex-shrink:0;transition:all .15s;border-radius:3px;
           }
           .wp-row.on .wp-check{background:${BLUE};border-color:${BLUE};}
 
           /* Price */
-          .price-block{padding:14px 16px;border-bottom:1px solid ${DIVIDER};}
+          .price-block{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
           .price-context{font-family:${SG};font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:4px;}
-          .price-big{font-family:${DET};font-size:3rem;color:#fff;line-height:1;margin-bottom:12px;}
+          .price-big{font-family:${DET};font-size:3.5rem;color:#fff;line-height:1;margin-bottom:16px;}
           .trial-btn{
-            width:100%;font-family:${DET};font-size:.7rem;
+            width:100%;font-family:${DET};font-size:.72rem;
             font-weight:700;letter-spacing:.1em;text-transform:uppercase;
             color:${TRIAL_TXT};background:transparent;
             border:1px solid ${TRIAL_BDR};
-            padding:12px;transition:all .15s;margin-top:8px;
-            border-radius:6px;
+            padding:15px;transition:all .15s;margin-top:10px;
+            border-radius:8px;
           }
           .trial-btn:hover{border-color:${BLUE};color:${BLUE};}
 
@@ -580,16 +580,16 @@ export default function FontPage({ font }) {
             <div className="ps-lbl">Tools</div>
             <div className="tools-row">
               <button className={`tool-btn${viewMode==='DISPLAY'?' on':''}`} onClick={() => setViewMode('DISPLAY')} title="Display">
-                <img src="/elements/tools-aa.svg" alt="Display" />
+                <img src="/elements/tools-aa.svg" alt="Display" style={{ width:52, height:54 }} />
               </button>
               <button className={`tool-btn${viewMode==='BODY'?' on':''}`} onClick={() => setViewMode('BODY')} title="Body text">
-                <img src="/elements/tools-colour-picker.svg" alt="Colour" />
+                <img src="/elements/tools-colour-picker.svg" alt="Colour" style={{ width:54, height:54 }} />
               </button>
               <button className={`tool-btn${viewMode==='HEADLINE'?' on':''}`} onClick={() => setViewMode('HEADLINE')} title="Headline">
-                <img src="/elements/tools-heart.svg" alt="Heart" />
+                <img src="/elements/tools-heart.svg" alt="Heart" style={{ width:58, height:52 }} />
               </button>
               <button className="tool-btn" onClick={() => inputRef.current?.focus()} title="Type">
-                <img src="/elements/tools-finger.svg" alt="Type" />
+                <img src="/elements/tools-finger.svg" alt="Type" style={{ width:36, height:52 }} />
               </button>
             </div>
           </div>
