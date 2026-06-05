@@ -309,7 +309,9 @@ export default function FontPage({ font }) {
           <Link href={`/typefaces/${prevFont.slug}`} className="nav-arrow">‹ {prevFont.name}</Link>
           <Link href={`/typefaces/${nextFont.slug}`} className="nav-arrow">  {nextFont.name} ›</Link>
           <button className="nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>Trial</button>
-          <a href="#buy" className="nav-buy">Buy →</a>
+          <a href="#buy" className="nav-buy">
+            Buy →{cartCount > 0 && <span style={{ marginLeft:6, background:'#fff', color:'#325eff', borderRadius:'50%', width:16, height:16, fontSize:9, fontWeight:700, display:'inline-flex', alignItems:'center', justifyContent:'center' }}>{cartCount}</span>}
+          </a>
         </div>
       </nav>
 
@@ -336,13 +338,15 @@ export default function FontPage({ font }) {
               </button>
             ))}
             <div className="tb-sep" />
-            <span className="tb-lbl">BG</span>
-            {BG_SWATCHES.map(c => <div key={c} className={`tb-sw${bgColor===c?' on':''}`} style={{ background:c }} onClick={() => setBgColor(c)} />)}
+            <span className="tb-lbl">Background</span>
+            {BG_SWATCHES.map(c => <div key={c} className={`tb-sw${bgColor===c?' on':''}`} style={{ background:c, width:20, height:20 }} onClick={() => setBgColor(c)} title={c} />)}
             <div className="tb-sep" />
-            <span className="tb-lbl">Text</span>
-            {TEXT_SWATCHES.map(c => <div key={c} className={`tb-sw${textColor===c?' on':''}`} style={{ background:c }} onClick={() => setTextColor(c)} />)}
+            <span className="tb-lbl">Text colour</span>
+            {TEXT_SWATCHES.map(c => <div key={c} className={`tb-sw${textColor===c?' on':''}`} style={{ background:c, width:20, height:20 }} onClick={() => setTextColor(c)} title={c} />)}
           </div>
 
+          {/* Hero specimen behind stage — subtle */}
+          <div style={{ position:'relative' }}>
           <div className="stage-wrap" style={{ background: bgColor }}>
             <textarea className="stage-input" value={previewText} onChange={e => setPreviewText(e.target.value)} maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off" />
             <div className="stage-display">
@@ -358,6 +362,7 @@ export default function FontPage({ font }) {
             </div>
             {!previewText && <div className="stage-hint">Click anywhere to type</div>}
           </div>
+          </div>
 
           <div className="meta-strip">
             {[[font.styles.length,'Weights'],[font.glyphCount+'+','Glyphs'],[font.released,'Released'],[font.pro?'Pro':font.hot?'New':'Retail','Status']].map(([v,k]) => (
@@ -371,6 +376,20 @@ export default function FontPage({ font }) {
           <div className="panel-head">
             <span className="panel-title">Type Panel</span>
             <span className="panel-ver">V1.0</span>
+          </div>
+
+          {/* Description + Price — top of panel */}
+          <div className="ps" style={{ borderBottom:'1px solid #1c1c2e', background:'#0f0f1a' }}>
+            <p style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:12, color:'#9097a1', lineHeight:1.65, marginBottom:14 }}>
+              {font.description}
+            </p>
+            <div className="price-ctx">{weightMode==='full'?`Full family · ${font.styles.length} weights`:`${weightCount} weight${weightCount>1?'s':''} · ${LICENSE_TYPES.find(l=>l.key===licenseType)?.label}`}</div>
+            <div className="price-big">£{estPrice}</div>
+            <div className="price-note">Indicative — final pricing coming soon</div>
+            <div ref={paypalRef} style={{ minHeight:44 }}>
+              {purchasing && <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:12, color:'#9097a1' }}>Processing...</span>}
+            </div>
+            <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>Free Trial Download</button>
           </div>
 
           {/* Weight */}
@@ -460,16 +479,7 @@ export default function FontPage({ font }) {
             )}
           </div>
 
-          {/* Price */}
-          <div className="ps">
-            <div className="price-ctx">{weightMode==='full'?`Full family · ${font.styles.length} weights`:`${weightCount} weight${weightCount>1?'s':''} · ${LICENSE_TYPES.find(l=>l.key===licenseType)?.label}`}</div>
-            <div className="price-big">£{estPrice}</div>
-            <div className="price-note">Indicative pricing — final pricing coming soon</div>
-            <div ref={paypalRef} style={{ minHeight:44 }}>
-              {purchasing && <span style={{ fontFamily:"'Space Grotesk',sans-serif", fontSize:12, color:'#9097a1' }}>Processing...</span>}
-            </div>
-            <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>Free Trial Download</button>
-          </div>
+
 
           {/* Trust */}
           <div className="trust-list">
