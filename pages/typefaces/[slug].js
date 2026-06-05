@@ -162,6 +162,7 @@ export default function FontPage({ font }) {
             display:grid;grid-template-columns:1fr auto;
             height:44px;border-bottom:1px solid ${DIVIDER};
             background:#000;
+            padding-right:300px;
           }
           .nav-left{display:flex;align-items:stretch;}
           .nav-pill{
@@ -259,7 +260,7 @@ export default function FontPage({ font }) {
             width:300px;
             height:calc(100vh - 44px);
             border-left:1px solid ${DIVIDER};
-            z-index:100;
+            z-index:150;
           }
           .ps{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
           .ps-lbl{
@@ -427,7 +428,7 @@ export default function FontPage({ font }) {
           .wr:hover{background:#100f20;}
           .wr.on{background:#12103a;}
           .wr-name{font-family:${DET};font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${BLUE};}
-          .wr-sample{font-size:clamp(1.875rem,3.5vw,3.25rem);line-height:1;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+          .wr-sample{font-size:clamp(1.4rem,2.8vw,2.6rem);line-height:1.1;color:#fff;overflow:hidden;text-overflow:clip;white-space:nowrap;}
           .add-btn{
             font-family:${DET};font-size:.65rem;font-weight:700;
             letter-spacing:.1em;text-transform:uppercase;
