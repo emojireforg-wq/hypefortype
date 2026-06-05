@@ -11,46 +11,43 @@ const SPECIMENS = {
 };
 
 const GLYPH_SETS = {
-  UPP: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-  LOW: 'abcdefghijklmnopqrstuvwxyz'.split(''),
-  NUM: '0123456789'.split(''),
-  PUN: '.,;:!?\'"-—…()[]{}@#$%&*+<>='.split(''),
-  ACC: 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
+  UPPERCASE:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  LOWERCASE:   'abcdefghijklmnopqrstuvwxyz'.split(''),
+  NUMERALS:    '0123456789'.split(''),
+  PUNCTUATION: '.,;:!?\'"-—…()[]{}@#$%&*+<>='.split(''),
+  ACCENTS:     'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
+  ALL:         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:!?'.split(''),
 };
 
 const LICENSE_TYPES = [
-  { key: 'desktop',    label: 'Desktop',          icon: '🖥' },
-  { key: 'webfont',    label: 'Webfont',           icon: '🌐' },
-  { key: 'app',        label: 'App',               icon: '📱' },
-  { key: 'broadcast',  label: 'Broadcast',         icon: '📺' },
-  { key: 'brand',      label: 'Brand Font',        icon: '✦' },
-  { key: 'enterprise', label: 'Enterprise',        icon: '🏢' },
-  { key: 'enterprise-group', label: 'Group Enterprise', icon: '🏗' },
+  { key: 'desktop',    label: 'Desktop' },
+  { key: 'webfont',    label: 'Webfont' },
+  { key: 'app',        label: 'App' },
+  { key: 'broadcast',  label: 'Broadcast' },
+  { key: 'brand',      label: 'Brand Font' },
+  { key: 'enterprise', label: 'Enterprise' },
+  { key: 'enterprise-group', label: 'Group Enterprise' },
 ];
 
-const DESKTOP_SEATS = [1, 2, 5, 10, 25, 50, 100];
-const WEB_PAGEVIEWS = ['10,000','50,000','100,000','250,000','500,000','1,000,000','Unlimited'];
+const DESKTOP_SEATS   = [1,2,5,10,25,50,100];
+const WEB_PAGEVIEWS   = ['10,000','50,000','100,000','250,000','500,000','1,000,000','Unlimited'];
+const PREVIEW_TEXT    = 'Zen samurai packs quartz koi jade silk.';
 
-const LOREM = `Gentle curves meet geometric precision. Every terminal softens without apology. Every weight carries its own distinct gravity.`;
-
-const BG_SWATCHES   = ['#000000','#0a0a0f','#ffffff','#f5f4f0','#1a1a2e','#0d1117'];
-const TEXT_SWATCHES = ['#f2f1eb','#cbced3','#000000','#325eff','#ffffff','#9097a1'];
-
+// Figma-extracted palette
 const C = {
   bg:      '#000000',
-  surface: '#0a0a0f',
-  srf2:    '#0f0f1a',
-  bdr:     '#1c1c2e',
-  bdrHi:   '#2a2a45',
-  accent:  '#325eff',
-  aDim:    'rgba(50,94,255,0.12)',
-  aBdr:    'rgba(50,94,255,0.4)',
-  aGlow:   '0 0 8px rgba(50,94,255,0.45)',
-  t1:      '#cbced3',
+  panel:   '#1e1d22',   // right panel — extracted from Figma
+  srf2:    '#0a0917',   // weight row tint — extracted
+  bdr:     '#2a2a2a',   // general border
+  glyphBdr:'#7c7c7c',   // glyph cell border — extracted from Figma
+  accent:  '#1b1afe',   // buy button blue — extracted from Figma
+  aDim:    'rgba(27,26,254,0.12)',
+  aGlow:   '0 0 8px rgba(27,26,254,0.5)',
+  t1:      '#ffffff',   // primary text pure white
   t2:      '#b0b1b6',
   t3:      '#9097a1',
-  t4:      '#4a4d56',
-  white:   '#f2f1eb',
+  t4:      '#555560',
+  white:   '#ffffff',
   sg:      "'Space Grotesk', sans-serif",
   sm:      "'Space Mono', monospace",
   det:     "'Determination', monospace",
@@ -62,52 +59,66 @@ export default function FontPage({ font }) {
   const [fontSize,        setFontSize]         = useState(72);
   const [letterSpacing,   setLetterSpacing]    = useState(0);
   const [lineHeight,      setLineHeight]       = useState(1.0);
-  const [glyphSet,        setGlyphSet]         = useState('UPP');
+  const [glyphSet,        setGlyphSet]         = useState('UPPERCASE');
   const [activeSpecimen,  setActiveSpecimen]   = useState(0);
   const [viewMode,        setViewMode]         = useState('display');
   const [bgColor,         setBgColor]          = useState('#000000');
-  const [textColor,       setTextColor]        = useState('#f2f1eb');
+  const [textColor,       setTextColor]        = useState('#ffffff');
   const [focusedGlyph,    setFocusedGlyph]     = useState(null);
-
-  // License state
   const [licenseType,     setLicenseType]      = useState('desktop');
-  const [desktopSeats,    setDesktopSeats]      = useState(1);
-  const [webPageviews,    setWebPageviews]      = useState('10,000');
-  // Weight selection: 'single' | 'full'
-  const [weightMode,      setWeightMode]        = useState('single');
-  // Which individual weights are selected (indices)
+  const [desktopSeats,    setDesktopSeats]     = useState(1);
+  const [webPageviews,    setWebPageviews]     = useState('10,000');
+  const [weightMode,      setWeightMode]       = useState('single');
   const [selectedWeights, setSelectedWeights]  = useState(new Set([0]));
-
   const [paypalReady,     setPaypalReady]      = useState(false);
   const [purchasing,      setPurchasing]       = useState(false);
+  const [cart,            setCart]             = useState([]);
+  const [addedIdx,        setAddedIdx]         = useState(null);
+  const [showToast,       setShowToast]        = useState(false);
+  const [toastMsg,        setToastMsg]         = useState('');
   const inputRef  = useRef(null);
   const paypalRef = useRef(null);
 
-  const tiers      = pricing[font.isFamily ? 'family' : 'single'];
-  const style      = font.styles[activeStyle];
-  const fontFamily = `'${font.name}', monospace`;
-  const specimens  = SPECIMENS[font.slug] || [];
-  const fontIdx    = fonts.findIndex(f => f.slug === font.slug);
-  const prevFont   = fonts[(fontIdx - 1 + fonts.length) % fonts.length];
-  const nextFont   = fonts[(fontIdx + 1) % fonts.length];
-  const allGlyphs  = GLYPH_SETS[glyphSet];
-  const DEFAULT_DISPLAY = 'AaBbCcDd';
-  const displayText = previewText || DEFAULT_DISPLAY;
+  useEffect(() => {
+    try { setCart(JSON.parse(localStorage.getItem('hft_cart') || '[]')); } catch(e) {}
+  }, []);
+
+  const tiers     = pricing[font.isFamily ? 'family' : 'single'];
+  const style     = font.styles[activeStyle];
+  const fontFamily= `'${font.name}', monospace`;
+  const specimens = SPECIMENS[font.slug] || [];
+  const fontIdx   = fonts.findIndex(f => f.slug === font.slug);
+  const prevFont  = fonts[(fontIdx - 1 + fonts.length) % fonts.length];
+  const nextFont  = fonts[(fontIdx + 1) % fonts.length];
+  const allGlyphs = GLYPH_SETS[glyphSet];
+  const displayText = previewText || 'AaBbCcDd';
+  const basePrice   = tiers?.desktop?.price || 45;
+  const weightCount = weightMode === 'full' ? font.styles.length : selectedWeights.size;
+  const estimatedPrice = weightMode === 'full'
+    ? (tiers?.bundle?.price || basePrice * 1.8).toFixed(0)
+    : (basePrice * weightCount).toFixed(0);
 
   const toggleWeight = (i) => {
     if (weightMode === 'full') return;
     setSelectedWeights(prev => {
       const next = new Set(prev);
-      if (next.has(i) && next.size > 1) next.delete(i);
-      else next.add(i);
+      if (next.has(i) && next.size > 1) next.delete(i); else next.add(i);
       return next;
     });
   };
 
-  // Base price placeholder logic (will be replaced with real pricing)
-  const basePrice = tiers?.desktop?.price || 25;
-  const weightCount = weightMode === 'full' ? font.styles.length : selectedWeights.size;
-  const estimatedPrice = weightMode === 'full' ? tiers?.bundle?.price || (basePrice * 2) : basePrice * weightCount;
+  const addToCart = (e, styleIdx) => {
+    e.stopPropagation();
+    const s = font.styles[styleIdx];
+    const item = { slug: font.slug, name: font.name, style: s.name, weight: s.weight, license: licenseType };
+    const newCart = [...cart, item];
+    setCart(newCart);
+    try { localStorage.setItem('hft_cart', JSON.stringify(newCart)); } catch(e) {}
+    setAddedIdx(styleIdx);
+    setToastMsg(`${font.name} ${s.name} added`);
+    setShowToast(true);
+    setTimeout(() => { setShowToast(false); setAddedIdx(null); }, 2500);
+  };
 
   useEffect(() => {
     if (!paypalReady || !paypalRef.current) return;
@@ -116,7 +127,7 @@ export default function FontPage({ font }) {
       createOrder: async () => {
         const res = await fetch('/api/paypal-create', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: estimatedPrice, description: `${font.name} — ${licenseType} License` }),
+          body: JSON.stringify({ amount: estimatedPrice, description: `${font.name} — ${licenseType}` }),
         });
         return (await res.json()).orderId;
       },
@@ -130,11 +141,9 @@ export default function FontPage({ font }) {
         if (result.success) window.location.href = `/download?token=${result.token}`;
         setPurchasing(false);
       },
-      style: { layout:'horizontal', color:'black', shape:'rect', label:'buynow', height:40, tagline:false },
+      style: { layout:'horizontal', color:'blue', shape:'rect', label:'buynow', height:44, tagline:false },
     }).render(paypalRef.current);
-  }, [paypalReady, licenseType, font, estimatedPrice]);
-
-  const currentLicense = LICENSE_TYPES.find(l => l.key === licenseType);
+  }, [paypalReady, licenseType, estimatedPrice, font]);
 
   return (
     <>
@@ -148,192 +157,239 @@ export default function FontPage({ font }) {
         ))}
         <style>{`
           *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-          html,body{background:#000!important;color:${C.t1}!important;font-family:${C.sg}!important;-webkit-font-smoothing:antialiased;}
-          ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:${C.bdr}}
-          a{text-decoration:none;color:inherit}button{cursor:pointer}
-          select,option{background:${C.surface};color:${C.t1};}
+          html,body{background:#000!important;color:#fff!important;font-family:${C.sg}!important;-webkit-font-smoothing:antialiased;}
+          ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:#333}
+          a{text-decoration:none;color:inherit;}button{cursor:pointer;}
+          select,option{background:${C.panel};color:#fff;}
 
-          /* NAV */
-          .nav{position:sticky;top:0;z-index:200;display:grid;grid-template-columns:auto auto auto 1fr auto auto auto;height:48px;border-bottom:1px solid ${C.bdr};background:rgba(0,0,0,0.93);backdrop-filter:blur(12px);}
-          .nav-logo{font-family:${C.det};font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:${C.white};padding:0 1.2rem;border-right:1px solid ${C.bdr};display:flex;align-items:center;}
-          .nav-back{font-family:${C.sg};font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:${C.t4};padding:0 1rem;border-right:1px solid ${C.bdr};display:flex;align-items:center;transition:color .15s;}
-          .nav-back:hover{color:${C.t1};}
-          .nav-arrow{font-family:${C.sg};font-size:11px;font-weight:500;color:${C.t4};padding:0 .9rem;border-right:1px solid ${C.bdr};display:flex;align-items:center;transition:color .15s;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
-          .nav-arrow:hover{color:${C.t1};}
-          .nav-arrow-right{border-right:none;border-left:1px solid ${C.bdr};}
-          .nav-spacer{flex:1;}
-          .nav-trial{font-family:${C.sg};font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:${C.accent};padding:0 1.2rem;border-left:1px solid ${C.bdr};border-right:1px solid ${C.bdr};display:flex;align-items:center;background:none;border-top:none;border-bottom:none;transition:opacity .15s;}
-          .nav-trial:hover{opacity:.75;}
-          .nav-buy{font-family:${C.sg};font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:${C.accent};padding:0 1.4rem;display:flex;align-items:center;transition:opacity .15s;}
+          /* ── NAV ── */
+          .nav{
+            position:sticky;top:0;z-index:200;
+            display:grid;grid-template-columns:1fr auto 1fr;
+            height:44px;border-bottom:1px solid #1a1a1a;
+            background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);
+          }
+          .nav-left{display:flex;align-items:stretch;gap:0;}
+          .nav-pill{
+            font-family:${C.sg};font-size:11px;font-weight:500;
+            letter-spacing:.06em;text-transform:uppercase;
+            color:#888;padding:0 14px;
+            border:1px solid #2a2a2a;margin:7px 0 7px 8px;
+            display:flex;align-items:center;gap:6px;
+            transition:color .15s,border-color .15s;white-space:nowrap;
+          }
+          .nav-pill:hover{color:#fff;border-color:#555;}
+          .nav-pill-font{
+            font-family:${C.sg};font-size:11px;font-weight:600;
+            letter-spacing:.04em;
+            color:#ccc;padding:0 14px;
+            border:1px solid #2a2a2a;margin:7px 0 7px 6px;
+            display:flex;align-items:center;
+            white-space:nowrap;
+          }
+          .nav-center{
+            font-family:${C.det};font-size:.82rem;
+            letter-spacing:.1em;text-transform:uppercase;
+            color:#fff;display:flex;align-items:center;justify-content:center;
+            padding:0 1rem;
+          }
+          .nav-right{display:flex;align-items:stretch;justify-content:flex-end;gap:0;}
+          .nav-next{
+            font-family:${C.sg};font-size:11px;font-weight:500;
+            letter-spacing:.06em;text-transform:uppercase;
+            color:#888;padding:0 14px;
+            border:1px solid #2a2a2a;margin:7px 6px 7px 0;
+            display:flex;align-items:center;
+            transition:color .15s;white-space:nowrap;
+          }
+          .nav-next:hover{color:#fff;border-color:#555;}
+          .nav-trial{
+            font-family:${C.sg};font-size:11px;font-weight:600;
+            letter-spacing:.08em;text-transform:uppercase;
+            color:${C.accent};background:transparent;
+            border:none;padding:0 14px;
+            display:flex;align-items:center;transition:opacity .15s;
+          }
+          .nav-trial:hover{opacity:.7;}
+          .nav-buy{
+            font-family:${C.sg};font-size:11px;font-weight:700;
+            letter-spacing:.1em;text-transform:uppercase;
+            color:#fff;background:${C.accent};
+            padding:0 20px;display:flex;align-items:center;
+            transition:opacity .15s;
+          }
           .nav-buy:hover{opacity:.85;}
 
-          /* LAYOUT */
-          .page-grid{display:grid;grid-template-columns:1fr 300px;border-bottom:1px solid ${C.bdr};}
+          /* ── MAIN LAYOUT ── */
+          .main-wrap{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 44px);}
 
-          /* CANVAS */
-          .canvas{border-right:1px solid ${C.bdr};display:flex;flex-direction:column;transition:background .25s;}
-          .toolbar{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding:7px 1.2rem;border-bottom:1px solid ${C.bdr};background:rgba(0,0,0,0.5);flex-shrink:0;}
-          .tb-lbl{font-family:${C.sm};font-size:9px;color:${C.t4};letter-spacing:.12em;text-transform:uppercase;}
-          .tb-sep{width:1px;height:14px;background:${C.bdr};}
-          .tb-btn{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid ${C.bdr};background:transparent;color:${C.t4};transition:all .15s;}
-          .tb-btn:hover{border-color:${C.bdrHi};color:${C.t1};}
+          /* ── LEFT CANVAS ── */
+          .canvas{border-right:1px solid #1a1a1a;display:flex;flex-direction:column;transition:background .25s;}
+          .toolbar{
+            display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+            padding:6px 1rem;border-bottom:1px solid #1a1a1a;
+            background:rgba(0,0,0,0.6);flex-shrink:0;
+          }
+          .tb-lbl{font-family:${C.sm};font-size:9px;color:#444;letter-spacing:.12em;text-transform:uppercase;}
+          .tb-sep{width:1px;height:14px;background:#222;}
+          .tb-btn{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid #222;background:transparent;color:#555;transition:all .15s;}
+          .tb-btn:hover{border-color:#444;color:#ccc;}
           .tb-btn.on{background:${C.aDim};border-color:${C.accent};color:${C.accent};}
-          .tb-sw{width:17px;height:17px;border:1px solid ${C.bdr};cursor:pointer;transition:all .15s;flex-shrink:0;}
+          .tb-sw{width:16px;height:16px;border:1px solid #333;cursor:pointer;transition:all .15s;flex-shrink:0;}
           .tb-sw:hover,.tb-sw.on{border-color:${C.accent};box-shadow:${C.aGlow};}
 
           /* Stage */
-          .stage-wrap{position:relative;height:280px;flex-shrink:0;}
-          .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:${C.accent};font-size:16px;padding:clamp(1.5rem,3vw,2.5rem);z-index:2;cursor:text;}
-          .stage-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1.5rem,3vw,2.5rem);pointer-events:none;overflow:hidden;}
-          .stage-text{width:100%;line-height:.92;letter-spacing:-.02em;word-break:break-word;transition:font-size .08s,letter-spacing .08s,line-height .08s;}
-          .stage-body{width:100%;max-width:58ch;transition:font-size .08s,line-height .08s;}
-          .stage-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:${C.sm};font-size:9px;color:${C.t4};letter-spacing:.12em;text-transform:uppercase;pointer-events:none;white-space:nowrap;}
+          .stage-wrap{position:relative;height:260px;flex-shrink:0;}
+          .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:${C.accent};font-size:16px;padding:2rem;z-index:2;cursor:text;}
+          .stage-display{position:absolute;inset:0;display:flex;align-items:center;padding:2rem;pointer-events:none;overflow:hidden;}
+          .stage-text{width:100%;line-height:.92;letter-spacing:-.02em;word-break:break-word;}
+          .stage-body{width:100%;max-width:58ch;}
+          .stage-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:${C.sm};font-size:9px;color:${C.accent};letter-spacing:.18em;text-transform:uppercase;pointer-events:none;white-space:nowrap;}
 
           /* Focused glyph */
           .glyph-focus{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;cursor:pointer;}
-          .glyph-focus-meta{font-family:${C.sm};font-size:10px;color:${C.t4};letter-spacing:.1em;margin-top:1rem;}
+          .glyph-focus-meta{font-family:${C.sm};font-size:10px;color:#555;letter-spacing:.1em;margin-top:1rem;}
 
           /* Meta strip */
-          .meta-strip{display:flex;border-top:1px solid ${C.bdr};flex-shrink:0;}
-          .meta-cell{flex:1;padding:.7rem .9rem;border-right:1px solid ${C.bdr};display:flex;flex-direction:column;gap:3px;}
-          .meta-cell:last-child{border-right:none;}
-          .meta-val{font-family:${C.det};font-size:1.1rem;color:${C.t1};line-height:1;}
-          .meta-key{font-family:${C.sg};font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:${C.t4};}
+          .meta-strip{display:flex;align-items:center;border-top:1px solid #1a1a1a;padding:1rem;gap:1.5rem;flex-shrink:0;}
+          .meta-num{font-family:${C.det};font-size:1.4rem;color:#fff;line-height:1;}
+          .meta-key{font-family:${C.sg};font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#444;margin-top:2px;}
+          .meta-divider{color:#1e1d22;font-size:1.2rem;}
+          .meta-desc{font-family:${C.sg};font-size:11px;color:#555;line-height:1.6;max-width:55ch;padding-top:.2rem;}
 
-          /* ── GLYPH STRIP (horizontal, below canvas) ── */
-          .glyph-strip-section{border-bottom:1px solid ${C.bdr};background:${C.bg};}
-          .glyph-strip-toolbar{display:flex;align-items:center;gap:0;border-bottom:1px solid ${C.bdr};}
-          .glyph-strip-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 18px;background:transparent;color:${C.t4};border:none;border-right:1px solid ${C.bdr};cursor:pointer;transition:all .15s;}
-          .glyph-strip-tab:hover{color:${C.t2};}
-          .glyph-strip-tab.on{background:${C.aDim};color:${C.accent};}
-          .glyph-strip-count{font-family:${C.sm};font-size:9px;color:${C.t4};padding:0 1rem;margin-left:auto;}
-          .glyph-strip-grid{
-            display:flex;flex-wrap:wrap;
-            padding:12px 16px;gap:4px;
-          }
-          .g-cell{
-            width:44px;height:44px;
-            display:flex;align-items:center;justify-content:center;
-            background:#000;border:1px solid #1c1c2e;
-            font-size:1.1rem;color:#fff;
-            cursor:pointer;transition:all .12s;flex-shrink:0;
-          }
-          .g-cell:hover{background:${C.aDim};border-color:${C.accent};transform:scale(1.1);}
-          .g-cell-hint{font-family:${C.sm};font-size:9px;color:${C.t4};padding:4px 16px 12px;width:100%;}
+          /* ── RIGHT PANEL ── */
+          .panel{background:${C.panel};display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 44px);position:sticky;top:44px;}
+          .panel-head{padding:10px 14px;border-bottom:1px solid #111;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+          .panel-title{font-family:${C.sg};font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#888;}
+          .panel-ver{font-family:${C.sm};font-size:9px;color:#444;}
+          .ps{padding:11px 14px;border-bottom:1px solid #111;}
+          .ps-head{display:flex;justify-content:space-between;margin-bottom:8px;}
+          .ps-lbl{font-family:${C.sg};font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#888;}
+          .ps-val{font-family:${C.sm};font-size:10px;color:#ccc;}
+          .p-select{width:100%;background:#111;border:1px solid #333;color:#fff;font-family:${C.sg};font-size:11px;font-weight:600;padding:8px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
+          .p-select:focus{border-color:${C.accent};}
+          .slider{width:100%;height:2px;-webkit-appearance:none;appearance:none;background:#333;outline:none;border-radius:1px;cursor:pointer;}
+          .slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:${C.accent};cursor:pointer;box-shadow:${C.aGlow};}
+          .rng{display:flex;justify-content:space-between;margin-top:4px;}
+          .rng span{font-family:${C.sm};font-size:9px;color:#444;}
 
-          /* PANEL */
-          .panel{background:${C.surface};display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 48px);position:sticky;top:48px;}
-          .panel-head{padding:11px 16px;border-bottom:1px solid ${C.bdr};display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
-          .panel-title{font-family:${C.sg};font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:${C.t1};}
-          .panel-ver{font-family:${C.sm};font-size:9px;color:${C.t4};}
-          .ps{padding:12px 16px;border-bottom:1px solid ${C.bdr};}
-          .ps:last-child{border-bottom:none;}
-          .ps-head{display:flex;justify-content:space-between;margin-bottom:9px;}
-          .ps-lbl{font-family:${C.sg};font-size:11px;color:${C.t3};font-weight:500;}
-          .ps-val{font-family:${C.sm};font-size:10px;color:${C.t1};}
-          .w-select{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:12px;font-weight:500;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
-          .w-select:focus{border-color:${C.accent};}
-          .slider{width:100%;height:2px;-webkit-appearance:none;appearance:none;background:${C.bdr};outline:none;border-radius:1px;cursor:pointer;}
-          .slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:${C.accent};cursor:pointer;box-shadow:${C.aGlow};}
-          .rng-labels{display:flex;justify-content:space-between;margin-top:4px;}
-          .rng-labels span{font-family:${C.sm};font-size:9px;color:${C.t4};}
+          /* Tools section */
+          .tools-section{padding:10px 14px;border-bottom:1px solid #111;}
+          .tools-icons{display:flex;gap:10px;align-items:center;margin-top:8px;}
+          .tool-icon{width:36px;height:36px;background:#111;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:border-color .15s;}
+          .tool-icon:hover{border-color:${C.accent};}
+          .tool-icon.on{border-color:${C.accent};background:${C.aDim};}
 
-          /* ── LICENSE SECTION ── */
-          .license-section{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
-          .lic-section-title{font-family:${C.sg};font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${C.t3};margin-bottom:10px;}
-
-          /* License type dropdown */
-          .lic-dropdown-wrap{position:relative;margin-bottom:10px;}
-          .lic-dropdown{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:12px;font-weight:600;padding:9px 12px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
-          .lic-dropdown.selected{border-color:${C.accent};background:${C.aDim};color:${C.accent};}
-          .lic-dropdown:focus{border-color:${C.accent};}
-          .lic-dropdown-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:${C.t4};pointer-events:none;font-size:10px;}
-
-          /* Sub-options */
-          .lic-sub{margin-top:8px;}
-          .lic-sub-label{font-family:${C.sg};font-size:10px;color:${C.t3};margin-bottom:5px;}
-          .lic-sub-select{width:100%;background:${C.srf2};border:1px solid ${C.bdr};color:${C.t1};font-family:${C.sg};font-size:11px;padding:7px 10px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
-          .lic-sub-select:focus{border-color:${C.accent};}
+          /* License */
+          .lic-wrap{position:relative;}
+          .lic-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#555;pointer-events:none;font-size:10px;}
+          .lic-sub-lbl{font-family:${C.sg};font-size:10px;color:#666;margin-bottom:5px;margin-top:8px;}
+          .lic-desc{font-family:${C.sg};font-size:10px;color:#555;margin-top:6px;line-height:1.5;font-style:italic;}
 
           /* Weight selection */
-          .weight-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;}
-          .wm-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:7px;border:1px solid ${C.bdr};background:transparent;color:${C.t4};cursor:pointer;transition:all .15s;text-align:center;}
-          .wm-tab:hover{border-color:${C.bdrHi};color:${C.t1};}
+          .wm-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;}
+          .wm-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:7px;border:1px solid #333;background:transparent;color:#555;cursor:pointer;transition:all .15s;text-align:center;}
+          .wm-tab:hover{border-color:#555;color:#ccc;}
           .wm-tab.on{background:${C.aDim};border-color:${C.accent};color:${C.accent};}
-          .weight-picker{display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto;}
-          .wp-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid ${C.bdr};cursor:pointer;transition:all .15s;}
-          .wp-item:hover{border-color:${C.bdrHi};}
-          .wp-item.on{background:${C.aDim};border-color:${C.accent};}
-          .wp-item-name{font-family:${C.sg};font-size:11px;font-weight:500;color:${C.t2};}
-          .wp-item-num{font-family:${C.sm};font-size:9px;color:${C.t4};}
-          .wp-item-check{width:14px;height:14px;border:1px solid ${C.bdr};background:transparent;transition:all .15s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-          .wp-item.on .wp-item-check{background:${C.accent};border-color:${C.accent};}
-          .wp-item.on .wp-item-name{color:${C.white};}
+          .wp-list{display:flex;flex-direction:column;gap:3px;max-height:180px;overflow-y:auto;}
+          .wp-row{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border:1px solid #222;cursor:pointer;transition:all .15s;}
+          .wp-row:hover{border-color:#444;}
+          .wp-row.on{background:${C.aDim};border-color:${C.accent};}
+          .wp-name{font-family:${C.sg};font-size:11px;color:#aaa;}
+          .wp-row.on .wp-name{color:#fff;}
+          .wp-check{width:14px;height:14px;border:1px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+          .wp-row.on .wp-check{background:${C.accent};border-color:${C.accent};}
 
-          /* Price display */
-          .price-block{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
-          .price-context{font-family:${C.sg};font-size:10px;color:${C.t4};margin-bottom:6px;}
-          .price-big{font-family:${C.det};font-size:2.6rem;color:${C.white};line-height:1;margin-bottom:2px;}
-          .price-note{font-family:${C.sg};font-size:10px;color:${C.t4};margin-bottom:14px;font-style:italic;}
-
-          /* Paypal + trial */
-          .buy-actions{padding:14px 16px;border-bottom:1px solid ${C.bdr};}
-          .trial-btn{width:100%;font-family:${C.sg};font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${C.t3};background:transparent;border:1px solid ${C.bdr};padding:9px;transition:all .15s;margin-top:6px;display:block;text-align:center;}
+          /* Price */
+          .price-block{padding:12px 14px;border-bottom:1px solid #111;}
+          .price-context{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:4px;}
+          .price-big{font-family:${C.det};font-size:3rem;color:#fff;line-height:1;margin-bottom:12px;}
+          .trial-btn{width:100%;font-family:${C.sg};font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#666;background:transparent;border:1px solid #333;padding:10px;transition:all .15s;margin-top:8px;}
           .trial-btn:hover{border-color:${C.accent};color:${C.accent};}
-          .trust-list{padding:12px 16px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid ${C.bdr};}
-          .trust-item{display:flex;align-items:flex-start;gap:8px;}
+          .trust-list{padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+          .trust-item{display:flex;align-items:flex-start;gap:7px;}
           .trust-dot{width:4px;height:4px;border-radius:50%;background:${C.accent};flex-shrink:0;margin-top:5px;box-shadow:${C.aGlow};}
-          .trust-txt{font-family:${C.sg};font-size:11px;color:${C.t3};line-height:1.5;}
+          .trust-txt{font-family:${C.sg};font-size:10px;color:#555;line-height:1.5;}
 
-          /* Below fold */
-          .section-hd{font-family:${C.sg};font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:${C.accent};}
-          .specimens-sec{padding:clamp(1.5rem,3vw,2.5rem);border-bottom:1px solid ${C.bdr};}
-          .spec-main{margin-bottom:.8rem;border:1px solid ${C.bdr};overflow:hidden;}
-          .spec-main img{width:100%;display:block;}
-          .spec-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-          .spec-thumb{cursor:pointer;border:2px solid transparent;overflow:hidden;transition:border-color .15s;}
-          .spec-thumb.on{border-color:${C.accent};}
-          .spec-thumb img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;filter:brightness(.75);transition:all .2s;}
-          .spec-thumb:hover img,.spec-thumb.on img{filter:brightness(1);}
-          .weights-sec{border-bottom:1px solid ${C.bdr};}
-          .wr{display:grid;grid-template-columns:110px 1fr 38px;align-items:center;gap:1rem;padding:.75rem clamp(1.2rem,3vw,2.5rem);border-bottom:1px solid ${C.bdr};cursor:pointer;transition:background .12s;}
-          .wr:hover{background:${C.surface};}
-          .wr.on{background:${C.srf2};}
-          .wr-name{font-family:${C.sg};font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:${C.t3};}
-          .wr-sample{font-size:clamp(1.2rem,2.5vw,2.2rem);line-height:1;color:${C.t1};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .12s;}
-          .wr:hover .wr-sample{color:${C.white};}
-          .wr-num{font-family:${C.sm};font-size:9px;color:${C.t4};text-align:right;}
+          /* ── GLYPH STRIP ── */
+          .glyph-section{border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;background:#000;}
+          .glyph-tabs{display:flex;border-bottom:1px solid #1a1a1a;}
+          .g-tab{font-family:${C.sg};font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:9px 16px;background:transparent;color:#555;border:none;border-right:1px solid #1a1a1a;cursor:pointer;transition:all .15s;}
+          .g-tab:hover{color:#ccc;}
+          .g-tab.on{color:#fff;background:${C.aDim};}
+          .g-count{font-family:${C.sm};font-size:9px;color:#444;padding:9px 14px;margin-left:auto;}
+          .glyph-grid{display:flex;flex-wrap:wrap;padding:14px 16px;gap:5px;}
+          .g-cell{
+            width:52px;height:52px;
+            display:flex;align-items:center;justify-content:center;
+            background:#000;border:1px solid ${C.glyphBdr};
+            font-size:1.15rem;color:#fff;
+            cursor:pointer;transition:all .12s;flex-shrink:0;
+          }
+          .g-cell:hover{background:${C.aDim};border-color:${C.accent};transform:scale(1.08);}
+          .g-hint{font-family:${C.sm};font-size:9px;color:#333;padding:0 16px 12px;width:100%;}
 
-          /* ABC ticker */
-          .abc-ticker{overflow:hidden;padding:10px 0;border-bottom:1px solid ${C.bdr};}
-          .abc-track{display:flex;gap:1.2rem;animation:tickr 20s linear infinite;white-space:nowrap;}
-          .abc-char{font-size:1.8rem;color:rgba(50,94,255,0.22);letter-spacing:.05em;}
-          @keyframes tickr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+          /* ── ALL WEIGHTS ── */
+          .weights-section{border-bottom:1px solid #1a1a1a;}
+          .weights-header{padding:10px 1.2rem;border-bottom:1px solid #1a1a1a;}
+          .weights-title{font-family:${C.sg};font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#555;}
+          .wr{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:1rem;padding:1.1rem 1.2rem;border-bottom:1px solid #0d0d0d;cursor:pointer;transition:background .12s;background:${C.srf2};}
+          .wr:hover{background:#100f20;}
+          .wr.on{background:#12103a;}
+          .wr-name{font-family:${C.sg};font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#555;}
+          .wr-sample{font-size:clamp(1.5rem,3vw,2.8rem);line-height:1;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+          .add-btn{font-family:${C.sg};font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:${C.accent};border:none;padding:7px 12px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+          .add-btn:hover{opacity:.8;}
+          .add-btn.done{background:#1a5c30;}
 
-          /* Footer */
-          .fp-ft{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.4rem;border-top:1px solid ${C.bdr};background:${C.surface};}
-          .fp-ft span{font-family:${C.sg};font-size:11px;color:${C.t4};text-transform:uppercase;letter-spacing:.06em;}
-          .fp-ft-links{display:flex;gap:1.5rem;}
-          .fp-ft a{font-family:${C.sg};font-size:11px;font-weight:500;color:${C.t4};text-transform:uppercase;letter-spacing:.08em;transition:color .15s;}
-          .fp-ft a:hover{color:${C.t1};}
+          /* ── SPECIMENS ── */
+          .specimen-banner{
+            background:${C.accent};padding:10px 1.4rem;
+            font-family:${C.sg};font-size:11px;font-weight:600;
+            letter-spacing:.08em;text-transform:uppercase;color:#fff;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+          }
+          .specimen-section{border-bottom:1px solid #1a1a1a;position:relative;}
+          .specimen-sub{font-family:${C.sm};font-size:9px;color:#555;letter-spacing:.12em;text-transform:uppercase;padding:8px 1.4rem;border-bottom:1px solid #1a1a1a;}
+          .specimen-stage{position:relative;overflow:hidden;}
+          .specimen-stage img{width:100%;display:block;}
+          .specimen-arrow{position:absolute;top:50%;transform:translateY(-50%);background:${C.accent};border:none;color:#fff;width:36px;height:52px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;z-index:5;transition:opacity .15s;}
+          .specimen-arrow:hover{opacity:.8;}
+          .specimen-arrow-left{left:0;}
+          .specimen-arrow-right{right:0;}
+
+          /* ── FOOTER ── */
+          .fp-footer{display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:1rem 1.4rem;border-top:1px solid #1a1a1a;background:#000;gap:1rem;}
+          .footer-logo{font-family:${C.det};font-size:.9rem;letter-spacing:.1em;color:#fff;}
+          .footer-copy{font-family:${C.sg};font-size:10px;color:#333;text-align:center;text-transform:uppercase;letter-spacing:.06em;}
+          .footer-links{display:flex;gap:1.5rem;justify-content:flex-end;}
+          .footer-link{font-family:${C.sg};font-size:10px;color:#333;letter-spacing:.08em;text-transform:uppercase;transition:color .15s;}
+          .footer-link:hover{color:#fff;}
+
+          /* ── TOAST ── */
+          .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a5c30;color:#fff;font-family:${C.sg};font-size:12px;font-weight:600;padding:10px 24px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;letter-spacing:.06em;}
+          .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
         `}</style>
       </Head>
 
       <Script src={`https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=GBP`} onReady={() => setPaypalReady(true)} />
 
-      {/* NAV */}
+      {/* ── NAV ── */}
       <nav className="nav">
-        <Link href="/" className="nav-logo">HypeForType</Link>
-        <Link href="/" className="nav-back">← All</Link>
-        <Link href={`/typefaces/${prevFont.slug}`} className="nav-arrow">‹ {prevFont.name}</Link>
-        <div className="nav-spacer" />
-        <Link href={`/typefaces/${nextFont.slug}`} className="nav-arrow nav-arrow-right">{nextFont.name} ›</Link>
-        <button className="nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>Trial</button>
-        <a href="#buy" className="nav-buy">Buy →</a>
+        <div className="nav-left">
+          <Link href="/" className="nav-pill">← All</Link>
+          <Link href={`/typefaces/${prevFont.slug}`} className="nav-pill-font">← {prevFont.name}</Link>
+        </div>
+        <Link href="/" className="nav-center">HypeForType</Link>
+        <div className="nav-right">
+          <Link href={`/typefaces/${nextFont.slug}`} className="nav-next">{nextFont.name} →</Link>
+          <button className="nav-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>Trial</button>
+          <a href="#buy" className="nav-buy">BUY →</a>
+        </div>
       </nav>
 
-      {/* MAIN GRID */}
-      <div className="page-grid">
+      {/* ── MAIN GRID ── */}
+      <div className="main-wrap">
 
         {/* LEFT CANVAS */}
         <div className="canvas" style={{ background: bgColor }}>
@@ -341,12 +397,10 @@ export default function FontPage({ font }) {
           {/* Fullscreen glyph */}
           {focusedGlyph && (
             <div className="glyph-focus" onClick={() => setFocusedGlyph(null)} style={{ background: bgColor + 'f2' }}>
-              <div style={{ fontFamily, fontWeight: style.weight, fontSize:'clamp(10rem,22vw,18rem)', lineHeight:1, color: textColor }}>
+              <div style={{ fontFamily, fontWeight:style.weight, fontSize:'clamp(10rem,20vw,16rem)', lineHeight:1, color:textColor }}>
                 {focusedGlyph}
               </div>
-              <div className="glyph-focus-meta">
-                U+{focusedGlyph.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')} · Click to close
-              </div>
+              <div className="glyph-focus-meta">U+{focusedGlyph.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')} · Click to close</div>
             </div>
           )}
 
@@ -360,23 +414,23 @@ export default function FontPage({ font }) {
             ))}
             <div className="tb-sep" />
             <span className="tb-lbl">BG</span>
-            {BG_SWATCHES.map(c => (
+            {['#000000','#0a0a0f','#ffffff','#f5f4f0','#1a1a2e','#0d1117'].map(c => (
               <div key={c} className={`tb-sw${bgColor===c?' on':''}`} style={{ background:c }} onClick={() => setBgColor(c)} />
             ))}
             <div className="tb-sep" />
             <span className="tb-lbl">Text</span>
-            {TEXT_SWATCHES.map(c => (
+            {['#ffffff','#cbced3','#000000','#1b1afe','#f5f4f0','#9097a1'].map(c => (
               <div key={c} className={`tb-sw${textColor===c?' on':''}`} style={{ background:c }} onClick={() => setTextColor(c)} />
             ))}
           </div>
 
           {/* Stage */}
-          <div className="stage-wrap" style={{ background: bgColor }}>
+          <div className="stage-wrap" style={{ background:bgColor }}>
             <textarea ref={inputRef} className="stage-input" value={previewText} onChange={e => setPreviewText(e.target.value)} maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off" />
             <div className="stage-display">
               {viewMode === 'body' ? (
                 <div className="stage-body" style={{ fontFamily, fontWeight:style.weight, fontSize:Math.min(fontSize,20)+'px', lineHeight:lineHeight+0.6, color:textColor }}>
-                  {previewText || LOREM}
+                  {previewText || 'Zen samurai packs quartz koi jade silk. The art of type is the art of thought made visible.'}
                 </div>
               ) : (
                 <div className="stage-text" style={{ fontFamily, fontWeight:style.weight, fontStyle:style.oblique?'italic':'normal', fontSize:(viewMode==='headline'?Math.max(fontSize,64):fontSize)+'px', letterSpacing:letterSpacing+'%', lineHeight:lineHeight, color:textColor }}>
@@ -384,14 +438,27 @@ export default function FontPage({ font }) {
                 </div>
               )}
             </div>
-            {!previewText && <div className="stage-hint">Click anywhere to type</div>}
+            {!previewText && <div className="stage-hint">CLICK ANYWHERE TO TYPE...</div>}
           </div>
 
           {/* Meta strip */}
           <div className="meta-strip">
-            {[[font.styles.length,'Weights'],[font.glyphCount+'+','Glyphs'],[font.released,'Released'],[font.pro?'Pro':font.hot?'New':'Retail','Status']].map(([v,k]) => (
-              <div key={k} className="meta-cell"><span className="meta-val">{v}</span><span className="meta-key">{k}</span></div>
-            ))}
+            <div>
+              <div className="meta-num">{String(font.styles.length).padStart(2,'0')}</div>
+              <div className="meta-key">Weights</div>
+            </div>
+            <span className="meta-divider">♥</span>
+            <div>
+              <div className="meta-num">{font.glyphCount}</div>
+              <div className="meta-key">Glyphs</div>
+            </div>
+            <span className="meta-divider">✦</span>
+            <div>
+              <div className="meta-num">{font.languages || 54}</div>
+              <div className="meta-key">Languages</div>
+            </div>
+            <span className="meta-divider">☺</span>
+            <div className="meta-desc">{font.description}</div>
           </div>
         </div>
 
@@ -402,215 +469,221 @@ export default function FontPage({ font }) {
             <span className="panel-ver">V1.0</span>
           </div>
 
-          {/* Weight */}
+          {/* Font Weight */}
           <div className="ps">
-            <div className="ps-head"><span className="ps-lbl">Weight</span><span className="ps-val">{style.name} · {style.weight}</span></div>
-            <select className="w-select" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
-              {font.styles.map((s,i) => <option key={i} value={i}>{s.name} · {s.weight}</option>)}
-            </select>
+            <div className="ps-head"><span className="ps-lbl">Font Weight</span><span className="ps-val">{style.weight}</span></div>
+            <div className="lic-wrap">
+              <select className="p-select" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
+                {font.styles.map((s,i) => <option key={i} value={i}>{font.name} {s.name}</option>)}
+              </select>
+              <span className="lic-arrow">▾</span>
+            </div>
           </div>
 
           {/* Size */}
           <div className="ps">
             <div className="ps-head"><span className="ps-lbl">Size</span><span className="ps-val">{fontSize}px</span></div>
             <input type="range" className="slider" min="12" max="200" value={fontSize} onChange={e => setFontSize(+e.target.value)} />
-            <div className="rng-labels"><span>12</span><span>200</span></div>
+            <div className="rng"><span>12</span><span>200</span></div>
           </div>
 
-          {/* Letter Spacing */}
+          {/* Spacing */}
           <div className="ps">
-            <div className="ps-head"><span className="ps-lbl">Letter Spacing</span><span className="ps-val">{letterSpacing>0?'+':''}{letterSpacing}%</span></div>
+            <div className="ps-head"><span className="ps-lbl">Spacing</span><span className="ps-val">{letterSpacing > 0?'+':''}{letterSpacing}.00</span></div>
             <input type="range" className="slider" min="-10" max="30" value={letterSpacing} onChange={e => setLetterSpacing(+e.target.value)} />
-            <div className="rng-labels"><span>−10</span><span>+30</span></div>
+            <div className="rng"><span>−10</span><span>+30</span></div>
           </div>
 
-          {/* Line Height */}
+          {/* Height */}
           <div className="ps">
-            <div className="ps-head"><span className="ps-lbl">Line Height</span><span className="ps-val">{(lineHeight+(viewMode==='body'?.6:0)).toFixed(1)}</span></div>
+            <div className="ps-head"><span className="ps-lbl">Height</span><span className="ps-val">{lineHeight.toFixed(2)}</span></div>
             <input type="range" className="slider" min="5" max="25" value={Math.round(lineHeight*10)} onChange={e => setLineHeight(+e.target.value/10)} />
-            <div className="rng-labels"><span>0.5</span><span>2.5</span></div>
+            <div className="rng"><span>0.5</span><span>2.5</span></div>
           </div>
 
-          {/* ── LICENSE & PURCHASE ── */}
-          <div className="license-section" id="buy">
-            <div className="lic-section-title">License Type</div>
+          {/* Tools */}
+          <div className="tools-section">
+            <div className="ps-lbl">Tools</div>
+            <div className="tools-icons">
+              <div className={`tool-icon${viewMode==='display'?' on':''}`} onClick={() => setViewMode('display')} title="Display">Aa</div>
+              <div className={`tool-icon${viewMode==='body'?' on':''}`} onClick={() => setViewMode('body')} title="Body">🎨</div>
+              <div className={`tool-icon${viewMode==='headline'?' on':''}`} onClick={() => setViewMode('headline')} title="Headline">❤️</div>
+              <div className="tool-icon" onClick={() => inputRef.current?.focus()} title="Type">👆</div>
+            </div>
+          </div>
 
-            {/* License dropdown */}
-            <div className="lic-dropdown-wrap">
-              <select className={`lic-dropdown selected`} value={licenseType} onChange={e => setLicenseType(e.target.value)}>
-                {LICENSE_TYPES.map(l => (
-                  <option key={l.key} value={l.key}>{l.icon}  {l.label}</option>
-                ))}
+          {/* License Type */}
+          <div className="ps" id="buy">
+            <div className="ps-head"><span className="ps-lbl">License Type</span></div>
+            <div className="lic-wrap">
+              <select className="p-select" value={licenseType} onChange={e => setLicenseType(e.target.value)}>
+                {LICENSE_TYPES.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
               </select>
-              <span className="lic-dropdown-arrow">▾</span>
+              <span className="lic-arrow">▾</span>
             </div>
 
-            {/* Desktop sub-option: seats */}
             {licenseType === 'desktop' && (
-              <div className="lic-sub">
-                <div className="lic-sub-label">Number of seats (installations)</div>
-                <div className="lic-dropdown-wrap">
-                  <select className="lic-sub-select" value={desktopSeats} onChange={e => setDesktopSeats(+e.target.value)}>
-                    {DESKTOP_SEATS.map(s => <option key={s} value={s}>{s} {s === 1 ? 'seat' : 'seats'}</option>)}
+              <>
+                <div className="lic-sub-lbl">Number of seats (Installations)</div>
+                <div className="lic-wrap">
+                  <select className="p-select" value={desktopSeats} onChange={e => setDesktopSeats(+e.target.value)}>
+                    {DESKTOP_SEATS.map(s => <option key={s} value={s}>{s} {s===1?'seat':'seats'}</option>)}
                   </select>
-                  <span className="lic-dropdown-arrow">▾</span>
+                  <span className="lic-arrow">▾</span>
                 </div>
-              </div>
+                <div className="lic-desc">Installation on {desktopSeats} {desktopSeats===1?'computer':'computers'}</div>
+              </>
             )}
 
-            {/* Webfont sub-option: pageviews */}
             {licenseType === 'webfont' && (
-              <div className="lic-sub">
-                <div className="lic-sub-label">Monthly pageviews</div>
-                <div className="lic-dropdown-wrap">
-                  <select className="lic-sub-select" value={webPageviews} onChange={e => setWebPageviews(e.target.value)}>
+              <>
+                <div className="lic-sub-lbl">Monthly pageviews</div>
+                <div className="lic-wrap">
+                  <select className="p-select" value={webPageviews} onChange={e => setWebPageviews(e.target.value)}>
                     {WEB_PAGEVIEWS.map(p => <option key={p} value={p}>{p} pageviews/mo</option>)}
                   </select>
-                  <span className="lic-dropdown-arrow">▾</span>
+                  <span className="lic-arrow">▾</span>
                 </div>
-              </div>
+              </>
             )}
 
-            {/* License description */}
-            <div style={{ fontFamily:C.sg, fontSize:11, color:C.t4, marginTop:8, lineHeight:1.5 }}>
-              {licenseType === 'desktop' && `For installation on up to ${desktopSeats} computer${desktopSeats > 1 ? 's' : ''}.`}
-              {licenseType === 'webfont' && `For use on websites serving up to ${webPageviews} pageviews/month.`}
-              {licenseType === 'app' && 'For embedding in a single mobile or desktop application.'}
-              {licenseType === 'broadcast' && 'For use in TV, film, streaming and broadcast productions.'}
-              {licenseType === 'brand' && 'For use as a primary brand typeface across all media.'}
-              {licenseType === 'enterprise' && 'Unlimited seats, domains and usage within one organisation.'}
-              {licenseType === 'enterprise-group' && 'Unlimited usage across multiple organisations or subsidiaries.'}
-            </div>
+            {!['desktop','webfont'].includes(licenseType) && (
+              <div className="lic-desc">
+                {licenseType==='app' && 'For embedding in a single application.'}
+                {licenseType==='broadcast' && 'For TV, film and broadcast productions.'}
+                {licenseType==='brand' && 'Primary brand typeface across all media.'}
+                {licenseType==='enterprise' && 'Unlimited seats within one organisation.'}
+                {licenseType==='enterprise-group' && 'Unlimited across multiple organisations.'}
+              </div>
+            )}
           </div>
 
-          {/* Weight selection */}
-          <div className="license-section">
-            <div className="lic-section-title">Weight Selection</div>
-            <div className="weight-mode-tabs">
-              <button className={`wm-tab${weightMode==='single'?' on':''}`} onClick={() => setWeightMode('single')}>
-                Individual
-              </button>
-              <button className={`wm-tab${weightMode==='full'?' on':''}`} onClick={() => setWeightMode('full')}>
-                Full Family
-              </button>
+          {/* Weight Selection */}
+          <div className="ps">
+            <div className="ps-head"><span className="ps-lbl">Weight Selection</span></div>
+            <div className="wm-tabs">
+              <button className={`wm-tab${weightMode==='single'?' on':''}`} onClick={() => setWeightMode('single')}>Individual</button>
+              <button className={`wm-tab${weightMode==='full'?' on':''}`} onClick={() => setWeightMode('full')}>Full Family</button>
             </div>
             {weightMode === 'single' ? (
-              <div className="weight-picker">
+              <div className="wp-list">
                 {font.styles.map((s,i) => (
-                  <div key={i} className={`wp-item${selectedWeights.has(i)?' on':''}`} onClick={() => toggleWeight(i)}>
-                    <span className="wp-item-name" style={{ fontFamily, fontWeight:s.weight }}>{s.name}</span>
-                    <span className="wp-item-num">{s.weight}</span>
-                    <div className="wp-item-check">
-                      {selectedWeights.has(i) && <span style={{ color:'#fff', fontSize:9 }}>✓</span>}
-                    </div>
+                  <div key={i} className={`wp-row${selectedWeights.has(i)?' on':''}`} onClick={() => toggleWeight(i)}>
+                    <span className="wp-name">{font.name} {s.name}</span>
+                    <div className="wp-check">{selectedWeights.has(i) && <span style={{color:'#fff',fontSize:9}}>✓</span>}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div style={{ fontFamily:C.sg, fontSize:11, color:C.t2, padding:'6px 0' }}>
-                All {font.styles.length} weights included — best value.
+              <div style={{ fontFamily:C.sg, fontSize:11, color:'#888', padding:'4px 0' }}>
+                All {font.styles.length} weights — best value
               </div>
             )}
           </div>
 
           {/* Price */}
           <div className="price-block">
-            <div className="price-context">
-              {weightMode === 'full' ? `Full family · ${font.styles.length} weights` : `${weightCount} weight${weightCount>1?'s':''} · ${currentLicense?.label}`}
-            </div>
+            <div className="price-context">{weightCount} {weightCount===1?'weight':'weights'} · {licenseType.toUpperCase()}</div>
             <div className="price-big">£{estimatedPrice}</div>
-            <div className="price-note">Pricing shown is indicative — final pricing coming soon</div>
-          </div>
-
-          {/* Actions */}
-          <div className="buy-actions">
             <div ref={paypalRef} style={{ minHeight:44 }}>
-              {purchasing && <span style={{ fontFamily:C.sg, fontSize:12, color:C.t3 }}>Processing...</span>}
+              {purchasing && <span style={{fontFamily:C.sg,fontSize:12,color:'#666'}}>Processing...</span>}
             </div>
             <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
-              Free Trial Download
+              FREE TRIAL DOWNLOAD
             </button>
           </div>
 
           {/* Trust */}
           <div className="trust-list">
-            {[`${font.styles.length} font files available`,`${font.glyphCount}+ glyphs`,'Instant download','Perpetual commercial license','PayPal Secure'].map((item,i) => (
+            {[`${font.styles.length} font files`,`${font.glyphCount}+ glyphs`,'Instant download','Perpetual license','PayPal Secure'].map((t,i) => (
               <div key={i} className="trust-item">
                 <div className="trust-dot" />
-                <span className="trust-txt">{item}</span>
+                <span className="trust-txt">{t}</span>
               </div>
             ))}
           </div>
-
         </div>
       </div>
 
-      {/* ── GLYPH STRIP — full width horizontal below the grid ── */}
-      <div className="glyph-strip-section">
-        <div className="glyph-strip-toolbar">
+      {/* ── GLYPH STRIP ── */}
+      <div className="glyph-section">
+        <div className="glyph-tabs">
           {Object.keys(GLYPH_SETS).map(k => (
-            <button key={k} className={`glyph-strip-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
-              {k === 'UPP' ? 'Uppercase' : k === 'LOW' ? 'Lowercase' : k === 'NUM' ? 'Numerals' : k === 'PUN' ? 'Punctuation' : 'Accents'}
+            <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
+              {k.charAt(0)+k.slice(1).toLowerCase()}
             </button>
           ))}
-          <span className="glyph-strip-count">{allGlyphs.length} glyphs</span>
+          <span className="g-count">{allGlyphs.length} glyphs</span>
         </div>
-        <div className="glyph-strip-grid">
+        <div className="glyph-grid">
           {allGlyphs.map((g,i) => (
-            <div key={i} className="g-cell" style={{ fontFamily, fontWeight:style.weight }} onClick={() => setFocusedGlyph(g)} title={`U+${g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}`}>
+            <div key={i} className="g-cell" style={{ fontFamily, fontWeight:style.weight }} onClick={() => setFocusedGlyph(g)}>
               {g}
             </div>
           ))}
         </div>
-        <div className="g-cell-hint">Click any glyph to enlarge · {font.glyphCount}+ total glyphs in this font</div>
+        <div className="g-hint">Click any glyph to enlarge · {font.glyphCount}+ total glyphs</div>
       </div>
 
-      {/* ABC TICKER */}
-      <div className="abc-ticker">
-        <div className="abc-track">
+      {/* ── ABC TICKER ── */}
+      <div style={{ overflow:'hidden', padding:'10px 0', borderBottom:'1px solid #1a1a1a' }}>
+        <div style={{ display:'flex', gap:'1.2rem', animation:'tickr 22s linear infinite', whiteSpace:'nowrap' }}>
           {'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map((ch,i) => (
-            <span key={i} className="abc-char" style={{ fontFamily, fontWeight:style.weight }}>{ch}</span>
+            <span key={i} style={{ fontFamily, fontWeight:style.weight, fontSize:'1.8rem', color:'rgba(27,26,254,0.22)' }}>{ch}</span>
           ))}
         </div>
+        <style>{`@keyframes tickr{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
       </div>
 
-      {/* SPECIMENS */}
-      {specimens.length > 0 && (
-        <div className="specimens-sec">
-          <div className="section-hd" style={{ marginBottom:'1.2rem' }}>Type Specimens</div>
-          <div className="spec-main"><img src={specimens[activeSpecimen]} alt={`${font.name} specimen`} /></div>
-          <div className="spec-thumbs">
-            {specimens.map((src,i) => (
-              <div key={i} className={`spec-thumb${activeSpecimen===i?' on':''}`} onClick={() => setActiveSpecimen(i)}>
-                <img src={src} alt={`specimen ${i+1}`} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ALL WEIGHTS */}
-      <div className="weights-sec">
-        <div style={{ padding:'9px clamp(1.2rem,3vw,2.5rem)', borderBottom:`1px solid ${C.bdr}`, borderTop:`1px solid ${C.bdr}` }}>
-          <div className="section-hd">All Weights</div>
+      {/* ── ALL WEIGHTS ── */}
+      <div className="weights-section">
+        <div className="weights-header">
+          <div className="weights-title">All Weights</div>
         </div>
         {font.styles.map((s,i) => (
           <div key={i} className={`wr${activeStyle===i?' on':''}`} onClick={() => setActiveStyle(i)}>
             <span className="wr-name">{s.name}</span>
             <span className="wr-sample" style={{ fontFamily, fontWeight:s.weight, fontStyle:s.oblique?'italic':'normal' }}>
-              {previewText || 'The quick brown fox'}
+              {previewText || PREVIEW_TEXT}
             </span>
-            <span className="wr-num">{s.weight}</span>
+            <button className={`add-btn${addedIdx===i?' done':''}`} onClick={e => addToCart(e,i)}>
+              {addedIdx===i ? '✓ ADDED' : 'ADD +'}
+            </button>
           </div>
         ))}
       </div>
 
-      <footer className="fp-ft">
-        <span>© 2026 HypeForType · {font.name}</span>
-        <div className="fp-ft-links">
-          {['Licensing','FAQ','Contact'].map(t => <Link key={t} href={'/'+t.toLowerCase()}>{t}</Link>)}
+      {/* ── SPECIMENS ── */}
+      {specimens.length > 0 && (
+        <div className="specimen-section">
+          <div style={{ padding:'9px 1.4rem', borderBottom:'1px solid #1a1a1a' }}>
+            <div className="weights-title">Specimen Designs</div>
+          </div>
+          <div className="specimen-banner">
+            TYPE IS THE VOICE OF A BRAND. WHEN IT SPEAKS WITH CLARITY, CONFIDENCE, AND CHARACTER, THE BRAND DOESN'T JUST GET SEEN — IT GETS FELT.
+          </div>
+          <div className="specimen-sub">HYPERFLURO PRESENTS: {font.name.toUpperCase()} — A GLOBAL BEST-SELLER TRUSTED BY BRANDS EVERYWHERE.</div>
+          <div className="specimen-stage">
+            <button className="specimen-arrow specimen-arrow-left" onClick={() => setActiveSpecimen(p => (p-1+specimens.length)%specimens.length)}>◄</button>
+            <img src={specimens[activeSpecimen]} alt={`${font.name} specimen`} />
+            <button className="specimen-arrow specimen-arrow-right" onClick={() => setActiveSpecimen(p => (p+1)%specimens.length)}>►</button>
+          </div>
+        </div>
+      )}
+
+      {/* ── FOOTER ── */}
+      <footer className="fp-footer">
+        <div className="footer-logo">HF</div>
+        <div className="footer-copy">COPYRIGHT 2026 © HYPEFLURO</div>
+        <div className="footer-links">
+          {['Licensing','FAQ','Contact'].map(t => <Link key={t} href={'/'+t.toLowerCase()} className="footer-link">{t}</Link>)}
         </div>
       </footer>
+
+      {/* Toast */}
+      <div className={`toast${showToast?' show':''}`}>
+        {toastMsg} · <Link href="/cart" style={{color:'#fff',textDecoration:'underline'}}>View Cart</Link>
+      </div>
     </>
   );
 }
