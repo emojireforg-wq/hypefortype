@@ -210,7 +210,7 @@ export default function FontPage({ font }) {
           .canvas{border-right:1px solid ${DIVIDER};display:flex;flex-direction:column;transition:background .25s;}
 
           /* Stage */
-          .stage-wrap{position:relative;height:280px;flex-shrink:0;}
+          .stage-wrap{position:relative;height:520px;flex-shrink:0;}
           .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:${BLUE};font-size:16px;padding:2.5rem;z-index:2;cursor:text;}
           .stage-display{position:absolute;inset:0;display:flex;align-items:center;padding:2.5rem;pointer-events:none;overflow:hidden;}
           .stage-text{width:100%;line-height:.92;letter-spacing:-.02em;word-break:break-word;}
@@ -223,12 +223,14 @@ export default function FontPage({ font }) {
           }
 
           /* Meta strip */
-          .meta-strip{display:flex;align-items:center;border-top:1px solid ${DIVIDER};padding:1rem 1.2rem;gap:1.5rem;flex-shrink:0;flex-wrap:wrap;}
-          .meta-grp{display:flex;flex-direction:column;gap:3px;}
-          .meta-num{font-family:${DET};font-size:1.4rem;color:#fff;line-height:1;}
-          .meta-key{font-family:${DET};font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:#444;}
-          .meta-sep{color:#1C1D2F;font-size:1.1rem;flex-shrink:0;}
-          .meta-desc{font-family:${SG};font-size:10px;color:#444;line-height:1.6;max-width:52ch;border-left:1px solid ${DIVIDER};padding-left:1.2rem;}
+          .meta-strip{display:flex;align-items:center;border-top:1px solid ${DIVIDER};padding:1rem 1.4rem;gap:2rem;flex-shrink:0;flex-wrap:wrap;}
+          .meta-grp{display:flex;flex-direction:column;gap:4px;}
+          .meta-num{font-family:${DET};font-size:1.6rem;color:#ffffff;line-height:1;}
+          .meta-key{font-family:${DET};font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#1B1AFF;}
+          .meta-icons{display:flex;align-items:center;height:45px;flex:1;}
+          .meta-icons img{height:45px;width:auto;}
+          .meta-desc-block{width:100%;border-top:1px solid ${DIVIDER};padding-top:.8rem;margin-top:.2rem;}
+          .meta-desc{font-family:${DET};font-size:.65rem;color:#1B1AFF;line-height:1.9;letter-spacing:.02em;}
 
           /* Glyph focused overlay */
           .glyph-focus{
@@ -387,7 +389,7 @@ export default function FontPage({ font }) {
           .g-count{font-family:${SM};font-size:9px;color:#333;padding:10px 14px;margin-left:auto;}
           .glyph-grid{display:flex;flex-wrap:wrap;padding:16px;gap:6px;}
           .g-cell{
-            width:56px;height:72px;
+            width:68px;height:86px;
             display:flex;flex-direction:column;align-items:center;justify-content:center;
             background:#000;border:1px solid #1B1D30;border-radius:8px;
             position:relative;cursor:pointer;transition:all .12s;flex-shrink:0;
@@ -395,7 +397,7 @@ export default function FontPage({ font }) {
           }
           .g-cell:hover{border-color:${BLUE};transform:scale(1.06);}
           .g-cell-code{font-family:${SM};font-size:7px;color:${BLUE};letter-spacing:.06em;position:absolute;top:6px;left:50%;transform:translateX(-50%);white-space:nowrap;}
-          .g-cell-char{font-size:1.5rem;color:#fff;line-height:1;margin-top:10px;}
+          .g-cell-char{font-size:1.8rem;color:#ffffff;line-height:1;margin-top:10px;}
           .g-hint{font-family:${SM};font-size:9px;color:#222;padding:0 16px 12px;width:100%;}
 
           /* ── ALL WEIGHTS ── */
@@ -524,17 +526,22 @@ export default function FontPage({ font }) {
               <div className="meta-num">{String(font.styles.length).padStart(2,'0')}</div>
               <div className="meta-key">Weights</div>
             </div>
-            <span className="meta-sep">♥</span>
             <div className="meta-grp">
               <div className="meta-num">{font.glyphCount}</div>
               <div className="meta-key">Glyphs</div>
             </div>
-            <span className="meta-sep">✦</span>
             <div className="meta-grp">
-              <div className="meta-num">{font.languages || 54}</div>
+              <div className="meta-num">{font.languages || '54'}</div>
               <div className="meta-key">Languages</div>
             </div>
-            <div className="meta-desc">{font.description}</div>
+            {/* Icons from SVG */}
+            <div className="meta-icons">
+              <img src="/elements/icons.svg" alt="icons" />
+            </div>
+            {/* Description below in blue DET font */}
+            <div className="meta-desc-block">
+              <div className="meta-desc">{font.longDescription || font.description}</div>
+            </div>
           </div>
           {/* ── GLYPH STRIP (inside left column) ── */}
           <div className="glyph-section">
