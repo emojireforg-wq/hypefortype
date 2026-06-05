@@ -164,29 +164,30 @@ export default function FontPage({ font }) {
             height:44px;border-bottom:1px solid ${DIVIDER};
             background:#000;
           }
-          .nav-left{display:flex;align-items:center;gap:6px;padding:0 12px;}
+          .nav-left{display:flex;align-items:stretch;}
           .nav-pill{
             font-family:${DET};font-size:.72rem;
             letter-spacing:.06em;text-transform:uppercase;
-            color:#888;padding:5px 12px;
-            border:1px solid ${DIVIDER};
-            display:flex;align-items:center;gap:5px;
-            transition:color .15s,border-color .15s;white-space:nowrap;
+            color:#888;padding:0 20px;
+            border-right:1px solid ${DIVIDER};
+            display:flex;align-items:center;gap:8px;
+            transition:color .15s;white-space:nowrap;
           }
-          .nav-pill:hover{color:#fff;border-color:#555;}
+          .nav-pill:hover{color:#fff;}
           .nav-pill-font{
             font-family:${DET};font-size:.72rem;
             letter-spacing:.06em;text-transform:uppercase;
-            color:#ccc;padding:5px 12px;
-            border:1px solid ${DIVIDER};
-            display:flex;align-items:center;
-            white-space:nowrap;
+            color:#888;padding:0 20px;
+            border-right:1px solid ${DIVIDER};
+            display:flex;align-items:center;gap:8px;
+            transition:color .15s;white-space:nowrap;
           }
+          .nav-pill-font:hover{color:#fff;}
           .nav-right{display:flex;align-items:stretch;}
           .nav-next{
             font-family:${DET};font-size:.72rem;
             letter-spacing:.06em;text-transform:uppercase;
-            color:#888;padding:0 14px;
+            color:#888;padding:0 20px;
             display:flex;align-items:center;
             border-left:1px solid ${DIVIDER};
             transition:color .15s;white-space:nowrap;
@@ -259,12 +260,11 @@ export default function FontPage({ font }) {
             font-family:${DET};font-size:.85rem;font-weight:700;
             letter-spacing:.1em;text-transform:uppercase;
             color:#fff;margin-bottom:16px;display:block;
-            text-decoration:underline;text-decoration-color:${BLUE};
-            text-underline-offset:4px;
+            text-decoration:none;
           }
-          .ps-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-          .ps-slider-lbl{font-family:${SG};font-size:13px;color:#fff;width:62px;flex-shrink:0;}
-          .ps-slider-val{font-family:${DET};font-size:.72rem;color:#fff;width:46px;text-align:right;flex-shrink:0;}
+          .ps-slider-row{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+          .ps-slider-lbl{font-family:${DET};font-size:.78rem;color:#fff;width:70px;flex-shrink:0;letter-spacing:.06em;}
+          .ps-slider-val{font-family:${DET};font-size:.78rem;color:#fff;width:52px;text-align:right;flex-shrink:0;}
 
           /* Dropdown */
           .dd-wrap{position:relative;margin-bottom:8px;}
@@ -272,10 +272,10 @@ export default function FontPage({ font }) {
             width:100%;
             background:${DARK_PANEL};
             border:1px solid ${BLUE};
-            color:${BLUE};
+            color:#ffffff;
             font-family:${DET};font-size:.72rem;
             font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-            padding:10px 36px 10px 12px;
+            padding:14px 40px 14px 16px;
             outline:none;cursor:pointer;
             -webkit-appearance:none;appearance:none;
             transition:border-color .15s;
@@ -290,18 +290,18 @@ export default function FontPage({ font }) {
             width:100%;
             background:${DARK_PANEL};
             border:1px solid ${BLUE};
-            color:${BLUE};
-            font-family:${DET};font-size:.7rem;
-            letter-spacing:.06em;text-transform:uppercase;
-            padding:9px 36px 9px 12px;
+            color:#335EFF;
+            font-family:${DET};font-size:.72rem;
+            letter-spacing:.08em;text-transform:uppercase;
+            padding:12px 40px 12px 16px;
             outline:none;cursor:pointer;
             -webkit-appearance:none;appearance:none;
-            margin-top:6px;
+            margin-top:8px;
           }
           .dd-sub:focus{border-color:${BLUE};}
           .dd-lbl{font-family:${SG};font-size:13px;font-weight:600;color:#fff;margin-bottom:6px;margin-top:14px;}
           .dd-lbl span{color:#335eff;font-family:${SG};font-weight:400;}
-          .dd-hint{font-family:${SM};font-size:10px;color:#555;margin-top:8px;letter-spacing:.06em;line-height:1.5;}
+          .dd-hint{font-family:${SM};font-size:10px;color:#8A95A6;margin-top:8px;letter-spacing:.06em;line-height:1.5;}
 
           /* Slider */
           .slider{
@@ -329,7 +329,7 @@ export default function FontPage({ font }) {
           .wm-tab{
             font-family:${DET};font-size:.75rem;font-weight:700;
             letter-spacing:.08em;text-transform:uppercase;
-            padding:12px 8px;background:transparent;color:#555;
+            padding:12px 8px;background:transparent;color:#8A95A6;
             border:none;cursor:pointer;transition:all .15s;text-align:center;
           }
           .wm-tab:first-child{border-right:1px solid ${BLUE};}
@@ -343,7 +343,7 @@ export default function FontPage({ font }) {
           }
           .wp-row:hover{border-color:#444;}
           .wp-row.on{border-color:${BLUE};background:${BLUE_DIM};}
-          .wp-name{font-family:${SG};font-size:13px;color:#aaa;}
+          .wp-name{font-family:${SG};font-size:13px;color:#8A95A6;}
           .wp-row.on .wp-name{color:#fff;}
           .wp-check{
             width:30px;height:30px;border:1px solid #333;
@@ -354,12 +354,12 @@ export default function FontPage({ font }) {
 
           /* Price */
           .price-block{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
-          .price-context{font-family:${SG};font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:4px;}
+          .price-context{font-family:${SM};font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8A95A6;margin-bottom:6px;}
           .price-big{font-family:${DET};font-size:3.5rem;color:#fff;line-height:1;margin-bottom:16px;}
           .trial-btn{
             width:100%;font-family:${DET};font-size:.72rem;
             font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-            color:${TRIAL_TXT};background:transparent;
+            color:#8A95A6;background:transparent;
             border:1px solid ${TRIAL_BDR};
             padding:15px;transition:all .15s;margin-top:10px;
             border-radius:8px;
@@ -370,7 +370,7 @@ export default function FontPage({ font }) {
           .trust-list{padding:10px 16px;display:flex;flex-direction:column;gap:5px;border-bottom:1px solid ${DIVIDER};}
           .trust-item{display:flex;align-items:flex-start;gap:7px;}
           .trust-dot{width:4px;height:4px;border-radius:50%;background:${BLUE};flex-shrink:0;margin-top:5px;}
-          .trust-txt{font-family:${SG};font-size:10px;color:#555;line-height:1.5;}
+          .trust-txt{font-family:${SG};font-size:10px;color:#8A95A6;line-height:1.5;}
 
           /* ── GLYPH STRIP ── */
           .glyph-section{border-top:1px solid ${DIVIDER};border-bottom:1px solid ${DIVIDER};background:#000;}
@@ -659,7 +659,7 @@ export default function FontPage({ font }) {
                 ))}
               </div>
             ) : (
-              <div style={{ fontFamily:SG, fontSize:11, color:'#888', padding:'4px 0' }}>
+              <div style={{ fontFamily:SG, fontSize:11, color:'#8A95A6', padding:'4px 0' }}>
                 All {font.styles.length} weights — best value
               </div>
             )}
