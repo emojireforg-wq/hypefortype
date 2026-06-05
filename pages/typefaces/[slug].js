@@ -356,6 +356,15 @@ export default function FontPage({ font }) {
 
           /* Price */
           .price-block{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
+          .paypal-wrap{position:relative;margin-bottom:0;}
+          .paypal-wrap iframe{border-radius:4px!important;}
+          .paypal-tint{
+            position:absolute;inset:0;
+            background:#1B1BFF;
+            mix-blend-mode:hue;
+            pointer-events:none;
+            border-radius:4px;
+          }
           .price-context{font-family:${SM};font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8A95A6;margin-bottom:6px;}
           .price-big{font-family:${DET};font-size:3.5rem;color:#fff;line-height:1;margin-bottom:16px;}
           .trial-btn{
@@ -414,7 +423,7 @@ export default function FontPage({ font }) {
           .wr:hover{background:#100f20;}
           .wr.on{background:#12103a;}
           .wr-name{font-family:${DET};font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${BLUE};}
-          .wr-sample{font-size:clamp(1.5rem,2.8vw,2.6rem);line-height:1;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+          .wr-sample{font-size:clamp(1.875rem,3.5vw,3.25rem);line-height:1;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
           .add-btn{
             font-family:${DET};font-size:.65rem;font-weight:700;
             letter-spacing:.1em;text-transform:uppercase;
@@ -696,8 +705,11 @@ export default function FontPage({ font }) {
           <div className="price-block">
             <div className="price-context">{weightCount} {weightCount===1?'weight':'weights'} · {licenseType.toUpperCase()}</div>
             <div className="price-big">£{estimatedPrice}</div>
-            <div ref={paypalRef} style={{ minHeight:44 }}>
-              {purchasing && <span style={{ fontFamily:SG, fontSize:12, color:'#666' }}>Processing...</span>}
+            <div className="paypal-wrap">
+              <div ref={paypalRef} style={{ minHeight:44 }}>
+                {purchasing && <span style={{ fontFamily:SG, fontSize:12, color:'#666' }}>Processing...</span>}
+              </div>
+              <div className="paypal-tint" />
             </div>
             <button className="trial-btn" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
               FREE TRIAL DOWNLOAD
