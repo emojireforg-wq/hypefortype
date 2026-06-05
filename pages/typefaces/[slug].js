@@ -11,8 +11,7 @@ const SPECIMENS = {
 };
 
 const GLYPH_SETS = {
-  UPPERCASE:   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-  LOWERCASE:   'abcdefghijklmnopqrstuvwxyz'.split(''),
+  ALPHABET:    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(''),
   NUMERALS:    '0123456789'.split(''),
   PUNCTUATION: '.,;:!?\'"-—…()[]{}@#$%&*+<>='.split(''),
   ACCENTS:     'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý'.split(''),
@@ -55,7 +54,7 @@ export default function FontPage({ font }) {
   const [fontSize,        setFontSize]         = useState(72);
   const [letterSpacing,   setLetterSpacing]    = useState(0);
   const [lineHeight,      setLineHeight]       = useState(1.0);
-  const [glyphSet,        setGlyphSet]         = useState('UPPERCASE');
+  const [glyphSet,        setGlyphSet]         = useState('ALPHABET');
   const [activeSpecimen,  setActiveSpecimen]   = useState(0);
   const [viewMode,        setViewMode]         = useState('DISPLAY');
   const [bgColor,         setBgColor]          = useState('#000000');
@@ -398,7 +397,7 @@ export default function FontPage({ font }) {
           .g-count{font-family:${SM};font-size:9px;color:#333;padding:10px 14px;margin-left:auto;}
           .glyph-grid{display:flex;flex-wrap:wrap;padding:16px;gap:6px;}
           .g-cell{
-            width:68px;height:86px;
+            width:72px;height:92px;
             display:flex;flex-direction:column;align-items:center;justify-content:center;
             background:#000;border:1px solid #1B1D30;border-radius:8px;
             position:relative;cursor:pointer;transition:all .12s;flex-shrink:0;
@@ -406,7 +405,7 @@ export default function FontPage({ font }) {
           }
           .g-cell:hover{border-color:${BLUE};transform:scale(1.06);}
           .g-cell-code{font-family:${SM};font-size:7px;color:${BLUE};letter-spacing:.06em;position:absolute;top:6px;left:50%;transform:translateX(-50%);white-space:nowrap;}
-          .g-cell-char{font-size:1.8rem;color:#ffffff;line-height:1;margin-top:10px;}
+          .g-cell-char{font-size:2.2rem;color:#ffffff;line-height:1;margin-top:12px;}
           .g-hint{font-family:${SM};font-size:9px;color:#222;padding:0 16px 12px;width:100%;}
 
           /* ── ALL WEIGHTS ── */
