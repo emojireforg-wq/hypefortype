@@ -70,6 +70,15 @@ export default function FontPage({ font }) {
   const [cart,            setCart]             = useState([]);
   const [addedIdx,        setAddedIdx]         = useState(null);
   const [showToast,       setShowToast]        = useState(false);
+  // Accordion open/close state
+  const [openSections, setOpenSections] = useState({
+    weight: true,
+    tools: true,
+    license: true,
+    selection: true,
+    price: true,
+  });
+  const toggleSection = (key) => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
   const [toastMsg,        setToastMsg]         = useState('');
   const inputRef  = useRef(null);
   const paypalRef = useRef(null);
@@ -251,6 +260,45 @@ export default function FontPage({ font }) {
           .glyph-focus-char{font-size:8rem;line-height:1;color:#fff;}
           .glyph-focus-hint{font-family:${SM};font-size:9px;color:#444;letter-spacing:.1em;margin-top:1.5rem;}
 
+          /* ── ACCORDION ── */
+          .acc-head{
+            display:flex;justify-content:space-between;align-items:center;
+            cursor:pointer;padding:12px 20px;
+            border-bottom:1px solid ${DIVIDER};
+            user-select:none;transition:background .15s;
+          }
+          .acc-head:hover{background:rgba(255,255,255,0.03);}
+          .acc-title{
+            font-family:${DET};font-size:.78rem;font-weight:700;
+            letter-spacing:.1em;text-transform:uppercase;color:#fff;
+          }
+          .acc-arrow{
+            color:#8A95A6;font-size:10px;transition:transform .2s;flex-shrink:0;
+          }
+          .acc-arrow.open{transform:rotate(180deg);}
+          .acc-body{overflow:hidden;transition:max-height .25s ease,opacity .2s ease;}
+          .acc-body.open{opacity:1;}
+          .acc-body.closed{max-height:0!important;opacity:0;}
+          .acc-inner{padding:14px 20px;}
+
+          /* Compact tools row */
+          .tools-compact{display:flex;gap:8px;align-items:center;}
+          .tool-compact{
+            width:32px;height:32px;background:transparent;
+            border:1px solid ${DIVIDER};
+            display:flex;align-items:center;justify-content:center;
+            cursor:pointer;transition:border-color .15s;padding:4px;flex-shrink:0;
+          }
+          .tool-compact:hover{border-color:${BLUE};}
+          .tool-compact.on{border-color:${BLUE};background:rgba(27,26,255,0.15);}
+          .tool-compact img{width:100%;height:100%;object-fit:contain;display:block;}
+
+          /* Compact sliders */
+          .sl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+          .sl-row:last-child{margin-bottom:0;}
+          .sl-lbl{font-family:${DET};font-size:.68rem;color:#fff;width:58px;flex-shrink:0;letter-spacing:.04em;}
+          .sl-val{font-family:${DET};font-size:.68rem;color:#fff;width:42px;text-align:right;flex-shrink:0;}
+
           /* ── RIGHT PANEL ── */
           .panel{
             background:#000;display:flex;flex-direction:column;
@@ -263,13 +311,8 @@ export default function FontPage({ font }) {
             z-index:150;
           }
           .ps{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
-          .ps-lbl{
-            font-family:${DET};font-size:.85rem;font-weight:700;
-            letter-spacing:.1em;text-transform:uppercase;
-            color:#fff;margin-bottom:16px;display:block;
-            text-decoration:none;
-          }
-          .ps-slider-row{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+          .ps-lbl{display:none;}
+          .ps-slider-row{display:none;}
           .ps-slider-lbl{font-family:${DET};font-size:.75rem;color:#fff;width:64px;flex-shrink:0;letter-spacing:.04em;}
           .ps-slider-val{font-family:${DET};font-size:.75rem;color:#fff;width:48px;text-align:right;flex-shrink:0;padding-right:2px;}
 
@@ -682,9 +725,16 @@ export default function FontPage({ font }) {
             )}
           </div>
 
-          {/* WEIGHT SELECTION */}
-          <div className="ps">
-            <div className="ps-lbl">Weight Selection</div>
+            </div>
+          </div>
+
+          {/* ── WEIGHT SELECTION accordion ── */}
+          <div className="acc-head" onClick={() => toggleSection('selection')}>
+            <span className="acc-title">Weight Selection</span>
+            <span className={`acc-arrow${openSections.selection?' open':''}`}>▼</span>
+          </div>
+          <div className={`acc-body${openSections.selection?' open':' closed'}`} style={{ maxHeight: openSections.selection ? '320px' : '0' }}>
+            <div className="acc-inner">
             <div className="wm-tabs">
               <button className={`wm-tab${weightMode==='single'?' on':''}`} onClick={() => setWeightMode('single')}>Individual</button>
               <button className={`wm-tab${weightMode==='full'?' on':''}`} onClick={() => setWeightMode('full')}>Full Family</button>
@@ -707,8 +757,16 @@ export default function FontPage({ font }) {
             )}
           </div>
 
-          {/* PRICE + BUY */}
-          <div className="price-block">
+            </div>
+          </div>
+
+          {/* ── PRICE + BUY accordion ── */}
+          <div className="acc-head" onClick={() => toggleSection('price')}>
+            <span className="acc-title">License & Purchase</span>
+            <span className={`acc-arrow${openSections.price?' open':''}`}>▼</span>
+          </div>
+          <div className={`acc-body${openSections.price?' open':' closed'}`} style={{ maxHeight: openSections.price ? '400px' : '0' }}>
+          <div className="price-block" style={{ border:'none', padding:'14px 20px' }}>
             <div className="price-context">{weightCount} {weightCount===1?'weight':'weights'} · {licenseType.toUpperCase()}</div>
             <div className="price-big">£{estimatedPrice}</div>
             <div className="paypal-wrap">
