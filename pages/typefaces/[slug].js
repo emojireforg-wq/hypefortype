@@ -203,7 +203,7 @@ export default function FontPage({ font }) {
           .nav-buy:hover{opacity:.85;}
 
           /* ── MAIN LAYOUT ── */
-          .main-wrap{display:grid;grid-template-columns:1fr 300px;align-items:start;}
+          .main-wrap{display:block;margin-right:300px;}
 
           /* ── LEFT CANVAS ── */
           .canvas{border-right:1px solid ${DIVIDER};display:flex;flex-direction:column;transition:background .25s;}
@@ -253,8 +253,13 @@ export default function FontPage({ font }) {
           /* ── RIGHT PANEL ── */
           .panel{
             background:#000;display:flex;flex-direction:column;
-            overflow-y:auto;max-height:calc(100vh - 44px);
-            position:sticky;top:44px;border-left:1px solid ${DIVIDER};
+            overflow-y:auto;
+            position:fixed;
+            top:44px;right:0;
+            width:300px;
+            height:calc(100vh - 44px);
+            border-left:1px solid ${DIVIDER};
+            z-index:100;
           }
           .ps{padding:22px 20px;border-bottom:1px solid ${DIVIDER};}
           .ps-lbl{
@@ -409,7 +414,7 @@ export default function FontPage({ font }) {
           .g-hint{font-family:${SM};font-size:9px;color:#222;padding:0 16px 12px;width:100%;}
 
           /* ── ALL WEIGHTS ── */
-          .weights-section{border-bottom:1px solid ${DIVIDER};}
+          .weights-section{border-bottom:1px solid ${DIVIDER};margin-right:300px;}
           .weights-header{padding:10px 1.2rem;border-bottom:1px solid ${DIVIDER};}
           .weights-title{font-family:${DET};font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#555;}
           .wr{
@@ -433,7 +438,7 @@ export default function FontPage({ font }) {
           .add-btn.done{background:#1a5c30;}
 
           /* ── SPECIMEN ── */
-          .specimen-section{border-bottom:1px solid ${DIVIDER};}
+          .specimen-section{border-bottom:1px solid ${DIVIDER};margin-right:300px;}
           .specimen-header{padding:9px 1.4rem;border-bottom:1px solid ${DIVIDER};}
           .specimen-banner{
             background:${BLUE};padding:9px 1.4rem;
@@ -455,7 +460,7 @@ export default function FontPage({ font }) {
           .specimen-arrow-right{right:0;}
 
           /* ── ABC TICKER ── */
-          .abc-ticker{overflow:hidden;padding:10px 0;border-bottom:1px solid ${DIVIDER};}
+          .abc-ticker{overflow:hidden;padding:10px 0;border-bottom:1px solid ${DIVIDER};margin-right:300px;}
           .abc-track{display:flex;gap:1.2rem;animation:tickr 22s linear infinite;white-space:nowrap;}
           .abc-char{font-size:1.8rem;color:rgba(27,26,255,0.22);letter-spacing:.05em;}
           @keyframes tickr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -465,6 +470,7 @@ export default function FontPage({ font }) {
             display:grid;grid-template-columns:auto 1fr auto;
             align-items:center;padding:1rem 1.4rem;
             border-top:1px solid ${DIVIDER};background:#000;gap:1rem;
+            margin-right:300px;
           }
           .footer-logo{font-family:${DET};font-size:.9rem;letter-spacing:.1em;color:#fff;}
           .footer-copy{font-family:${SM};font-size:9px;color:#333;text-align:center;text-transform:uppercase;letter-spacing:.08em;}
