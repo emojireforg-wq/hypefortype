@@ -204,10 +204,10 @@ export default function FontPage({ font }) {
           .nav-buy:hover{opacity:.85;}
 
           /* ── MAIN LAYOUT ── */
-          .main-wrap{display:grid;grid-template-columns:1fr 300px;}
+          .main-wrap{display:grid;grid-template-columns:1fr 300px;align-items:start;}
 
           /* ── LEFT CANVAS ── */
-          .canvas{border-right:1px solid ${DIVIDER};display:flex;flex-direction:column;transition:background .25s;min-height:calc(100vh - 44px);}
+          .canvas{border-right:1px solid ${DIVIDER};display:flex;flex-direction:column;transition:background .25s;}
 
           /* Stage */
           .stage-wrap{position:relative;height:280px;flex-shrink:0;}
@@ -263,8 +263,8 @@ export default function FontPage({ font }) {
             text-decoration:none;
           }
           .ps-slider-row{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
-          .ps-slider-lbl{font-family:${DET};font-size:.78rem;color:#fff;width:70px;flex-shrink:0;letter-spacing:.06em;}
-          .ps-slider-val{font-family:${DET};font-size:.78rem;color:#fff;width:52px;text-align:right;flex-shrink:0;}
+          .ps-slider-lbl{font-family:${DET};font-size:.75rem;color:#fff;width:64px;flex-shrink:0;letter-spacing:.04em;}
+          .ps-slider-val{font-family:${DET};font-size:.75rem;color:#fff;width:48px;text-align:right;flex-shrink:0;padding-right:2px;}
 
           /* Dropdown */
           .dd-wrap{position:relative;margin-bottom:8px;}
@@ -373,7 +373,7 @@ export default function FontPage({ font }) {
           .trust-txt{font-family:${SG};font-size:10px;color:#8A95A6;line-height:1.5;}
 
           /* ── GLYPH STRIP ── */
-          .glyph-section{border-top:1px solid ${DIVIDER};border-bottom:1px solid ${DIVIDER};background:#000;}
+          .glyph-section{border-top:1px solid ${DIVIDER};background:#000;}
           .glyph-tabs{display:flex;border-bottom:1px solid ${DIVIDER};}
           .g-tab{
             font-family:${DET};font-size:.68rem;font-weight:700;
@@ -536,6 +536,26 @@ export default function FontPage({ font }) {
             </div>
             <div className="meta-desc">{font.description}</div>
           </div>
+          {/* ── GLYPH STRIP (inside left column) ── */}
+          <div className="glyph-section">
+            <div className="glyph-tabs">
+              {Object.keys(GLYPH_SETS).map(k => (
+                <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
+                  {k.charAt(0)+k.slice(1).toLowerCase()}
+                </button>
+              ))}
+              <span className="g-count">{allGlyphs.length} shown · {font.glyphCount}+ total</span>
+            </div>
+            <div className="glyph-grid">
+              {allGlyphs.map((g,i) => (
+                <div key={i} className="g-cell" style={{ fontFamily, fontWeight:style.weight }} onClick={() => setFocusedGlyph(g)}>
+                  <div className="g-cell-code">U+{g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</div>
+                  <div className="g-cell-char">{g}</div>
+                </div>
+              ))}
+            </div>
+            <div className="g-hint">Click any glyph to enlarge</div>
+          </div>
         </div>
 
         {/* RIGHT PANEL */}
@@ -554,7 +574,7 @@ export default function FontPage({ font }) {
             </div>
 
             {/* Size slider */}
-            <div className="ps-slider-row">
+            <div className="ps-slider-row" style={{ marginTop: 24 }}>
               <span className="ps-slider-lbl">Size</span>
               <input type="range" className="slider" min="12" max="200" value={fontSize} onChange={e => setFontSize(+e.target.value)} />
               <span className="ps-slider-val">{fontSize}px</span>
@@ -689,26 +709,7 @@ export default function FontPage({ font }) {
         </div>
       </div>
 
-      {/* ── GLYPH STRIP ── */}
-      <div className="glyph-section">
-        <div className="glyph-tabs">
-          {Object.keys(GLYPH_SETS).map(k => (
-            <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
-              {k.charAt(0)+k.slice(1).toLowerCase()}
-            </button>
-          ))}
-          <span className="g-count">{allGlyphs.length} shown · {font.glyphCount}+ total</span>
-        </div>
-        <div className="glyph-grid">
-          {allGlyphs.map((g,i) => (
-            <div key={i} className="g-cell" style={{ fontFamily, fontWeight:style.weight }} onClick={() => setFocusedGlyph(g)}>
-              <div className="g-cell-code">U+{g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</div>
-              <div className="g-cell-char">{g}</div>
-            </div>
-          ))}
-        </div>
-        <div className="g-hint">Click any glyph to enlarge</div>
-      </div>
+
 
       {/* ── ABC TICKER ── */}
       <div className="abc-ticker">
