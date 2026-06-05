@@ -60,6 +60,7 @@ export default function FontPage({ font }) {
   const [showToast,       setShowToast]        = useState(false);
   const [paypalReady,     setPaypalReady]      = useState(false);
   const [purchasing,      setPurchasing]       = useState(false);
+  const [cartCount,       setCartCount]        = useState(0);
   const paypalRef = useRef(null);
 
   const tiers      = pricing[font.isFamily ? 'family' : 'single'];
