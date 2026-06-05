@@ -97,6 +97,10 @@ export default function FontPage({ font }) {
   };
 
   useEffect(() => {
+    try { setCartCount(JSON.parse(localStorage.getItem('hft_cart') || '[]').length); } catch(_) {}
+  }, [addedIdx]);
+
+  useEffect(() => {
     if (!paypalReady || !paypalRef.current) return;
     paypalRef.current.innerHTML = '';
     window.paypal.Buttons({
@@ -151,9 +155,9 @@ export default function FontPage({ font }) {
           .nav-right{display:flex;align-items:stretch;justify-content:flex-end;}
           .nav-arrow{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;color:#4a4d56;padding:0 .9rem;border-left:1px solid #1c1c2e;display:flex;align-items:center;transition:color .15s;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
           .nav-arrow:hover{color:#cbced3;}
-          .nav-trial{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:${A};padding:0 1.2rem;border-left:1px solid #1c1c2e;border-right:1px solid #1c1c2e;display:flex;align-items:center;background:none;border-top:none;border-bottom:none;transition:opacity .15s;}
+          .nav-trial{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#325eff;padding:0 1.2rem;border-left:1px solid #1c1c2e;border-right:1px solid #1c1c2e;display:flex;align-items:center;background:none;border-top:none;border-bottom:none;transition:opacity .15s;}
           .nav-trial:hover{opacity:.75;}
-          .nav-buy{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:${A};padding:0 1.4rem;display:flex;align-items:center;transition:opacity .15s;}
+          .nav-buy{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#325eff;padding:0 1.4rem;display:flex;align-items:center;transition:opacity .15s;}
           .nav-buy:hover{opacity:.85;}
 
           /* MAIN GRID */
@@ -166,13 +170,13 @@ export default function FontPage({ font }) {
           .tb-sep{width:1px;height:14px;background:#1c1c2e;}
           .tb-btn{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid #1c1c2e;background:transparent;color:#4a4d56;transition:all .15s;}
           .tb-btn:hover{border-color:#2a2a45;color:#cbced3;}
-          .tb-btn.on{background:${ADIM};border-color:${A};color:${A};}
+          .tb-btn.on{background:rgba(50,94,255,0.12);border-color:#325eff;color:#325eff;}
           .tb-sw{width:17px;height:17px;border:1px solid #1c1c2e;cursor:pointer;transition:all .15s;flex-shrink:0;}
-          .tb-sw:hover,.tb-sw.on{border-color:${A};box-shadow:0 0 8px rgba(50,94,255,0.45);}
+          .tb-sw:hover,.tb-sw.on{border-color:#325eff;box-shadow:0 0 8px rgba(50,94,255,0.45);}
 
           /* Stage */
           .stage-wrap{position:relative;height:280px;flex-shrink:0;}
-          .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:${A};font-size:16px;padding:clamp(1.5rem,3vw,2.5rem);z-index:2;cursor:text;spellcheck:false;}
+          .stage-input{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:#325eff;font-size:16px;padding:clamp(1.5rem,3vw,2.5rem);z-index:2;cursor:text;spellcheck:false;}
           .stage-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(1.5rem,3vw,2.5rem);pointer-events:none;overflow:hidden;}
           .stage-text{width:100%;line-height:.92;letter-spacing:-.02em;word-break:break-word;}
           .stage-body{width:100%;max-width:58ch;}
@@ -199,34 +203,34 @@ export default function FontPage({ font }) {
           .ps-lbl{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#9097a1;font-weight:500;}
           .ps-val{font-family:'Space Mono',monospace;font-size:10px;color:#cbced3;}
           .w-sel{width:100%;background:#0f0f1a;border:1px solid #1c1c2e;color:#cbced3;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
-          .w-sel:focus{border-color:${A};}
+          .w-sel:focus{border-color:#325eff;}
           .slider{width:100%;height:2px;-webkit-appearance:none;appearance:none;background:#1c1c2e;outline:none;border-radius:1px;cursor:pointer;}
-          .slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:${A};cursor:pointer;box-shadow:0 0 8px rgba(50,94,255,0.45);}
+          .slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#325eff;cursor:pointer;box-shadow:0 0 8px rgba(50,94,255,0.45);}
           .rng{display:flex;justify-content:space-between;margin-top:4px;}
           .rng span{font-family:'Space Mono',monospace;font-size:9px;color:#4a4d56;}
 
           /* LICENSE */
           .lic-wrap{position:relative;margin-bottom:8px;}
-          .lic-sel{width:100%;background:#0f0f1a;border:1px solid ${A};color:${A};font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:9px 12px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;transition:all .15s;}
+          .lic-sel{width:100%;background:#0f0f1a;border:1px solid #325eff;color:#325eff;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:9px 12px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;transition:all .15s;}
           .lic-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#4a4d56;pointer-events:none;font-size:10px;}
           .sub-lbl{font-family:'Space Grotesk',sans-serif;font-size:10px;color:#9097a1;margin-bottom:5px;}
           .sub-sel{width:100%;background:#0f0f1a;border:1px solid #1c1c2e;color:#cbced3;font-family:'Space Grotesk',sans-serif;font-size:11px;padding:7px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
-          .sub-sel:focus{border-color:${A};}
+          .sub-sel:focus{border-color:#325eff;}
           .lic-desc{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#4a4d56;margin-top:8px;line-height:1.5;}
 
           /* WEIGHT PICKER */
           .wm-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;}
           .wm-tab{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:7px;border:1px solid #1c1c2e;background:transparent;color:#4a4d56;cursor:pointer;transition:all .15s;text-align:center;}
           .wm-tab:hover{border-color:#2a2a45;color:#cbced3;}
-          .wm-tab.on{background:${ADIM};border-color:${A};color:${A};}
+          .wm-tab.on{background:rgba(50,94,255,0.12);border-color:#325eff;color:#325eff;}
           .wp-list{display:flex;flex-direction:column;gap:3px;}
           .wp-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid #1c1c2e;cursor:pointer;transition:all .15s;}
           .wp-row:hover{border-color:#2a2a45;}
-          .wp-row.on{background:${ADIM};border-color:${A};}
+          .wp-row.on{background:rgba(50,94,255,0.12);border-color:#325eff;}
           .wp-name{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;color:#b0b1b6;}
           .wp-num{font-family:'Space Mono',monospace;font-size:9px;color:#4a4d56;}
           .wp-chk{width:14px;height:14px;border:1px solid #1c1c2e;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
-          .wp-row.on .wp-chk{background:${A};border-color:${A};}
+          .wp-row.on .wp-chk{background:#325eff;border-color:#325eff;}
           .wp-row.on .wp-name{color:#f2f1eb;}
 
           /* PRICE */
@@ -234,10 +238,10 @@ export default function FontPage({ font }) {
           .price-big{font-family:'Determination',monospace;font-size:2.6rem;color:#f2f1eb;line-height:1;margin-bottom:3px;}
           .price-note{font-family:'Space Grotesk',sans-serif;font-size:10px;color:#4a4d56;margin-bottom:12px;font-style:italic;}
           .trial-btn{width:100%;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#9097a1;background:transparent;border:1px solid #1c1c2e;padding:9px;transition:all .15s;margin-top:6px;display:block;text-align:center;cursor:pointer;}
-          .trial-btn:hover{border-color:${A};color:${A};}
+          .trial-btn:hover{border-color:#325eff;color:#325eff;}
           .trust-list{display:flex;flex-direction:column;gap:7px;padding:12px 16px;}
           .trust-item{display:flex;align-items:flex-start;gap:8px;}
-          .trust-dot{width:4px;height:4px;border-radius:50%;background:${A};flex-shrink:0;margin-top:5px;box-shadow:0 0 6px rgba(50,94,255,0.5);}
+          .trust-dot{width:4px;height:4px;border-radius:50%;background:#325eff;flex-shrink:0;margin-top:5px;box-shadow:0 0 6px rgba(50,94,255,0.5);}
           .trust-txt{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#9097a1;line-height:1.5;}
 
           /* GLYPH STRIP */
@@ -245,24 +249,24 @@ export default function FontPage({ font }) {
           .glyph-tabs{display:flex;border-bottom:1px solid #1c1c2e;}
           .g-tab{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:9px 18px;background:transparent;color:#4a4d56;border:none;border-right:1px solid #1c1c2e;cursor:pointer;transition:all .15s;}
           .g-tab:hover{color:#b0b1b6;}
-          .g-tab.on{background:${ADIM};color:${A};}
+          .g-tab.on{background:rgba(50,94,255,0.12);color:#325eff;}
           .g-count{font-family:'Space Mono',monospace;font-size:9px;color:#4a4d56;padding:0 1rem;margin-left:auto;display:flex;align-items:center;}
           .g-grid{display:flex;flex-wrap:wrap;padding:12px 16px;gap:4px;}
           .g-cell{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#000;border:1px solid #1c1c2e;font-size:1.1rem;color:#fff;cursor:pointer;transition:all .12s;}
-          .g-cell:hover{background:${ADIM};border-color:${A};transform:scale(1.1);}
+          .g-cell:hover{background:rgba(50,94,255,0.12);border-color:#325eff;transform:scale(1.1);}
           .g-hint{font-family:'Space Mono',monospace;font-size:9px;color:#4a4d56;padding:4px 16px 12px;}
 
           /* ALL WEIGHTS */
           .weights-sec{border-bottom:1px solid #1c1c2e;}
           .sec-hd-row{padding:10px clamp(1.2rem,3vw,2.5rem);border-bottom:1px solid #1c1c2e;border-top:1px solid #1c1c2e;}
-          .sec-hd{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:${A};}
+          .sec-hd{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#325eff;}
           .wr{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:1rem;padding:1.2rem clamp(1.2rem,3vw,2.5rem);border-bottom:1px solid #1c1c2e;cursor:pointer;transition:background .12s;}
           .wr:hover{background:#0a0a0f;}
           .wr.on{background:#0f0f1a;}
           .wr-name{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#9097a1;}
           .wr-sample{font-size:clamp(1.8rem,3.5vw,3.2rem);line-height:1;color:#cbced3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .12s;}
           .wr:hover .wr-sample{color:#f2f1eb;}
-          .wr-cart{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:${A};border:none;padding:8px 14px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+          .wr-cart{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#325eff;border:none;padding:8px 14px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
           .wr-cart:hover{opacity:.85;}
           .wr-cart.added{background:#1a6b3a;}
 
@@ -278,7 +282,7 @@ export default function FontPage({ font }) {
           .spec-main img{width:100%;display:block;}
           .spec-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
           .spec-thumb{cursor:pointer;border:2px solid transparent;overflow:hidden;transition:border-color .15s;}
-          .spec-thumb.on{border-color:${A};}
+          .spec-thumb.on{border-color:#325eff;}
           .spec-thumb img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;filter:brightness(.75);transition:all .2s;}
           .spec-thumb:hover img,.spec-thumb.on img{filter:brightness(1);}
 
