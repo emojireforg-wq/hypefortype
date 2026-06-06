@@ -571,7 +571,7 @@ export default function Licensing() {
           .detail-label{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
           .detail-points{list-style:none;display:flex;flex-direction:column;gap:.4rem}
           .detail-point{font-size:14px;color:var(--t2);line-height:1.7;padding-left:1.2rem;position:relative;margin-bottom:.2rem}
-          .detail-point::before{content:'—';position:absolute;left:0;color:var(--t4)}
+          .detail-point::before{content:'→';position:absolute;left:0;color:var(--blue)}
           .eula-btn{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);background:transparent;border:1px solid var(--blue);padding:10px 16px;cursor:pointer;white-space:nowrap;transition:all .15s;align-self:flex-start;margin-top:.2rem}
           .eula-btn:hover{background:var(--blue);color:#fff}
 
