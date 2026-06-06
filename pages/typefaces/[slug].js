@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'monino-pro': [1,2,3,4,5,6,7,8,9].map(i => `/specimens/monino-pro/${i}.png`),
   'miyagi': ['/specimens/miyagi/miyagi-o.png'],
   'lippy': ['/specimens/lippy/lippy.png','/specimens/lippy/lippy-002.png','/specimens/lippy/lippy-003.png','/specimens/lippy/lippy-004.png','/specimens/lippy/lippy-005.png','/specimens/lippy/lippy-006.png','/specimens/lippy/lippy-007.png'],
   'hiroko': [1,2,3,4,5].map(i => `/specimens/hiroko/hiroko-00${i}.png`),
@@ -68,7 +69,7 @@ const FONT_PHRASES = {
   'letro':             'Letters that move.',
   'lippy':             'Bold lips. Bolder type.',
   'miyagi':            'Rewind. Replay. Repeat.',
-  'monino-pro':        'Precision built.',
+  'monino-pro':        'Clean. Sharp. Precise.',
   'monolite':          'One line. Pure.',
   'nanami':            'Soft power.',
   'nanami-handmade':   'Made by hand. Built to last.',
