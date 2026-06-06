@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Nav({ buyLabel, onBuy }) {
   return (
@@ -7,7 +8,7 @@ export default function Nav({ buyLabel, onBuy }) {
       top: 0, left: 0, right: 0,
       zIndex: 300,
       display: 'grid',
-      gridTemplateColumns: 'auto 1fr auto',
+      gridTemplateColumns: '1fr auto 1fr',
       alignItems: 'stretch',
       height: '48px',
       borderBottom: '1px solid var(--border)',
@@ -15,20 +16,8 @@ export default function Nav({ buyLabel, onBuy }) {
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
     }}>
-      <Link href="/" style={{
-        fontFamily: "'Determination', monospace",
-        fontSize: '0.9rem',
-        letterSpacing: '.08em',
-        textTransform: 'uppercase',
-        color: 'var(--white)',
-        padding: '0 1.6rem',
-        borderRight: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center',
-        whiteSpace: 'nowrap',
-      }}>
-        HypeForType
-      </Link>
 
+      {/* Left — nav links */}
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         {['Typefaces','Licensing','FAQ','Contact'].map(n => (
           <Link key={n}
@@ -42,15 +31,27 @@ export default function Nav({ buyLabel, onBuy }) {
               display: 'flex', alignItems: 'center',
               whiteSpace: 'nowrap',
               transition: 'color .2s',
+              borderRight: '1px solid var(--border)',
             }}
-            onMouseEnter={e => e.target.style.color = 'var(--white)'}
-            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.3)'}>
+            onMouseEnter={e => e.currentTarget.style.color = 'var(--white)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.3)'}>
             {n}
           </Link>
         ))}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'stretch', borderLeft: '1px solid var(--border)' }}>
+      {/* Centre — logo */}
+      <Link href="/" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '0 1.6rem',
+        borderLeft: '1px solid var(--border)',
+        borderRight: '1px solid var(--border)',
+      }}>
+        <Image src="/hft-logo.svg" alt="HypeForType" width={120} height={28} style={{ height: '22px', width: 'auto' }} priority />
+      </Link>
+
+      {/* Right — cart / buy */}
+      <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'flex-end', borderLeft: '1px solid var(--border)' }}>
         {buyLabel && onBuy ? (
           <button onClick={onBuy} style={{
             fontFamily: "'Space Grotesk', sans-serif",
@@ -58,6 +59,7 @@ export default function Nav({ buyLabel, onBuy }) {
             letterSpacing: '.1em', textTransform: 'uppercase',
             color: '#fff', background: 'var(--blue)',
             border: 'none', padding: '0 1.6rem',
+            cursor: 'pointer',
             transition: 'opacity .2s',
           }}
             onMouseEnter={e => e.target.style.opacity = '.8'}
@@ -80,6 +82,7 @@ export default function Nav({ buyLabel, onBuy }) {
           </Link>
         )}
       </div>
+
     </nav>
   );
 }
