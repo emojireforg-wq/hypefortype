@@ -243,11 +243,11 @@ export default function FontPage({ font }) {
 
           .left{border-right:1px solid #0e0f28;display:flex;flex-direction:column;}
 
-          .stage-wrap{position:relative;flex:1;min-height:340px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;}
-          .stage-ce{position:absolute;inset:0;z-index:3;padding:2rem;outline:none;cursor:text;color:transparent;-webkit-text-fill-color:transparent;caret-color:#1b1aff;word-break:break-word;white-space:pre-wrap;}
-          .stage-display{position:absolute;inset:0;display:flex;align-items:center;padding:2rem;pointer-events:none;z-index:2;}
+          .stage-wrap{position:relative;min-height:400px;height:auto;display:flex;align-items:flex-start;justify-content:flex-start;overflow:visible;background:#000;}
+          .stage-ce{position:absolute;top:0;left:0;right:0;min-height:100%;z-index:3;padding:2rem;outline:none;cursor:text;color:transparent;-webkit-text-fill-color:transparent;caret-color:#1b1aff;word-break:break-word;white-space:pre-wrap;}
+          .stage-display{position:relative;display:flex;align-items:flex-start;padding:2rem;pointer-events:none;z-index:2;width:100%;}
           .stage-inner{width:100%;word-break:break-word;}
-          .stage-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;color:#282c52;letter-spacing:.2em;text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:4;}
+          .stage-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;color:#282c52;letter-spacing:.2em;text-transform:uppercase;pointer-events:none;white-space:nowrap;z-index:4;display:block;}
 
           .glyph-focus{position:fixed;inset:0;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;cursor:pointer;}
           .glyph-focus-lbl{font-family:'Space Mono',monospace;font-size:11px;color:#4a5488;letter-spacing:.1em;margin-top:1rem;}
@@ -284,7 +284,7 @@ export default function FontPage({ font }) {
           .slider{flex:1;height:2px;-webkit-appearance:none;appearance:none;background:rgba(27,26,255,0.25);outline:none;border-radius:1px;cursor:pointer;}
           .slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#1b1aff;cursor:pointer;}
           .slider-val{font-family:'Space Mono',monospace;font-size:10px;color:#7888c0;flex-shrink:0;width:40px;text-align:right;}
-          .w-drop{width:100%;background:#000;border:1px solid #1b1aff;color:#e8e8ff;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
+          .w-drop-wrap{position:relative;}.w-drop{width:100%;background:#000;border:1px solid #1b1aff;color:#e8e8ff;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 36px 8px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}.w-drop-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#1b1aff;pointer-events:none;font-size:10px;}
 
           .typelab-head{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#e8e8ff;margin-bottom:8px;}
           .anim-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;}
@@ -527,6 +527,7 @@ export default function FontPage({ font }) {
           {/* Weight */}
           <div className="panel-row">
             <div className="panel-lbl">Font Weight</div>
+            <div className="w-drop-wrap">
             <select className="w-drop" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
               {font.styles.map((s,i) => (
                 <option key={i} value={i}>{font.name.toUpperCase()} {s.name.toUpperCase()}</option>
