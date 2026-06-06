@@ -9,6 +9,15 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'baq-rounded': [
+    '/specimens/baq-rounded/baq-rounded-frame-1-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_2_-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_3_-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_4_-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_5_-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_6_-o.jpg',
+    '/specimens/baq-rounded/baq-rounded-frame-1-_7_-o.jpg',
+  ],
 };
 
 const GLYPH_SETS = {
@@ -35,7 +44,7 @@ const ZEN_SENTENCE     = 'Zen samurai packs quartz koi jade silk.';
 
 const FONT_PHRASES = {
   'babalove':          'Beauty is power own it.',
-  'baq-rounded':       'Round the world.',
+  'baq-rounded':       'Bold. Blob. Beautiful.',
   'bomkin':            'Break the mold.',
   'crop':              'Sharp and clean.',
   'do-it-again':       'Do it again.',
