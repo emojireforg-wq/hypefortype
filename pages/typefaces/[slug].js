@@ -305,7 +305,7 @@ export default function FontPage({ font }) {
 
           .lic-wrap{position:relative;margin-bottom:6px;}
           .lic-drop{width:100%;background:#000;border:1px solid #1b1aff;color:#e8e8ff;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
-          .lic-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#4a5488;pointer-events:none;}
+          .lic-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#1b1aff;pointer-events:none;font-size:10px;}
           .sub-wrap{position:relative;margin-bottom:4px;}
           .sub-drop{width:100%;background:#000;border:1px solid #1b1aff;color:#1b1aff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
           .lic-hint{font-family:'Space Mono',monospace;font-size:9px;color:#4a5488;letter-spacing:.06em;margin-top:4px;}
@@ -608,7 +608,7 @@ export default function FontPage({ font }) {
                   <select className="sub-drop" value={desktopSeats} onChange={e => setDesktopSeats(+e.target.value)}>
                     {SEAT_OPTIONS.map(s => <option key={s} value={s}>{s} SEAT{s>1?'S':''}</option>)}
                   </select>
-                  <span className="lic-arrow" style={{ color:'#4a5488' }}>&#9660;</span>
+                  <span className="lic-arrow">&#9660;</span>
                 </div>
                 <div className="lic-hint">installation on {desktopSeats} computer{desktopSeats>1?'s':''}</div>
               </div>
@@ -620,7 +620,7 @@ export default function FontPage({ font }) {
                   <select className="sub-drop" value={webPageviews} onChange={e => setWebPageviews(e.target.value)}>
                     {PAGEVIEW_OPTIONS.map(p => <option key={p} value={p}>{p.toUpperCase()} PV/MO</option>)}
                   </select>
-                  <span className="lic-arrow" style={{ color:'#4a5488' }}>&#9660;</span>
+                  <span className="lic-arrow">&#9660;</span>
                 </div>
               </div>
             )}
