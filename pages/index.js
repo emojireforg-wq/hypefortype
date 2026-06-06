@@ -340,7 +340,7 @@ export default function Home() {
       {/* ── Stats bar ── */}
       <div className="stats-bar">
         <div className="stats-left">
-          <span>{fonts.length}</span> Typefaces &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>3,000+</span> Designers
+          <span>{fonts.length}</span> Typefaces &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>25,000+</span> Designers
         </div>
         <div className="stats-dots">
           <span>Desktop</span>
