@@ -311,6 +311,7 @@ export default function Home() {
       </Head>
 
       <Nav />
+      <div style={{ height: "48px" }} />
 
       {/* ── Preview bar ── */}
       <div className="preview-bar">
