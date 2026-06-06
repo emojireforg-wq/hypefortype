@@ -353,7 +353,7 @@ export default function Home() {
       {/* ── Fixed bottom bar ── */}
       <div className="bottom-bar">
         <div className="bottom-bar-left">
-          <span>{fonts.length}</span> Typefaces &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>25,000+</span> Designers
+          <span>{fonts.length}</span> Families &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>25,000+</span> Designers
         </div>
         <div className="bottom-bar-mid">
           <span>Desktop</span><span className="bottom-bar-dot">&middot;</span>
