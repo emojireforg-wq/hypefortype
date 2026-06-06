@@ -345,11 +345,11 @@ export default function FontPage({ font }) {
           .weights-sec{border-top:1px solid #0e0f28;}
           .weights-hd{padding:8px 1.2rem;border-bottom:1px solid #0e0f28;background:#06060f;}
           .weights-hd-txt{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#e8e8ff;}
-          .wr{display:grid;grid-template-columns:120px 1fr auto;align-items:center;padding:0 1.2rem;border-bottom:1px solid #0e0f28;min-height:80px;cursor:pointer;transition:background .12s;}
+          .wr{display:grid;grid-template-columns:120px 1fr auto;align-items:center;padding:0.6rem 1.2rem;border-bottom:1px solid #0e0f28;min-height:96px;cursor:pointer;transition:background .12s;overflow:visible;}
           .wr:hover{background:#0a0f35;}
           .wr.on{background:#0a0f35;}
           .wr-name{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#4a5488;flex-shrink:0;}
-          .wr-sample{font-size:clamp(2rem,3.5vw,3.4rem);line-height:1;color:#cbcde8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1rem;transition:color .12s;}
+          .wr-sample{font-size:clamp(2rem,3.5vw,3.4rem);line-height:1.2;color:#cbcde8;overflow:visible;text-overflow:ellipsis;white-space:nowrap;padding:0.2rem 1rem;transition:color .12s;}
           .wr:hover .wr-sample,.wr.on .wr-sample{color:#e8e8ff;}
           .wr-add{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#1b1aff;border:none;padding:8px 14px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
           .wr-add:hover{opacity:.85;}
