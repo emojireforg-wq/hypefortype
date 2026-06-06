@@ -50,7 +50,7 @@ const FONT_PHRASES = {
   'baq-rounded':       'Bold. Blob. Beautiful.',
   'bomkin':            'Sunday Monday Happy Days',
   'crop':              'MANY MEN WISH DEATH UPON ME',
-  'do-it-again':       'Do it again.',
+  'do-it-again':       'LAS VEGAS CASINO NIGHTS',
   'ebisu':             'Tokyo nights.',
   'electro':           'Live wire.',
   'headlined':         'Make headlines.',
@@ -94,6 +94,7 @@ const DEFAULT_STYLES = {
 const FONT_SIZES = {
   'babalove': 160,
   'crop': 100,
+  'do-it-again': 120,
   'headlined': 140,
   'headlined-solid': 140,
   'crop': 130,
