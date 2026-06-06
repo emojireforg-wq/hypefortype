@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'bomkin': [1,2,3,4,5,6,7].map(i => `/specimens/bomkin/bomkin-${i}.jpg`),
   'baq-rounded': [
     '/specimens/baq-rounded/baq-rounded-frame-1-o.jpg',
     '/specimens/baq-rounded/baq-rounded-frame-1-_2_-o.jpg',
@@ -45,7 +46,7 @@ const ZEN_SENTENCE     = 'Zen samurai packs quartz koi jade silk.';
 const FONT_PHRASES = {
   'babalove':          'Beauty is power own it.',
   'baq-rounded':       'Bold. Blob. Beautiful.',
-  'bomkin':            'Break the mold.',
+  'bomkin':            'Sunday Monday Happy Days',
   'crop':              'Sharp and clean.',
   'do-it-again':       'Do it again.',
   'ebisu':             'Tokyo nights.',
