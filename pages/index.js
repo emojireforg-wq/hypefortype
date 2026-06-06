@@ -110,6 +110,9 @@ export default function Home() {
             height: 72px;
             border-bottom: 1px solid var(--border);
             background: var(--bg);
+            position: sticky;
+            top: 48px;
+            z-index: 99;
           }
           .preview-label {
             font-family: 'Space Mono', monospace;
@@ -141,8 +144,8 @@ export default function Home() {
             height: 44px;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 44px;
-            z-index: 100;
+            top: 120px;
+            z-index: 98;
             background: rgba(0,0,0,0.95);
             backdrop-filter: blur(10px);
           }
