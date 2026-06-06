@@ -358,8 +358,8 @@ export default function Home() {
             line-height: 1;
             color: rgba(255,255,255,0.55);
             letter-spacing: -.01em;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            overflow: visible;
+            text-overflow: clip;
             white-space: nowrap;
             transition: color .15s;
             margin-bottom: 5px;
