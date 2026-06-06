@@ -7,7 +7,7 @@ import Script from 'next/script';
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const SPECIMENS = {
-  'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
+  'nanami-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
   'nanami': ['001','002','003','004','005','006','007','008','009','010','011','012','013','014','015'].map(i => `/specimens/nanami/nanami-${i}.png`),
   'monolite': [1,2,3].map(i => `/specimens/monolite/monolite-00${i}.png`),
@@ -75,7 +75,7 @@ const FONT_PHRASES = {
   'monolite':          'Form follows function.',
   'nanami':            'Designed in the space between.',
   'nanami-handmade':   'Made by hand. Built to last.',
-  'nanami-rounded-pro':'Soft power.',
+  'nanami-pro':         'The complete collection.',
   'nanami-3d':         'Depth of field.',
   'nanami-extended':   'Reach further.',
   'carolinia':         'Refined by nature.',
