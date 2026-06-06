@@ -528,11 +528,13 @@ export default function FontPage({ font }) {
           <div className="panel-row">
             <div className="panel-lbl">Font Weight</div>
             <div className="w-drop-wrap">
-            <select className="w-drop" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
-              {font.styles.map((s,i) => (
-                <option key={i} value={i}>{font.name.toUpperCase()} {s.name.toUpperCase()}</option>
-              ))}
-            </select>
+              <select className="w-drop" value={activeStyle} onChange={e => setActiveStyle(+e.target.value)}>
+                {font.styles.map((s,i) => (
+                  <option key={i} value={i}>{font.name.toUpperCase()} {s.name.toUpperCase()}</option>
+                ))}
+              </select>
+              <span className="w-drop-arrow">&#9660;</span>
+            </div>
           </div>
 
           {/* Sliders */}
