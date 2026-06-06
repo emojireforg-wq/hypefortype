@@ -140,28 +140,7 @@ export default function Home() {
 
 
 
-          /* ── Column headers ─────────── */
-          .grid-head {
-            display: grid;
-            grid-template-columns: 3rem 1fr 10rem 6rem 10rem;
-            padding: 0 2rem;
-            height: 40px;
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-            gap: 1rem;
-            background: var(--bg2);
-            position: sticky;
-            top: 164px;
-            z-index: 96;
-          }
-          .grid-head span {
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            color: var(--t4);
-          }
+
 
           /* ── Font rows ──────────────── */
           .font-row {
@@ -343,13 +322,6 @@ export default function Home() {
       </div>
 
 {/* ── Column headers ── */}
-      <div className="grid-head">
-        <span>No.</span>
-        <span>Typeface</span>
-        <span>Category</span>
-        <span>Styles</span>
-        <span>Price</span>
-      </div>
 
       {/* ── Font rows ── */}
       <section id="typefaces" style={{ paddingTop: "0" }}>
