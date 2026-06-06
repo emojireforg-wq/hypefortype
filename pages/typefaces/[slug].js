@@ -32,10 +32,53 @@ const SEAT_OPTIONS      = [1,2,5,10,25,50,100];
 const PAGEVIEW_OPTIONS  = ['10,000','50,000','100,000','250,000','500,000','1,000,000','Unlimited'];
 const ZEN_SENTENCE      = 'Zen samurai packs quartz koi jade silk.';
 
+
+const FONT_PHRASES = {
+  'babalove':          'Love is bold.',
+  'baq-rounded':       'Round the world.',
+  'bomkin':            'Break the mold.',
+  'crop':              'Sharp & clean.',
+  'do-it-again':       'Do it again.',
+  'ebisu':             'Tokyo nights.',
+  'electro':           'Live wire.',
+  'headlined':         'Make headlines.',
+  'headlined-solid':   'Own the page.',
+  'hiroko':            'Still water runs deep.',
+  'hiruko':            'Between two worlds.',
+  'kono':              'This is now.',
+  'letro':             'Letters that move.',
+  'lippy':             'Say it loud.',
+  'miyagi':            'Balance everything.',
+  'monino-pro':        'Precision built.',
+  'monolite':          'One line. Pure.',
+  'nanami':            '美しい文字。',
+  'nanami-handmade':   'Written by hand.',
+  'nanami-rounded-pro':'Soft power.',
+  'nanami-3d':         'Depth of field.',
+  'nanami-extended':   'Reach further.',
+  'nerolina':          'Refined by nature.',
+  'odyssea':           'Set sail.',
+  'patisserie':        'Sweet precision.',
+  'rika':              'Urban edge.',
+  'roka':              'Stand firm.',
+  'roxic':             'Rule breaker.',
+  'shine-pro':         'Catch the light.',
+  'sobek':             'Ancient power.',
+  'soto':              'Outside the lines.',
+  'squoosh-gothic':    'Compressed. Intense.',
+  'vow-neue':          'A promise kept.',
+  'yoko':              '横書きの美。',
+  'york-handwriting':  'Written with care.',
+  'yuki':              '雪のように。',
+  'yuko':              'Gentle strength.',
+  'yume':              '夢を見ている。',
+  'yumo':              'Flow state.',
+};
+
 export default function FontPage({ font }) {
   const [activeStyle,     setActiveStyle]     = useState(0);
   const [previewText,     setPreviewText]      = useState('');
-  const [fontSize,        setFontSize]         = useState(72);
+  const [fontSize,        setFontSize]         = useState(120);
   const [letterSpacing,   setLetterSpacing]    = useState(0);
   const [lineHeight,      setLineHeight]       = useState(1.0);
   const [glyphSet,        setGlyphSet]         = useState('ALPHABET');
@@ -137,29 +180,23 @@ export default function FontPage({ font }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
+          max_tokens: 300,
           messages: [{
             role: 'user',
-            content: `You are a creative director. The user wants to see the font "${font.name}" used in a design context. Their brief: "${mockupPrompt}". 
-            
-Return ONLY a JSON object (no markdown, no explanation) with this exact structure:
-{
-  "headline": "the main headline text to display in the font (max 4 words, punchy)",
-  "subline": "a supporting line (max 8 words)",
-  "context": "one of: packaging | poster | logo | editorial | brand | billboard",
-  "bg": "a dark hex colour that suits the brief",
-  "accent": "a contrasting hex colour for the accent",
-  "tagline": "a short brand tagline (max 5 words)"
-}`
+            content: 'Creative director task. Brief: "' + mockupPrompt + '". Font: "' + font.name + '". Respond with ONLY a raw JSON object, no markdown fences, no explanation. Schema: {"headline":"max 3 words","subline":"max 6 words","bg":"dark hex e.g. #0a0a14","accent":"light hex e.g. #f0e8d0","label":"context type e.g. PACKAGING"}'
           }]
         })
       });
       const data = await res.json();
-      const text = data.content?.[0]?.text || '';
-      const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim();
-      setMockupResult(JSON.parse(clean));
+      const text = (data.content?.[0]?.text || '').trim();
+      // Strip any markdown fences
+      const clean = text.replace(/```json|```/g, '').trim();
+      // Find the JSON object
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('No JSON found');
+      setMockupResult(JSON.parse(match[0]));
     } catch(e) {
-      setMockupResult({ error: true });
+      setMockupResult({ error: true, msg: e.message });
     }
     setMockupLoading(false);
   };
@@ -409,13 +446,99 @@ Return ONLY a JSON object (no markdown, no explanation) with this exact structur
           {/* Live stage */}
           <div className={`stage-wrap${animation ? ' anim-'+animation : ''}`}
             ref={stageRef}
-            onClick={e => { e.currentTarget.querySelector('textarea')?.focus(); setAnimation(null); }}>
+            onClick={e => { if (!mockupResult?.headline) { e.currentTarget.querySelector('textarea')?.focus(); setAnimation(null); } }}>
             <textarea
               className="stage-textarea"
               value={previewText}
               onChange={e => { setPreviewText(e.target.value); setAnimation(null); }}
               maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off"
+              style={{ display: mockupResult?.headline ? 'none' : undefined }}
             />
+
+            {/* MOCKUP TAKEOVER — fills entire stage */}
+            {mockupResult?.headline && (
+              <div style={{
+                position:'absolute', inset:0, zIndex:10,
+                background: mockupResult.bg || '#050510',
+                display:'flex', flexDirection:'column',
+                alignItems:'center', justifyContent:'center',
+                padding:'2.5rem',
+              }}>
+                {/* Dismiss X */}
+                <button onClick={() => setMockupResult(null)} style={{
+                  position:'absolute', top:12, right:14,
+                  fontFamily:"'Space Mono',monospace", fontSize:11,
+                  color:'rgba(255,255,255,0.4)', background:'transparent',
+                  border:'1px solid rgba(255,255,255,0.1)', padding:'4px 10px',
+                  cursor:'pointer', letterSpacing:'.1em', transition:'all .15s',
+                  zIndex:20,
+                }}
+                  onMouseEnter={e => { e.target.style.color='#fff'; e.target.style.borderColor='rgba(255,255,255,0.4)'; }}
+                  onMouseLeave={e => { e.target.style.color='rgba(255,255,255,0.4)'; e.target.style.borderColor='rgba(255,255,255,0.1)'; }}>
+                  ✕ CLOSE
+                </button>
+
+                {/* Context label */}
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'rgba(255,255,255,0.3)', letterSpacing:'.2em', textTransform:'uppercase', marginBottom:'1.5rem' }}>
+                  {mockupResult.label || 'MOCKUP'} — {font.name}
+                </div>
+
+                {/* Main headline in the actual font */}
+                <div style={{
+                  fontFamily: ff,
+                  fontWeight: style.weight,
+                  fontSize: 'clamp(3rem,8vw,7rem)',
+                  color: mockupResult.accent || '#fff',
+                  letterSpacing:'-.02em',
+                  lineHeight: .9,
+                  textAlign:'center',
+                  marginBottom:'1rem',
+                }}>
+                  {mockupResult.headline}
+                </div>
+
+                {/* Subline */}
+                <div style={{
+                  fontFamily: ff,
+                  fontWeight: 300,
+                  fontSize: 'clamp(.7rem,1.5vw,1.1rem)',
+                  color: 'rgba(255,255,255,0.5)',
+                  letterSpacing:'.14em',
+                  textTransform:'uppercase',
+                  textAlign:'center',
+                }}>
+                  {mockupResult.subline}
+                </div>
+
+                {/* Watermark — diagonal, prominent, uncopyable */}
+                <div style={{
+                  position:'absolute', inset:0,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  pointerEvents:'none', zIndex:15, overflow:'hidden',
+                }}>
+                  <div style={{
+                    fontFamily:"'Space Mono',monospace",
+                    fontSize:'clamp(.8rem,2vw,1.2rem)',
+                    color:'rgba(255,255,255,0.18)',
+                    letterSpacing:'.15em',
+                    textTransform:'uppercase',
+                    transform:'rotate(-25deg)',
+                    whiteSpace:'nowrap',
+                    textShadow:'0 0 30px rgba(0,0,0,0.8)',
+                    userSelect:'none',
+                  }}>
+                    UNLICENSED PREVIEW · HYPERFLURO · UNLICENSED PREVIEW · HYPERFLURO
+                  </div>
+                </div>
+
+                {/* Bottom CTA */}
+                <div style={{ position:'absolute', bottom:14, left:0, right:0, textAlign:'center' }}>
+                  <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'.12em', textTransform:'uppercase' }}>
+                    License {font.name} to use this design commercially
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="stage-text" style={{ position:'relative', zIndex:1, width:'100%', padding:'2rem' }}>
               <div className="stage-display-inner" style={{
                 fontFamily: ff,
@@ -428,10 +551,10 @@ Return ONLY a JSON object (no markdown, no explanation) with this exact structur
                 wordBreak: 'break-word',
               }}>
                 {animation === 'fade'
-                  ? (previewText || font.name).split('').map((ch,i) => (
+                  ? (previewText || fontPhrase).split('').map((ch,i) => (
                       <span key={i} style={{ animationDelay: i*0.06+'s' }}>{ch}</span>
                     ))
-                  : (previewText || font.name)
+                  : (previewText || fontPhrase)
                 }
               </div>
             </div>
@@ -557,59 +680,19 @@ Return ONLY a JSON object (no markdown, no explanation) with this exact structur
                 </button>
               </div>
 
-              {mockupLoading && (
-                <div className="mockup-canvas" style={{ background:'#000' }}>
-                  <span className="mockup-loading">Generating concept...</span>
-                </div>
-              )}
-
-              {mockupResult && !mockupResult.error && (
-                <div className="mockup-canvas" style={{ background: mockupResult.bg || '#0a0014' }}>
-                  {/* Actual font mockup */}
-                  <div style={{ textAlign:'center', padding:'0 1rem', position:'relative', zIndex:2 }}>
-                    <div style={{
-                      fontFamily: ff,
-                      fontWeight: style.weight,
-                      fontSize: 'clamp(1.2rem,5vw,2.2rem)',
-                      color: mockupResult.accent || '#fff',
-                      letterSpacing:'-.01em',
-                      lineHeight:.95,
-                      marginBottom:6,
-                    }}>
-                      {mockupResult.headline}
-                    </div>
-                    <div style={{
-                      fontFamily: ff,
-                      fontWeight: '300',
-                      fontSize: '0.65rem',
-                      color: 'rgba(255,255,255,0.6)',
-                      letterSpacing:'.12em',
-                      textTransform:'uppercase',
-                    }}>
-                      {mockupResult.subline}
-                    </div>
-                  </div>
-                  {/* Watermark — burned in, uncopyable */}
-                  <div className="mockup-watermark">
-                    <span>UNLICENSED · HYPERFLURO · WATERMARKED PREVIEW</span>
-                  </div>
-                  {/* Second watermark at different angle */}
-                  <div style={{ position:'absolute', bottom:8, right:8, fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(255,255,255,0.25)', letterSpacing:'.1em', zIndex:10 }}>
-                    © HYPERFLURO
-                  </div>
-                </div>
-              )}
-
-              {mockupResult?.error && (
-                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#f55', padding:'8px 0' }}>
-                  Generation failed — try again
-                </div>
-              )}
-
               {!mockupResult && !mockupLoading && (
                 <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#282c52', lineHeight:1.6 }}>
-                  Type a brief → see {font.name} in context.<br/>
-                  Purchase license to use without watermark.
+                  Describe a context → Claude generates a live mockup with {font.name} applied. Purchase to use without watermark.
+                </div>
+              )}
+              {mockupLoading && (
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#4a5488', letterSpacing:'.1em', textTransform:'uppercase', padding:'6px 0' }}>
+                  <span className="mockup-loading">Generating...</span>
+                </div>
+              )}
+              {mockupResult?.error && (
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#f55', padding:'4px 0' }}>
+                  Failed — try again
                 </div>
               )}
             </div>
