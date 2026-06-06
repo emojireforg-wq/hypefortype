@@ -60,7 +60,7 @@ const FONT_PHRASES = {
   'electro':           'NEON TOKYO 2049',
   'headlined':         'LOSS AFTER LOSS MADE A BOSS',
   'headlined-solid':   'Own the page.',
-  'hiroko':            'The art of restraint.',
+  'hiroko':            'Concrete walls. Clean lines. Raw power.',
   'hiruko':            'Two cultures. One typeface.',
   'kono':              'This is now.',
   'letro':             'Letters that move.',
