@@ -34,7 +34,7 @@ const ZEN_SENTENCE      = 'Zen samurai packs quartz koi jade silk.';
 
 
 const FONT_PHRASES = {
-  'babalove':          'Love is bold.',
+  'babalove':          'Beauty is power\nown it.',
   'baq-rounded':       'Round the world.',
   'bomkin':            'Break the mold.',
   'crop':              'Sharp & clean.',
@@ -75,10 +75,24 @@ const FONT_PHRASES = {
   'yumo':              'Flow state.',
 };
 
+
+const FONT_SIZES = {
+  'babalove':          160,
+  'ebisu':             120,
+  'nanami':            120,
+  'nanami-rounded-pro':120,
+  'nanami-handmade':   120,
+  'hiruko':            110,
+  'headlined':         140,
+  'headlined-solid':   140,
+  'crop':              130,
+  'electro':           130,
+};
+
 export default function FontPage({ font }) {
   const [activeStyle,     setActiveStyle]     = useState(0);
   const [previewText,     setPreviewText]      = useState('');
-  const [fontSize,        setFontSize]         = useState(120);
+  const [fontSize,        setFontSize]         = useState(FONT_SIZES[font?.slug] || 120);
   const [letterSpacing,   setLetterSpacing]    = useState(0);
   const [lineHeight,      setLineHeight]       = useState(1.0);
   const [glyphSet,        setGlyphSet]         = useState('ALPHABET');
@@ -447,13 +461,37 @@ export default function FontPage({ font }) {
           <div className={`stage-wrap${animation ? ' anim-'+animation : ''}`}
             ref={stageRef}
             onClick={e => { if (!mockupResult?.headline) { e.currentTarget.querySelector('textarea')?.focus(); setAnimation(null); } }}>
-            <textarea
-              className="stage-textarea"
-              value={previewText}
-              onChange={e => { setPreviewText(e.target.value); setAnimation(null); }}
-              maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off"
-              style={{ display: mockupResult?.headline ? 'none' : undefined }}
-            />
+            {/* Contenteditable — cursor sits right inside the text */}
+            {!mockupResult?.headline && (
+              <div
+                contentEditable={true}
+                suppressContentEditableWarning={true}
+                onInput={e => { setPreviewText(e.currentTarget.textContent || ''); setAnimation(null); }}
+                onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
+                spellCheck={false}
+                autoCorrect="off"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 3,
+                  padding: '2rem',
+                  outline: 'none',
+                  cursor: 'text',
+                  color: 'transparent',
+                  caretColor: '#1b1aff',
+                  fontFamily: ff,
+                  fontWeight: style.weight,
+                  fontStyle: style.oblique ? 'italic' : 'normal',
+                  fontSize: fontSize + 'px',
+                  letterSpacing: letterSpacing + '%',
+                  lineHeight: lineHeight,
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  WebkitTextFillColor: 'transparent',
+                }}
+                data-placeholder={fontPhrase}
+              />
+            )}
 
             {/* MOCKUP TAKEOVER — fills entire stage */}
             {mockupResult?.headline && (
