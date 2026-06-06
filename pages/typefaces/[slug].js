@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'lippy': ['/specimens/lippy/lippy.png','/specimens/lippy/lippy-002.png','/specimens/lippy/lippy-003.png','/specimens/lippy/lippy-004.png','/specimens/lippy/lippy-005.png','/specimens/lippy/lippy-006.png','/specimens/lippy/lippy-007.png'],
   'hiroko': [1,2,3,4,5].map(i => `/specimens/hiroko/hiroko-00${i}.png`),
   'hiruko': ['001','002','004','005','006','007'].map(i => `/specimens/hiruko/hiruko_specimen_${i}.png`),
   'nanami-handmade': [1,2,3,4,5].map(i => `/specimens/nanami-handmade/nanami-handmade-${i}.png`),
@@ -64,7 +65,7 @@ const FONT_PHRASES = {
   'hiruko':            'Two cultures. One typeface.',
   'kono':              'This is now.',
   'letro':             'Letters that move.',
-  'lippy':             'Say it loud.',
+  'lippy':             'Bold lips. Bolder type.',
   'miyagi':            'Balance everything.',
   'monino-pro':        'Precision built.',
   'monolite':          'One line. Pure.',
