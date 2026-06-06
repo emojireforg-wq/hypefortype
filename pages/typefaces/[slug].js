@@ -52,7 +52,12 @@ export default function FontPage({ font }) {
   const [showToast,       setShowToast]        = useState(false);
   const [paypalReady,     setPaypalReady]      = useState(false);
   const [purchasing,      setPurchasing]       = useState(false);
+  const [animation,       setAnimation]        = useState(null);
+  const [mockupPrompt,    setMockupPrompt]     = useState('');
+  const [mockupResult,    setMockupResult]     = useState(null);
+  const [mockupLoading,   setMockupLoading]    = useState(false);
   const paypalRef = useRef(null);
+  const stageRef  = useRef(null);
 
   const tiers     = pricing[font.isFamily ? 'family' : 'single'];
   const style     = font.styles[activeStyle];
@@ -122,6 +127,43 @@ export default function FontPage({ font }) {
     })?.render(paypalRef.current);
   }, [paypalReady, licenseType, estPrice, font]);
 
+  const generateMockup = async () => {
+    if (!mockupPrompt.trim()) return;
+    setMockupLoading(true);
+    setMockupResult(null);
+    try {
+      const res = await fetch('/api/anthropic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: `You are a creative director. The user wants to see the font "${font.name}" used in a design context. Their brief: "${mockupPrompt}". 
+            
+Return ONLY a JSON object (no markdown, no explanation) with this exact structure:
+{
+  "headline": "the main headline text to display in the font (max 4 words, punchy)",
+  "subline": "a supporting line (max 8 words)",
+  "context": "one of: packaging | poster | logo | editorial | brand | billboard",
+  "bg": "a dark hex colour that suits the brief",
+  "accent": "a contrasting hex colour for the accent",
+  "tagline": "a short brand tagline (max 5 words)"
+}`
+          }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '';
+      const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim();
+      setMockupResult(JSON.parse(clean));
+    } catch(e) {
+      setMockupResult({ error: true });
+    }
+    setMockupLoading(false);
+  };
+
   const SG = "'Space Grotesk', sans-serif";
   const SM = "'Space Mono', monospace";
   const DET = "'Determination', monospace";
@@ -172,7 +214,7 @@ export default function FontPage({ font }) {
           /* Stage */
           .stage-wrap{position:relative;flex:1;min-height:320px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:text;}
           .stage-textarea{position:absolute;inset:0;width:100%;height:100%;background:transparent;border:none;outline:none;resize:none;color:transparent;caret-color:#1b1aff;font-size:16px;padding:2rem;z-index:2;cursor:text;}
-          .stage-text{pointer-events:none;padding:2rem;width:100%;word-break:break-word;transition:font-size .08s,letter-spacing .08s,line-height .08s;}
+          .stage-text{pointer-events:none;width:100%;word-break:break-word;transition:font-size .08s,letter-spacing .08s,line-height .08s;}
           .stage-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-family:'Space Mono', monospace;font-size:9px;color:#282c52;letter-spacing:.2em;text-transform:uppercase;pointer-events:none;white-space:nowrap;}
 
           /* Glyph focus */
@@ -187,12 +229,42 @@ export default function FontPage({ font }) {
           .meta-key{font-family:'Space Mono', monospace;font-size:9px;color:#4a5488;letter-spacing:.12em;text-transform:uppercase;}
           .meta-lang{font-family:'Space Grotesk', sans-serif;font-size:13px;color:#e8e8ff;font-weight:500;}
 
-          /* Icons row */
-          .icons-row{display:flex;gap:.5rem;padding:.6rem 1rem;border-bottom:1px solid #0e0f28;font-size:1.6rem;flex-wrap:wrap;}
+          /* Long desc — muted, readable */
+          .long-desc{padding:.8rem 1rem;border-bottom:1px solid #0e0f28;}
+          .long-desc p{font-family:'Space Grotesk', sans-serif;font-size:12px;color:#4a5488;line-height:1.75;font-weight:400;}
 
-          /* Long desc */
-          .long-desc{padding:.8rem 1rem 0;border-bottom:1px solid #0e0f28;}
-          .long-desc p{font-family:'Space Mono', monospace;font-size:10px;color:#1b1aff;line-height:1.7;font-weight:400;}
+          /* TYPE LAB */
+          .typelab{padding:0;border-bottom:1px solid #0e0f28;}
+          .typelab-head{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e8e8ff;padding:10px 1rem 8px;border-bottom:1px solid #0e0f28;}
+          .anim-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;}
+          .anim-btn{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 6px;border:1px solid #0e0f28;background:transparent;color:#4a5488;cursor:pointer;transition:all .2s;text-align:center;}
+          .anim-btn:hover{border-color:#1b1aff;color:#e8e8ff;background:rgba(27,26,255,0.08);}
+          .anim-btn.on{background:rgba(27,26,255,0.15);border-color:#1b1aff;color:#1b1aff;}
+          .mockup-area{padding:8px;border-top:1px solid #0e0f28;}
+          .mockup-input-row{display:flex;gap:4px;margin-bottom:8px;}
+          .mockup-input{flex:1;background:#000;border:1px solid #0e0f28;color:#e8e8ff;font-family:'Space Grotesk',sans-serif;font-size:11px;padding:7px 10px;outline:none;transition:border-color .2s;}
+          .mockup-input:focus{border-color:#1b1aff;}
+          .mockup-input::placeholder{color:#282c52;}
+          .mockup-gen-btn{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;background:#1b1aff;color:#fff;border:none;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+          .mockup-gen-btn:hover{opacity:.85;}
+          .mockup-gen-btn:disabled{opacity:.4;cursor:not-allowed;}
+          .mockup-canvas{position:relative;width:100%;height:160px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #0e0f28;}
+          .mockup-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;}
+          .mockup-watermark span{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);transform:rotate(-20deg);white-space:nowrap;text-shadow:0 0 20px rgba(0,0,0,0.8);}
+          .mockup-loading{font-family:'Space Mono',monospace;font-size:9px;color:#4a5488;letter-spacing:.1em;text-transform:uppercase;animation:pulse 1.2s ease-in-out infinite;}
+          @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+          /* Animations */
+          @keyframes wave{0%,100%{transform:translateY(0)}25%{transform:translateY(-8px)}75%{transform:translateY(8px)}}
+          @keyframes glitch{0%,100%{text-shadow:none;transform:none}20%{text-shadow:-2px 0 #f00,2px 0 #0ff;transform:skew(-1deg)}40%{text-shadow:2px 0 #f00,-2px 0 #0ff;transform:skew(1deg)}60%{text-shadow:-1px 0 #f00,1px 0 #0ff;transform:none}}
+          @keyframes neon{0%,100%{text-shadow:0 0 10px #1b1aff,0 0 20px #1b1aff,0 0 40px #1b1aff}50%{text-shadow:0 0 5px #1b1aff,0 0 10px #1b1aff}}
+          @keyframes gravity{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(4px)}80%{transform:translateY(-2px)}100%{transform:translateY(0);opacity:1}}
+          @keyframes fadechar{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
+          .anim-wave .stage-display-inner{animation:wave 1.2s ease-in-out infinite;}
+          .anim-glitch .stage-display-inner{animation:glitch 0.4s steps(1) infinite;}
+          .anim-neon .stage-display-inner{animation:neon 1.5s ease-in-out infinite;}
+          .anim-gravity .stage-display-inner{animation:gravity 0.6s cubic-bezier(.22,.61,.36,1) forwards;}
+          .anim-fade .stage-display-inner span{display:inline-block;animation:fadechar .4s ease forwards;opacity:0;}
 
           /* Glyph section */
           .glyph-section{border-bottom:1px solid #0e0f28;}
@@ -202,9 +274,9 @@ export default function FontPage({ font }) {
           .g-tab.on{color:#1b1aff;}
           .g-count{font-family:'Space Mono', monospace;font-size:9px;color:#282c52;padding:0 .8rem;margin-left:auto;display:flex;align-items:center;flex-shrink:0;}
           .g-grid{display:flex;flex-wrap:wrap;gap:0;padding:.5rem;}
-          .g-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;cursor:pointer;transition:background .12s;border:1px solid transparent;}
+          .g-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;width:88px;height:88px;cursor:pointer;transition:background .12s;border:1px solid transparent;}
           .g-cell:hover{background:rgba(27,26,255,0.12);border-color:#1b1aff;}
-          .g-char{font-size:1.6rem;color:#e8e8ff;line-height:1;}
+          .g-char{font-size:2.2rem;color:#e8e8ff;line-height:1;}
           .g-code{font-family:'Space Mono', monospace;font-size:8px;color:#282c52;margin-top:3px;letter-spacing:.04em;}
           .g-hint{font-family:'Space Mono', monospace;font-size:9px;color:#282c52;padding:4px 1rem 8px;letter-spacing:.06em;}
 
@@ -271,7 +343,7 @@ export default function FontPage({ font }) {
           .wr:hover{background:#06060f;}
           .wr.on{background:#06060f;}
           .wr-name{font-family:'Space Mono', monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#4a5488;flex-shrink:0;}
-          .wr-sample{font-size:clamp(1.4rem,2.8vw,2.4rem);line-height:1;color:#c0c8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1rem;transition:color .12s;}
+          .wr-sample{font-size:clamp(2rem,3.5vw,3.4rem);line-height:1;color:#c0c8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1rem;transition:color .12s;}
           .wr:hover .wr-sample,.wr.on .wr-sample{color:#e8e8ff;}
           .wr-add{font-family:'Space Mono', monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#1b1aff;border:none;padding:8px 14px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
           .wr-add:hover{opacity:.85;}
@@ -335,25 +407,35 @@ export default function FontPage({ font }) {
         <div className="left">
 
           {/* Live stage */}
-          <div className="stage-wrap" onClick={e => e.currentTarget.querySelector('textarea')?.focus()}>
+          <div className={`stage-wrap${animation ? ' anim-'+animation : ''}`}
+            ref={stageRef}
+            onClick={e => { e.currentTarget.querySelector('textarea')?.focus(); setAnimation(null); }}>
             <textarea
               className="stage-textarea"
               value={previewText}
-              onChange={e => setPreviewText(e.target.value)}
+              onChange={e => { setPreviewText(e.target.value); setAnimation(null); }}
               maxLength={80} spellCheck={false} autoCorrect="off" autoComplete="off"
             />
-            <div className="stage-text" style={{
-              fontFamily: ff,
-              fontWeight: style.weight,
-              fontStyle: style.oblique ? 'italic' : 'normal',
-              fontSize: fontSize + 'px',
-              letterSpacing: letterSpacing + '%',
-              lineHeight: lineHeight,
-              color: '#e8e8ff',
-            }}>
-              {previewText || 'AaBbCcDd'}
+            <div className="stage-text" style={{ position:'relative', zIndex:1, width:'100%', padding:'2rem' }}>
+              <div className="stage-display-inner" style={{
+                fontFamily: ff,
+                fontWeight: style.weight,
+                fontStyle: style.oblique ? 'italic' : 'normal',
+                fontSize: fontSize + 'px',
+                letterSpacing: letterSpacing + '%',
+                lineHeight: lineHeight,
+                color: animation === 'neon' ? '#fff' : '#e8e8ff',
+                wordBreak: 'break-word',
+              }}>
+                {animation === 'fade'
+                  ? (previewText || font.name).split('').map((ch,i) => (
+                      <span key={i} style={{ animationDelay: i*0.06+'s' }}>{ch}</span>
+                    ))
+                  : (previewText || font.name)
+                }
+              </div>
             </div>
-            {!previewText && <div className="stage-hint">CLICK ANYWHERE TO TYPE...</div>}
+            {!previewText && !animation && <div className="stage-hint">CLICK ANYWHERE TO TYPE...</div>}
           </div>
 
           {/* Meta strip */}
@@ -372,21 +454,7 @@ export default function FontPage({ font }) {
             </div>
           </div>
 
-          {/* Icons row */}
-          <div className="icons-row">
-            <span title="Glyph inspector">♥</span>
-            <span title="Tools">☜</span>
-            <span title="Lightning">⚡</span>
-            <span title="Smile">☺</span>
-            <span title="Star">✦</span>
-            <span title="Asterisk">✳</span>
-            <span title="Arrow">↑</span>
-            <span title="Sun">☀</span>
-            <span title="Moon">◉</span>
-            <span title="Ring">◎</span>
-          </div>
-
-          {/* Long description */}
+          {/* Long description — readable grey */}
           <div className="long-desc">
             <p>{font.longDescription || font.description}</p>
           </div>
@@ -446,14 +514,104 @@ export default function FontPage({ font }) {
             </div>
           </div>
 
-          {/* Tools */}
-          <div className="panel-row">
-            <div className="panel-label">Tools</div>
-            <div className="tools-icons">
-              <span title="Glyphs">Aa</span>
-              <span title="Colour">🌈</span>
-              <span title="Favourite">🖤</span>
-              <span title="Pointer">☜</span>
+          {/* TYPE LAB */}
+          <div className="typelab">
+            <div className="typelab-head">Type Lab</div>
+
+            {/* Animation triggers */}
+            <div className="anim-grid">
+              {[
+                { key:'wave',    label:'Wave',    desc:'Flowing motion' },
+                { key:'glitch',  label:'Glitch',  desc:'Cyberpunk static' },
+                { key:'neon',    label:'Neon',    desc:'Glow pulse' },
+                { key:'gravity', label:'Gravity', desc:'Drop in' },
+                { key:'fade',    label:'Fade In', desc:'Letter reveal' },
+              ].map(a => (
+                <button key={a.key}
+                  className={`anim-btn${animation===a.key?' on':''}`}
+                  onClick={() => {
+                    setAnimation(animation===a.key ? null : a.key);
+                  }}
+                  title={a.desc}>
+                  {a.label}
+                </button>
+              ))}
+            </div>
+
+            {/* AI Mockup Generator */}
+            <div className="mockup-area">
+              <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#4a5488', marginBottom:6 }}>
+                AI Mockup — Powered by Claude
+              </div>
+              <div className="mockup-input-row">
+                <input
+                  className="mockup-input"
+                  value={mockupPrompt}
+                  onChange={e => setMockupPrompt(e.target.value)}
+                  onKeyDown={e => e.key==='Enter' && generateMockup()}
+                  placeholder="e.g. luxury perfume brand..."
+                  maxLength={60}
+                />
+                <button className="mockup-gen-btn" onClick={generateMockup} disabled={mockupLoading || !mockupPrompt.trim()}>
+                  {mockupLoading ? '...' : 'GEN'}
+                </button>
+              </div>
+
+              {mockupLoading && (
+                <div className="mockup-canvas" style={{ background:'#000' }}>
+                  <span className="mockup-loading">Generating concept...</span>
+                </div>
+              )}
+
+              {mockupResult && !mockupResult.error && (
+                <div className="mockup-canvas" style={{ background: mockupResult.bg || '#0a0014' }}>
+                  {/* Actual font mockup */}
+                  <div style={{ textAlign:'center', padding:'0 1rem', position:'relative', zIndex:2 }}>
+                    <div style={{
+                      fontFamily: ff,
+                      fontWeight: style.weight,
+                      fontSize: 'clamp(1.2rem,5vw,2.2rem)',
+                      color: mockupResult.accent || '#fff',
+                      letterSpacing:'-.01em',
+                      lineHeight:.95,
+                      marginBottom:6,
+                    }}>
+                      {mockupResult.headline}
+                    </div>
+                    <div style={{
+                      fontFamily: ff,
+                      fontWeight: '300',
+                      fontSize: '0.65rem',
+                      color: 'rgba(255,255,255,0.6)',
+                      letterSpacing:'.12em',
+                      textTransform:'uppercase',
+                    }}>
+                      {mockupResult.subline}
+                    </div>
+                  </div>
+                  {/* Watermark — burned in, uncopyable */}
+                  <div className="mockup-watermark">
+                    <span>UNLICENSED · HYPERFLURO · WATERMARKED PREVIEW</span>
+                  </div>
+                  {/* Second watermark at different angle */}
+                  <div style={{ position:'absolute', bottom:8, right:8, fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(255,255,255,0.25)', letterSpacing:'.1em', zIndex:10 }}>
+                    © HYPERFLURO
+                  </div>
+                </div>
+              )}
+
+              {mockupResult?.error && (
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#f55', padding:'8px 0' }}>
+                  Generation failed — try again
+                </div>
+              )}
+
+              {!mockupResult && !mockupLoading && (
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#282c52', lineHeight:1.6 }}>
+                  Type a brief → see {font.name} in context.<br/>
+                  Purchase license to use without watermark.
+                </div>
+              )}
             </div>
           </div>
 
