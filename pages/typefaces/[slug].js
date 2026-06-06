@@ -7,6 +7,7 @@ import Script from 'next/script';
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const SPECIMENS = {
+  'shine-pro': [1,2,3,4,5].map(i => `/specimens/shine-pro/shine-${i}.png`),
   'rika': [1,2,3,4,5].map(i => `/specimens/rika/rika-${i}.png`),
   'nanami-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
@@ -85,7 +86,7 @@ const FONT_PHRASES = {
   'rika':              'Built for the discerning eye.',
   'roka':              'Stand firm.',
   'roxic':             'Rule breaker.',
-  'shine-pro':         'Catch the light.',
+  'shine-pro':         'Brilliance by design.',
   'sobek':             'Ancient power.',
   'soto':              'Outside the lines.',
   'squoosh-gothic':    'Compressed. Intense.',
