@@ -70,9 +70,6 @@ export default function Home() {
             height: 44px;
             border-bottom: 1px solid var(--border);
             background: var(--bg2);
-            position: sticky;
-            top: 120px;
-            z-index: 98;
           }
           .stats-left {
             font-family: 'Space Mono', monospace;
@@ -303,12 +300,6 @@ export default function Home() {
           placeholder="Type to preview all fonts..."
         />
       </div>
-
-      {/* ── Stats bar ── */}
-      <div className="stats-bar">
-        <div className="stats-left">
-          <span>{fonts.length}</span> Typefaces &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>25,000+</span> Designers
-        </div>
         <div className="stats-dots">
           <span>Desktop</span>
           <span className="stats-dot">&middot;</span>
@@ -359,6 +350,20 @@ export default function Home() {
         </div>
         <span className="footer-loc">London &middot; Online</span>
       </footer>
+      {/* ── Fixed bottom bar ── */}
+      <div className="bottom-bar">
+        <div className="bottom-bar-left">
+          <span>{fonts.length}</span> Typefaces &nbsp;&middot;&nbsp; <span>400+</span> Weights &nbsp;&middot;&nbsp; Trusted by <span>25,000+</span> Designers
+        </div>
+        <div className="bottom-bar-mid">
+          <span>Desktop</span><span className="bottom-bar-dot">&middot;</span>
+          <span>Web</span><span className="bottom-bar-dot">&middot;</span>
+          <span>App</span><span className="bottom-bar-dot">&middot;</span>
+          <span>Broadcast</span>
+        </div>
+        <div className="bottom-bar-right">London &middot; Est. 2024</div>
+      </div>
+      <div className="page-bottom-pad" />
     </>
   );
 }
