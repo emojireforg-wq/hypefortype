@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'crop': ['001','002','003','004','005'].map(i => `/specimens/crop/crop-${i}.jpg`),
   'bomkin': [1,2,3,4,6,7].map(i => `/specimens/bomkin/bomkin-${i}.jpg`),
   'baq-rounded': [
     '/specimens/baq-rounded/baq-rounded-frame-1-o.jpg',
