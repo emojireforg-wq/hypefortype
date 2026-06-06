@@ -70,6 +70,9 @@ export default function Home() {
             height: 44px;
             border-bottom: 1px solid var(--border);
             background: var(--bg2);
+            position: sticky;
+            top: 120px;
+            z-index: 98;
           }
           .stats-left {
             font-family: 'Space Mono', monospace;
@@ -144,8 +147,8 @@ export default function Home() {
             height: 44px;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 120px;
-            z-index: 98;
+            top: 164px;
+            z-index: 97;
             background: rgba(0,0,0,0.95);
             backdrop-filter: blur(10px);
           }
