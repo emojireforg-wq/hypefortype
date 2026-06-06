@@ -112,6 +112,7 @@ export default function Licensing() {
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
         <style>{`
           *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+          html{scroll-behavior:smooth}
           :root{--bg:#000;--bg2:#06060f;--blue:#1b1aff;--white:#e8e8ff;--t2:#7888c0;--t3:#4a5488;--t4:#282c52;--border:#0e0f28}
           html,body{background:var(--bg);color:var(--white);font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
           a{text-decoration:none;color:inherit}
@@ -124,46 +125,46 @@ export default function Licensing() {
           /* Hero */
           .eyebrow{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:.8rem}
           .h1{font-size:clamp(2rem,5vw,4rem);font-weight:700;line-height:.95;color:var(--white);margin-bottom:1rem}
-          .sub{font-size:14px;color:var(--t2);line-height:1.7;max-width:520px;margin-bottom:2.5rem}
+          .sub{font-size:17px;color:var(--t2);line-height:1.75;max-width:580px;margin-bottom:2.5rem}
 
           /* Section label */
-          .sec{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding-bottom:.7rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;margin-top:3rem}
+          .sec{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding-bottom:.7rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;margin-top:3rem}
 
           /* License type icons row */
           .icons-row{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
           @media(max-width:700px){.icons-row{grid-template-columns:repeat(3,1fr)}}
-          .icon-cell{background:var(--bg2);padding:1.4rem 1rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.5rem;transition:background .15s;cursor:default}
+          .icon-cell{background:var(--bg2);padding:1.8rem 1.2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.5rem;transition:background .15s;cursor:pointer}
           .icon-cell:hover{background:#0a0b1f}
           .icon-img{width:32px;height:32px}
-          .icon-label{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
-          .icon-price{font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:.04em}
+          .icon-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
+          .icon-price{font-family:'Space Mono',monospace;font-size:11px;color:var(--blue);letter-spacing:.04em}
 
           /* Comparison table */
           .table-wrap{overflow-x:auto;margin-bottom:0}
           table{width:100%;border-collapse:collapse;min-width:700px}
-          thead th{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.7rem .5rem;text-align:center;border-bottom:1px solid var(--blue);color:var(--white);background:var(--bg2)}
+          thead th{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.9rem .8rem;text-align:center;border-bottom:1px solid var(--blue);color:var(--white);background:var(--bg2)}
           thead th:first-child{text-align:left;color:var(--t3);border-bottom-color:var(--border);padding-left:0;min-width:160px}
-          tbody td{padding:.55rem .5rem;border-bottom:1px solid var(--border);text-align:center;font-size:14px}
-          tbody td:first-child{text-align:left;font-size:11px;color:var(--t2);font-family:'Space Grotesk',sans-serif;padding-left:0}
+          tbody td{padding:.7rem .8rem;border-bottom:1px solid var(--border);text-align:center;font-size:16px}
+          tbody td:first-child{text-align:left;font-size:14px;color:var(--t2);font-family:'Space Grotesk',sans-serif;padding-left:0}
           tbody tr:hover td{background:rgba(27,26,255,0.04)}
           .yes{color:var(--blue)}
           .no{color:var(--t4)}
 
           /* Details */
           .details{display:flex;flex-direction:column;gap:0}
-          .detail-row{display:grid;grid-template-columns:200px 1fr;gap:2rem;padding:1.5rem 0;border-bottom:1px solid var(--border);align-items:start}
+          .detail-row{display:grid;grid-template-columns:220px 1fr;gap:2.5rem;padding:2rem 0;border-bottom:1px solid var(--border);align-items:start}
           @media(max-width:600px){.detail-row{grid-template-columns:1fr}}
           .detail-head{display:flex;align-items:center;gap:.7rem}
           .detail-icon{font-size:1.4rem}
-          .detail-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
+          .detail-label{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
           .detail-points{list-style:none;display:flex;flex-direction:column;gap:.4rem}
-          .detail-point{font-size:12px;color:var(--t2);line-height:1.6;padding-left:1rem;position:relative}
+          .detail-point{font-size:14px;color:var(--t2);line-height:1.7;padding-left:1.2rem;position:relative;margin-bottom:.2rem}
           .detail-point::before{content:'—';position:absolute;left:0;color:var(--t4)}
 
           /* CTA */
           .cta-box{border:1px solid var(--border);padding:2rem;display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;margin-top:3rem}
-          .cta-title{font-size:16px;font-weight:700;margin-bottom:.3rem}
-          .cta-sub{font-size:12px;color:var(--t2)}
+          .cta-title{font-size:20px;font-weight:700;margin-bottom:.4rem}
+          .cta-sub{font-size:15px;color:var(--t2)}
           .cta-btn{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--blue);padding:12px 24px;border:none;cursor:pointer;white-space:nowrap;box-shadow:0 0 20px rgba(27,26,255,0.3);transition:opacity .15s;display:inline-block}
           .cta-btn:hover{opacity:.85}
 
@@ -189,11 +190,11 @@ export default function Licensing() {
         {/* Icon row */}
         <div className="icons-row">
           {LICENSES.map(l => (
-            <div key={l.key} className="icon-cell">
+            <a key={l.key} className="icon-cell" href={`#license-${l.key}`} style={{textDecoration:"none"}}>
               <img src={l.icon} alt={l.label} style={{width:'32px',height:'32px',filter:'invert(1) sepia(1) saturate(5) hue-rotate(200deg)',opacity:0.85}} />
               <span className="icon-label">{l.label}</span>
               <span className="icon-price">{l.price}</span>
-            </div>
+            </a>
           ))}
         </div>
 
@@ -226,7 +227,7 @@ export default function Licensing() {
         <div className="sec">Licensing details</div>
         <div className="details">
           {DETAILS.map(d => (
-            <div key={d.key} className="detail-row">
+            <div key={d.key} id={`license-${d.key}`} className="detail-row" style={{scrollMarginTop:"120px"}}>
               <div className="detail-head">
                 <img src={d.icon} alt={d.label} style={{width:'24px',height:'24px',filter:'invert(1) sepia(1) saturate(5) hue-rotate(200deg)',opacity:0.85,flexShrink:0}} />
                 <span className="detail-label">{d.label}</span>
