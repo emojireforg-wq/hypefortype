@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'hiroko': [1,2,3,4,5].map(i => `/specimens/hiroko/hiroko-00${i}.png`),
   'hiruko': ['001','002','004','005','006','007'].map(i => `/specimens/hiruko/hiruko_specimen_${i}.png`),
   'nanami-handmade': [1,2,3,4,5].map(i => `/specimens/nanami-handmade/nanami-handmade-${i}.png`),
   'headlined': ['001','002','003','004','005'].map(i => `/specimens/headlined/headlined-${i}.jpg`),
@@ -59,7 +60,7 @@ const FONT_PHRASES = {
   'electro':           'NEON TOKYO 2049',
   'headlined':         'LOSS AFTER LOSS MADE A BOSS',
   'headlined-solid':   'Own the page.',
-  'hiroko':            'Still water runs deep.',
+  'hiroko':            'The art of restraint.',
   'hiruko':            'Two cultures. One typeface.',
   'kono':              'This is now.',
   'letro':             'Letters that move.',
