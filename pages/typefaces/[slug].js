@@ -362,6 +362,18 @@ export default function FontPage({ font }) {
           .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1a6b3a;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:10px 24px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
           .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+
+          .sticky-buy{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:12px 2rem;background:rgba(0,0,0,0.97);border-top:1px solid #1b1aff;backdrop-filter:blur(12px);box-shadow:0 -4px 30px rgba(27,26,255,0.2);}
+          .sticky-buy-info{display:flex;align-items:center;gap:1.5rem;flex:1;min-width:0;}
+          .sticky-buy-name{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#e8e8ff;white-space:nowrap;}
+          .sticky-buy-meta{font-family:'Space Mono',monospace;font-size:10px;color:#4a5488;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+          .sticky-buy-price{font-family:'Determination',monospace;font-size:1.8rem;color:#e8e8ff;line-height:1;flex-shrink:0;}
+          .sticky-buy-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+          .sticky-trial{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#4a5488;background:transparent;border:1px solid #0e0f28;padding:10px 16px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+          .sticky-trial:hover{border-color:#1b1aff;color:#1b1aff;}
+          .sticky-cta{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#1b1aff;border:none;padding:12px 24px;cursor:pointer;transition:opacity .15s;white-space:nowrap;box-shadow:0 0 20px rgba(27,26,255,0.4);}
+          .sticky-cta:hover{opacity:.85;}
+          .page-bottom-pad{height:72px;}
           .fp-ft{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.2rem;border-top:1px solid #0e0f28;background:#06060f;}
           .fp-ft-hft{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#4a5488;letter-spacing:.1em;}
           .fp-ft-copy{font-family:'Space Mono',monospace;font-size:10px;color:#282c52;letter-spacing:.06em;text-transform:uppercase;}
@@ -717,6 +729,24 @@ export default function FontPage({ font }) {
 
       {/* TOAST */}
       <div className={`toast${showToast?' show':''}`}>{toastMsg}</div>
+
+      {/* STICKY BOTTOM BUY BAR */}
+      <div className="sticky-buy">
+        <div className="sticky-buy-info">
+          <span className="sticky-buy-name">{font.name}</span>
+          <span className="sticky-buy-meta">{weightCount} weight{weightCount>1?'s':''} &middot; {licenseType}</span>
+        </div>
+        <div className="sticky-buy-price">&#163;{estPrice}</div>
+        <div className="sticky-buy-actions">
+          <button className="sticky-trial" onClick={() => window.location.href=`/api/trial?slug=${font.slug}`}>
+            Free Trial
+          </button>
+          <button className="sticky-cta" onClick={() => { const el = document.getElementById('buy'); el && el.scrollIntoView({ behavior:'smooth' }); }}>
+            Buy Now &#8594;
+          </button>
+        </div>
+      </div>
+      <div className="page-bottom-pad" />
 
       {/* FOOTER */}
       <footer className="fp-ft">
