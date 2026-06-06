@@ -67,7 +67,7 @@ const FONT_PHRASES = {
   'monino-pro':        'Precision built.',
   'monolite':          'One line. Pure.',
   'nanami':            'Soft power.',
-  'nanami-handmade':   'Ink finds its way',
+  'nanami-handmade':   'Made by hand. Built to last.',
   'nanami-rounded-pro':'Soft power.',
   'nanami-3d':         'Depth of field.',
   'nanami-extended':   'Reach further.',
