@@ -323,7 +323,7 @@ export default function Home() {
             align-items: center;
             border-bottom: 1px solid var(--border);
             padding: 0 clamp(1.4rem,3vw,2.5rem);
-            min-height: 88px;
+            min-height: 120px;
             text-decoration: none;
             color: inherit;
             position: relative;
@@ -354,7 +354,7 @@ export default function Home() {
           }
           .row-name-wrap { min-width: 0; padding-right: 1rem; }
           .row-name {
-            font-size: clamp(1.5rem, 3vw, 2.6rem);
+            font-size: clamp(3rem, 6vw, 5.2rem);
             line-height: 1;
             color: rgba(255,255,255,0.55);
             letter-spacing: -.01em;
