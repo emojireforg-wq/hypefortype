@@ -138,41 +138,7 @@ export default function Home() {
           }
           .preview-input::placeholder { color: var(--t4); font-size: 22px; }
 
-          /* ── Filter bar ────────────── */
-          .filter-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            height: 44px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 164px;
-            z-index: 97;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
-          }
-          .filter-pills { display: flex; gap: .3rem; }
-          .pill {
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            padding: 5px 12px;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--t3);
-            transition: all .15s;
-          }
-          .pill:hover { border-color: var(--blue); color: var(--white); }
-          .pill.active { background: var(--blue); border-color: var(--blue); color: #fff; }
-          .filter-count {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--t4);
-            letter-spacing: .08em;
-          }
+
 
           /* ── Column headers ─────────── */
           .grid-head {
@@ -372,19 +338,7 @@ export default function Home() {
         <div className="stats-right">London &middot; Est. 2024</div>
       </div>
 
-      {/* ── Filter bar ── */}
-      <div className="filter-bar">
-        <div className="filter-pills">
-          {FILTERS.map(f => (
-            <button key={f} className={`pill${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>
-              {f}
-            </button>
-          ))}
-        </div>
-        <span className="filter-count">{filtered.length} typeface{filtered.length !== 1 ? 's' : ''}</span>
-      </div>
-
-      {/* ── Column headers ── */}
+{/* ── Column headers ── */}
       <div className="grid-head">
         <span>No.</span>
         <span>Typeface</span>
