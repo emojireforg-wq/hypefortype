@@ -9,6 +9,7 @@ const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const SPECIMENS = {
   'nanami-rounded-pro': [1,2,3,4,5,6].map(i => `/specimens/nanami-rounded-pro-${i}.jpg`),
   'babalove': [1,2,3,4,5,6].map(i => `/specimens/babalove/babalove${i}.jpg`),
+  'headlined': ['001','002','003','004','005'].map(i => `/specimens/headlined/headlined-${i}.jpg`),
   'electro': ['001','002','003','004','005','006','007','008'].map(i => `/specimens/electro/electro-${i}.jpg`),
   'ebisu': ['001','002','003','004','005','006','007','008','009','010','011'].map(i => `/specimens/ebisu/ebisu-${i}.jpg`),
   'crop': ['001','002','003','004','005'].map(i => `/specimens/crop/crop-${i}.jpg`),
@@ -54,7 +55,7 @@ const FONT_PHRASES = {
   'do-it-again':       'LAS VEGAS CASINO NIGHTS',
   'ebisu':             'Tokyo nights.',
   'electro':           'NEON TOKYO 2049',
-  'headlined':         'Make headlines.',
+  'headlined':         'LOSS AFTER LOSS MADE A BOSS',
   'headlined-solid':   'Own the page.',
   'hiroko':            'Still water runs deep.',
   'hiruko':            'Between two worlds.',
@@ -97,10 +98,12 @@ const FONT_SIZES = {
   'crop': 100,
   'do-it-again': 120,
   'electro': 130,
+  'headlined': 120,
   'headlined': 140,
   'headlined-solid': 140,
   'crop': 130,
   'electro': 130,
+  'headlined': 120,
 };
 
 export default function FontPage({ font }) {
