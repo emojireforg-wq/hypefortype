@@ -3,13 +3,17 @@ import Link from 'next/link';
 import Nav from '../components/Nav';
 
 const LICENSES = [
-  { key:'desktop',    label:'Desktop',    price:'From £25', icon:'🖥' },
-  { key:'web',        label:'Web',        price:'From £35', icon:'🌐' },
-  { key:'app',        label:'App',        price:'From £55', icon:'📱' },
-  { key:'broadcast',  label:'Broadcast',  price:'From £85', icon:'📺' },
-  { key:'brand',      label:'Logo',       price:'From £95', icon:'®'  },
-  { key:'enterprise', label:'Corporate',  price:'POA',      icon:'🏢' },
-  { key:'trial',      label:'Trial',      price:'Free',     icon:'🎁' },
+  { key:'desktop',    label:'Desktop',      price:'From £25', icon:'/icons/others-52.svg' },
+  { key:'desktop2',   label:'Desktop Pro',  price:'From £35', icon:'/icons/tech-06.svg'   },
+  { key:'webfont',    label:'Webfont',      price:'From £45', icon:'/icons/phone-13.svg'  },
+  { key:'web',        label:'Web App',      price:'From £35', icon:'/icons/grid-05.svg'   },
+  { key:'app',        label:'App',          price:'From £55', icon:'/icons/tech-07.svg'   },
+  { key:'server',     label:'Server',       price:'From £75', icon:'/icons/grid-08.svg'   },
+  { key:'broadcast',  label:'Broadcast',    price:'From £85', icon:'/icons/phone-05.svg'  },
+  { key:'brand',      label:'Brand Font',   price:'From £95', icon:'/icons/others-08.svg' },
+  { key:'enterprise', label:'Corporate',    price:'POA',      icon:'/icons/others-24.svg' },
+  { key:'annual',     label:'Annual',       price:'From £15', icon:'/icons/photo-09.svg'  },
+  { key:'trial',      label:'Trial',        price:'Free',     icon:'/icons/photo-04.svg'  },
 ];
 
 const TABLE_ROWS = [
@@ -27,7 +31,7 @@ const TABLE_ROWS = [
 
 const DETAILS = [
   {
-    key:'desktop', label:'Desktop', icon:'🖥',
+    key:'desktop', label:'Desktop', icon:'/icons/others-52.svg',
     points:[
       'For freelancers, studios, agencies, and companies.',
       'Create documents and static images for print or digital use (PDF, JPEG, PNG etc.)',
@@ -37,7 +41,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'web', label:'Web', icon:'🌐',
+    key:'web', label:'Web App', icon:'/icons/grid-05.svg',
     points:[
       'Embed font files via @font-face as dynamic text on a website.',
       '1 license covers 1 domain or URL.',
@@ -47,7 +51,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'app', label:'App / eBook', icon:'📱',
+    key:'app', label:'App', icon:'/icons/tech-07.svg',
     points:[
       'Embed fonts in software, mobile apps, games, internal servers, and eBooks.',
       'One license covers one app/software/eBook title across all platforms and updates.',
@@ -57,7 +61,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'broadcast', label:'Video / Broadcast', icon:'📺',
+    key:'broadcast', label:'Broadcast', icon:'/icons/phone-05.svg',
     points:[
       'Use fonts in TV, cinema, or Video On Demand streaming productions.',
       'One license per single title (film, series, or campaign). Multiple titles need multiple licenses.',
@@ -67,7 +71,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'brand', label:'Logo', icon:'®',
+    key:'brand', label:'Brand Font', icon:'/icons/others-08.svg',
     points:[
       'Design a logo, wordmark, or device mark with permission to trademark it.',
       'You may modify font outlines exclusively for logo creation purposes.',
@@ -77,7 +81,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'enterprise', label:'Corporate', icon:'🏢',
+    key:'enterprise', label:'Corporate', icon:'/icons/others-24.svg',
     points:[
       'Single corporate entity with unlimited employees and CPUs.',
       'Includes affiliated suppliers: agencies, advertisers, retailers, and service providers.',
@@ -87,7 +91,7 @@ const DETAILS = [
     ],
   },
   {
-    key:'trial', label:'Trial', icon:'🎁',
+    key:'trial', label:'Trial', icon:'/icons/photo-04.svg',
     points:[
       'Download free to test font integration in your designs.',
       'You may share trial fonts with third parties for evaluation.',
@@ -126,11 +130,11 @@ export default function Licensing() {
           .sec{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding-bottom:.7rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;margin-top:3rem}
 
           /* License type icons row */
-          .icons-row{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
-          @media(max-width:700px){.icons-row{grid-template-columns:repeat(4,1fr)}}
+          .icons-row{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem}
+          @media(max-width:700px){.icons-row{grid-template-columns:repeat(3,1fr)}}
           .icon-cell{background:var(--bg2);padding:1.4rem 1rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.5rem;transition:background .15s;cursor:default}
           .icon-cell:hover{background:#0a0b1f}
-          .icon-emoji{font-size:1.8rem;line-height:1}
+          .icon-img{width:32px;height:32px}
           .icon-label{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
           .icon-price{font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:.04em}
 
@@ -186,7 +190,7 @@ export default function Licensing() {
         <div className="icons-row">
           {LICENSES.map(l => (
             <div key={l.key} className="icon-cell">
-              <span className="icon-emoji">{l.icon}</span>
+              <img src={l.icon} alt={l.label} style={{width:'32px',height:'32px',filter:'invert(1) sepia(1) saturate(5) hue-rotate(200deg)',opacity:0.85}} />
               <span className="icon-label">{l.label}</span>
               <span className="icon-price">{l.price}</span>
             </div>
@@ -224,7 +228,7 @@ export default function Licensing() {
           {DETAILS.map(d => (
             <div key={d.key} className="detail-row">
               <div className="detail-head">
-                <span className="detail-icon">{d.icon}</span>
+                <img src={d.icon} alt={d.label} style={{width:'24px',height:'24px',filter:'invert(1) sepia(1) saturate(5) hue-rotate(200deg)',opacity:0.85,flexShrink:0}} />
                 <span className="detail-label">{d.label}</span>
               </div>
               <ul className="detail-points">
