@@ -59,7 +59,7 @@ const FONT_PHRASES = {
   'headlined':         'LOSS AFTER LOSS MADE A BOSS',
   'headlined-solid':   'Own the page.',
   'hiroko':            'Still water runs deep.',
-  'hiruko':            'Between two worlds',
+  'hiruko':            'Two cultures. One typeface.',
   'kono':              'This is now.',
   'letro':             'Letters that move.',
   'lippy':             'Say it loud.',
