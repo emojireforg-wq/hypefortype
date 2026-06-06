@@ -47,7 +47,7 @@ const FONT_PHRASES = {
   'babalove':          'Beauty is power own it.',
   'baq-rounded':       'Bold. Blob. Beautiful.',
   'bomkin':            'Sunday Monday Happy Days',
-  'crop':              'Sharp and clean.',
+  'crop':              'MANY MEN WISH DEATH UPON ME',
   'do-it-again':       'Do it again.',
   'ebisu':             'Tokyo nights.',
   'electro':           'Live wire.',
@@ -85,8 +85,13 @@ const FONT_PHRASES = {
   'yumo':              'Flow state.',
 };
 
+const DEFAULT_STYLES = {
+  'crop': 4,
+};
+
 const FONT_SIZES = {
   'babalove': 160,
+  'crop': 100,
   'headlined': 140,
   'headlined-solid': 140,
   'crop': 130,
@@ -94,7 +99,7 @@ const FONT_SIZES = {
 };
 
 export default function FontPage({ font }) {
-  const [activeStyle,     setActiveStyle]     = useState(0);
+  const [activeStyle,     setActiveStyle]     = useState(DEFAULT_STYLES[font.slug] || 0);
   const [previewText,     setPreviewText]      = useState('');
   const [fontSize,        setFontSize]         = useState(FONT_SIZES[font.slug] || 120);
   const [letterSpacing,   setLetterSpacing]    = useState(0);
