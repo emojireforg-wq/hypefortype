@@ -129,6 +129,8 @@ export default function FontPage({ font }) {
   const [mockupPrompt,    setMockupPrompt]     = useState('');
   const [mockupResult,    setMockupResult]     = useState(null);
   const [mockupLoading,   setMockupLoading]    = useState(false);
+  const [allFontGlyphs,   setAllFontGlyphs]    = useState(null);
+  const [glyphsLoading,   setGlyphsLoading]    = useState(false);
   const [paypalReady,     setPaypalReady]      = useState(false);
   const [purchasing,      setPurchasing]       = useState(false);
   const paypalRef = useRef(null);
@@ -171,6 +173,18 @@ export default function FontPage({ font }) {
     setToastMsg(font.name + ' ' + s.name + ' added to cart');
     setShowToast(true);
     setTimeout(() => { setShowToast(false); setAddedIdx(null); }, 2500);
+  };
+
+  const fetchAllGlyphs = async () => {
+    if (allFontGlyphs) return; // already loaded
+    setGlyphsLoading(true);
+    try {
+      const s = font.styles[activeStyle];
+      const res = await fetch('/api/font-glyphs?slug=' + font.slug + '&file=' + encodeURIComponent(s.file));
+      const data = await res.json();
+      if (data.glyphs) setAllFontGlyphs(data.glyphs);
+    } catch(e) {}
+    setGlyphsLoading(false);
   };
 
   const generateMockup = async () => {
@@ -540,19 +554,34 @@ export default function FontPage({ font }) {
           <div className="glyph-section">
             <div className="glyph-tabs">
               {Object.keys(GLYPH_SETS).map(k => (
-                <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => setGlyphSet(k)}>
+                <button key={k} className={`g-tab${glyphSet===k?' on':''}`} onClick={() => { setGlyphSet(k); if (k === 'ALL') fetchAllGlyphs(); }}>
                   {k.charAt(0) + k.slice(1).toLowerCase()}
                 </button>
               ))}
-              <span className="g-count">{allGlyphs.length} shown &middot; {font.glyphCount}+ total</span>
+              <span className="g-count">{glyphSet === "ALL" && allFontGlyphs ? allFontGlyphs.length + " shown" : allGlyphs.length + " shown"} &middot; {font.glyphCount}+ total</span>
             </div>
             <div className="g-grid">
-              {allGlyphs.map((g,i) => (
-                <div key={i} className="g-cell" onClick={() => setFocusedGlyph(g)}>
-                  <span className="g-char" style={{ fontFamily:ff, fontWeight:style.weight }}>{g}</span>
-                  <span className="g-code">U+{g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</span>
-                </div>
-              ))}
+              {glyphSet === 'ALL' ? (
+                glyphsLoading ? (
+                  <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#4a5488', padding:'1rem', gridColumn:'1/-1' }}>Loading all glyphs...</div>
+                ) : allFontGlyphs ? (
+                  allFontGlyphs.map((g,i) => (
+                    <div key={i} className="g-cell" onClick={() => setFocusedGlyph(g.char)}>
+                      <span className="g-char" style={{ fontFamily:ff, fontWeight:style.weight }}>{g.char}</span>
+                      <span className="g-code">{g.hex}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color:'#4a5488', padding:'1rem', gridColumn:'1/-1' }}>Click ALL to load glyphs</div>
+                )
+              ) : (
+                allGlyphs.map((g,i) => (
+                  <div key={i} className="g-cell" onClick={() => setFocusedGlyph(g)}>
+                    <span className="g-char" style={{ fontFamily:ff, fontWeight:style.weight }}>{g}</span>
+                    <span className="g-code">U+{g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</span>
+                  </div>
+                ))
+              )}
             </div>
             <div className="g-hint">Click any glyph to enlarge</div>
           </div>
