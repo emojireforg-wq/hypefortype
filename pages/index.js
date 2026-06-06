@@ -105,9 +105,9 @@ export default function Home() {
           .preview-bar {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
             padding: 0 2rem;
-            height: 44px;
+            height: 72px;
             border-bottom: 1px solid var(--border);
             background: var(--bg);
           }
@@ -126,11 +126,11 @@ export default function Home() {
             border: none;
             outline: none;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
+            font-size: 22px;
             color: var(--white);
             caret-color: var(--blue);
           }
-          .preview-input::placeholder { color: var(--t4); }
+          .preview-input::placeholder { color: var(--t4); font-size: 22px; }
 
           /* ── Filter bar ────────────── */
           .filter-bar {
@@ -337,6 +337,18 @@ export default function Home() {
 
       <Nav />
 
+      {/* ── Preview bar ── */}
+      <div className="preview-bar">
+        <span className="preview-label">Preview</span>
+        <input
+          className="preview-input"
+          value={preview}
+          onChange={e => setPreview(e.target.value)}
+          maxLength={40}
+          placeholder="Type to preview all fonts..."
+        />
+      </div>
+
       {/* ── Stats bar ── */}
       <div className="stats-bar">
         <div className="stats-left">
@@ -352,18 +364,6 @@ export default function Home() {
           <span>Broadcast</span>
         </div>
         <div className="stats-right">London &middot; Est. 2024</div>
-      </div>
-
-      {/* ── Preview bar ── */}
-      <div className="preview-bar">
-        <span className="preview-label">Preview</span>
-        <input
-          className="preview-input"
-          value={preview}
-          onChange={e => setPreview(e.target.value)}
-          maxLength={40}
-          placeholder="Type to preview all fonts..."
-        />
       </div>
 
       {/* ── Filter bar ── */}
