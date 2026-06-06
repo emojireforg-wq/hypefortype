@@ -34,7 +34,7 @@ const ZEN_SENTENCE      = 'Zen samurai packs quartz koi jade silk.';
 
 
 const FONT_PHRASES = {
-  'babalove':          'Beauty is power\nown it.',
+  'babalove':          'Beauty is power own it.',
   'baq-rounded':       'Round the world.',
   'bomkin':            'Break the mold.',
   'crop':              'Sharp & clean.',
