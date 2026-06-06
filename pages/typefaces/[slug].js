@@ -78,7 +78,7 @@ const FONT_PHRASES = {
   'nanami-rounded-pro':'Soft power.',
   'nanami-3d':         'Depth of field.',
   'nanami-extended':   'Reach further.',
-  'nerolina':          'Refined by nature.',
+  'carolinia':         'Refined by nature.',
   'odyssea':           'Set sail.',
   'patisserie':        'Sweet precision.',
   'rika':              'Urban edge.',
