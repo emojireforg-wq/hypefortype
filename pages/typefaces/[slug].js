@@ -75,7 +75,7 @@ const FONT_PHRASES = {
   'monolite':          'Form follows function.',
   'nanami':            'Designed in the space between.',
   'nanami-handmade':   'Made by hand. Built to last.',
-  'nanami-pro':         'The complete collection.',
+  'nanami-pro':         'Precision without limits.',
   'nanami-3d':         'Depth of field.',
   'nanami-extended':   'Reach further.',
   'carolinia':         'Refined by nature.',
