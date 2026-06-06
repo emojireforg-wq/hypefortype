@@ -145,11 +145,14 @@ export default function Home() {
             display: grid;
             grid-template-columns: 3rem 1fr 10rem 6rem 10rem;
             padding: 0 2rem;
-            height: 32px;
+            height: 40px;
             border-bottom: 1px solid var(--border);
             align-items: center;
             gap: 1rem;
             background: var(--bg2);
+            position: sticky;
+            top: 164px;
+            z-index: 96;
           }
           .grid-head span {
             font-family: 'Space Mono', monospace;
@@ -348,7 +351,7 @@ export default function Home() {
       </div>
 
       {/* ── Font rows ── */}
-      <section id="typefaces">
+      <section id="typefaces" style={{ paddingTop: "0" }}>
         {filtered.map(f => (
           <Link key={f.slug} href={`/typefaces/${f.slug}`} className="font-row">
             <span className="row-idx">{f.idx}</span>
