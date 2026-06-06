@@ -1,125 +1,621 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Nav from '../components/Nav';
-import { fonts } from '../lib/fonts';
-import { useState, useEffect } from 'react';
+import { fonts, pricing } from '../lib/fonts';
+import { useState, useEffect, useRef } from 'react';
 
-const dd = "'DigitalDisco', monospace";
-const det = "'Determination', monospace";
-const border = '1px solid var(--border)';
+const HERO_FONT = fonts.find(f => f.slug === 'nanami') || fonts[0];
+const FILTERS = ['All','Display','Japanese','Handmade','Rounded','Pro'];
+
+function startPrice(f) {
+  const t = pricing[f.isFamily ? 'family' : 'single'];
+  return t.desktop.price;
+}
 
 export default function Home() {
-  const [preview, setPreview] = useState('');
-  const [sz, setSz] = useState(2);
-  const [clock, setClock] = useState('');
-  const [dateStr, setDateStr] = useState('');
-  const accentSet = new Set([0,4,9,13,16,19,22,25]);
+  const [preview,  setPreview]  = useState('');
+  const [filter,   setFilter]   = useState('All');
+  const [heroText, setHeroText] = useState('Type.\nLoud.');
+  const [mouse,    setMouse]    = useState({ x: 0.5, y: 0.5 });
+  const [clock,    setClock]    = useState('');
+  const heroRef = useRef(null);
 
   useEffect(() => {
-    const tick = () => setClock(new Date().toUTCString().split(' ')[4] + ' GMT');
-    tick(); const id = setInterval(tick, 1000); return () => clearInterval(id);
+    const tick = () => setClock(new Date().toUTCString().split(' ')[4] + ' UTC');
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
+
+  // Parallax mouse tracking on hero
   useEffect(() => {
-    setDateStr(new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase());
+    const hero = heroRef.current;
+    if (!hero) return;
+    const handle = (e) => {
+      const r = hero.getBoundingClientRect();
+      setMouse({
+        x: (e.clientX - r.left) / r.width,
+        y: (e.clientY - r.top)  / r.height,
+      });
+    };
+    hero.addEventListener('mousemove', handle);
+    return () => hero.removeEventListener('mousemove', handle);
   }, []);
+
+  const filtered = filter === 'All'
+    ? fonts
+    : fonts.filter(f => f.tags.some(t => t.toLowerCase().includes(filter.toLowerCase())));
+
+  const px = (mouse.x - 0.5) * 28;
+  const py = (mouse.y - 0.5) * 16;
 
   return (
     <>
       <Head>
-        <title>HypeForType — Type Foundry</title>
-        <meta name="description" content="28 distinctive typefaces for designers, brands, and studios. Desktop, Web, App and Broadcast licenses." />
+        <title>HypeForType — Independent Type Foundry</title>
+        <meta name="description" content="28 distinctive typefaces for designers, brands and studios. London." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {fonts.map(f => f.styles.map(s => (
-          <style key={`${f.slug}-${s.file}`}>{`@font-face{font-family:'${f.name}';src:url('/fonts/${f.slug}/${encodeURIComponent(s.file)}');font-weight:${s.weight};font-style:${s.oblique?'italic':'normal'};font-display:swap;}`}</style>
+          <style key={`${f.slug}-${s.file}`}>{`
+            @font-face {
+              font-family: '${f.name}';
+              src: url('/fonts/${f.slug}/${encodeURIComponent(s.file)}');
+              font-weight: ${s.weight};
+              font-style: ${s.oblique ? 'italic' : 'normal'};
+              font-display: swap;
+            }
+          `}</style>
         )))}
+        <style>{`
+          /* ── Hero ─────────────────── */
+          .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+            background: var(--bg);
+            padding-top: 48px;
+          }
+          .hero-bg-glyph {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(40vw, 55vw, 62vw);
+            line-height: 1;
+            color: rgba(26,26,255,0.07);
+            pointer-events: none;
+            user-select: none;
+            will-change: transform;
+            transition: transform 0.08s ease-out;
+            white-space: nowrap;
+          }
+          .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: clamp(2rem,5vw,4rem) clamp(1.4rem,4vw,3.5rem);
+            padding-bottom: clamp(3rem,6vw,5rem);
+          }
+          .hero-eyebrow {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.8rem;
+          }
+          .hero-eyebrow span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+          }
+          .hero-eyebrow .dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--blue);
+            flex-shrink: 0;
+          }
+          .hero-headline {
+            font-size: clamp(5rem, 14vw, 14rem);
+            line-height: 0.92;
+            letter-spacing: -0.03em;
+            color: var(--white);
+            margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+            white-space: pre-line;
+          }
+          .hero-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+          }
+          .hero-desc {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+            line-height: 1.7;
+            max-width: 36ch;
+          }
+          .hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+          }
+          .btn-primary {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #fff;
+            background: var(--blue);
+            border: none;
+            padding: 13px 28px;
+            display: inline-block;
+            transition: opacity .2s;
+          }
+          .btn-primary:hover { opacity: 0.8; }
+          .btn-ghost {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 24px;
+            display: inline-block;
+            transition: all .2s;
+          }
+          .btn-ghost:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: var(--white);
+          }
+
+          /* ── Preview input overlay ── */
+          .preview-overlay {
+            position: absolute;
+            top: 48px; left: 0; right: 0;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0 clamp(1.4rem,4vw,3.5rem);
+            height: 52px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8,8,15,0.6);
+            backdrop-filter: blur(8px);
+          }
+          .preview-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--blue);
+            white-space: nowrap;
+            flex-shrink: 0;
+          }
+          .preview-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            width: 100%;
+            caret-color: var(--blue);
+          }
+          .preview-input::placeholder { color: rgba(255,255,255,0.15); }
+
+          /* ── Stats bar ────────────── */
+          .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+          }
+          .stat-cell {
+            padding: clamp(1.2rem,3vw,2rem) clamp(1.4rem,3vw,2.5rem);
+            border-right: 1px solid var(--border);
+          }
+          .stat-cell:last-child { border-right: none; }
+          .stat-num {
+            font-family: 'Determination', monospace;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            color: var(--white);
+            line-height: 1;
+            margin-bottom: .4rem;
+          }
+          .stat-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.2);
+          }
+
+          /* ── Ticker ───────────────── */
+          .ticker-wrap {
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 0;
+            background: var(--blue);
+          }
+          .ticker-track {
+            display: flex;
+            animation: tickerScroll 22s linear infinite;
+            white-space: nowrap;
+          }
+          .ticker-item {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+            padding-right: 3rem;
+          }
+
+          /* ── Filter bar ───────────── */
+          .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px clamp(1.4rem,3vw,2.5rem);
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+            flex-wrap: wrap;
+          }
+          .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+          .pill {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: 5px 13px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: rgba(255,255,255,0.25);
+            cursor: pointer;
+            transition: all .15s;
+          }
+          .pill:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+          .pill.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+          .filter-count {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.18);
+            letter-spacing: .06em;
+            white-space: nowrap;
+          }
+
+          /* ── Grid header ──────────── */
+          .grid-head {
+            display: grid;
+            grid-template-columns: 64px 1fr 140px 120px 130px;
+            gap: 0;
+            padding: 7px clamp(1.4rem,3vw,2.5rem);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+          }
+          .grid-head span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.12);
+          }
+
+          /* ── Font rows ────────────── */
+          .font-row {
+            display: grid;
+            grid-template-columns: 64px 1fr 140px 120px 130px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding: 0 clamp(1.4rem,3vw,2.5rem);
+            min-height: 120px;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: background .15s;
+            gap: 0;
+          }
+          .font-row::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0;
+            background: var(--blue);
+            transition: width .2s ease;
+          }
+          .font-row:hover::before { width: 3px; }
+          .font-row:hover { background: rgba(26,26,255,0.04); }
+          .font-row:hover .row-name { color: var(--white); }
+          .font-row:hover .row-cta { opacity: 1; transform: translateX(0); }
+          .font-row:hover .row-price { color: var(--white); }
+
+          .row-idx {
+            font-family: 'DigitalDisco', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.12);
+            letter-spacing: .1em;
+            padding-left: 3px;
+          }
+          .row-name-wrap { min-width: 0; padding-right: 1rem; }
+          .row-name {
+            font-size: clamp(3rem, 6vw, 5.2rem);
+            line-height: 1;
+            color: rgba(255,255,255,0.55);
+            letter-spacing: -.01em;
+            overflow: visible;
+            text-overflow: clip;
+            white-space: nowrap;
+            transition: color .15s;
+            margin-bottom: 5px;
+          }
+          .row-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          }
+          .badge-new {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px; font-weight: 700;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: 2px 6px;
+            background: var(--blue);
+            color: #fff;
+          }
+          .badge-pro {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px; font-weight: 600;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: 2px 6px;
+            border: 1px solid var(--border);
+            color: rgba(255,255,255,0.2);
+          }
+          .row-styles {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.18);
+          }
+          .row-cat {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px; font-weight: 500;
+            letter-spacing: .06em; text-transform: uppercase;
+            color: rgba(255,255,255,0.2);
+          }
+          .row-price {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            transition: color .15s;
+          }
+          .row-cta {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            opacity: 0;
+            transform: translateX(8px);
+            transition: opacity .2s, transform .2s;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+          }
+          .row-cta-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+          }
+
+          /* ── Footer ───────────────── */
+          .site-footer {
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            margin-top: 6rem;
+            background: var(--bg2);
+          }
+          .footer-copy {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: 1.4rem 1.8rem;
+          }
+          .footer-links {
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            padding: 1.4rem 2rem;
+          }
+          .footer-link {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px; font-weight: 500;
+            letter-spacing: .1em; text-transform: uppercase;
+            color: rgba(255,255,255,0.18);
+            transition: color .2s;
+          }
+          .footer-link:hover { color: var(--white); }
+          .footer-loc {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: 1.4rem 1.8rem;
+            text-align: right;
+          }
+        `}</style>
       </Head>
 
       <Nav />
 
-      {/* STATUS BAR */}
-      <div style={{ background:'var(--bg2)', borderBottom:border, padding:'4px 1.2rem', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'1rem', overflow:'hidden' }}>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.28rem,.7vw,.42rem)', letterSpacing:'.16em', textTransform:'uppercase', color:'#2e2e2e', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-          28 Typefaces — Desktop · Web · App · Broadcast Licenses — Secure Checkout via PayPal
-        </span>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.28rem,.7vw,.42rem)', letterSpacing:'.16em', textTransform:'uppercase', color:'#2e2e2e', whiteSpace:'nowrap' }}>{clock}</span>
-      </div>
+      {/* ─────────────────────── HERO ─────────────────────── */}
+      <section className="hero" ref={heroRef}>
 
-      {/* PREVIEW BAR */}
-      <div style={{ background:'var(--bg)', borderBottom:'1px solid var(--blue-brd)', padding:'clamp(.7rem,2vw,1.1rem) 1.2rem', display:'flex', alignItems:'center', gap:'.8rem' }}>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.32rem,.8vw,.46rem)', letterSpacing:'.2em', textTransform:'uppercase', color:'var(--blue)', opacity:.55, whiteSpace:'nowrap', flexShrink:0 }}>Preview →</span>
-        <input
-          value={preview} onChange={e=>setPreview(e.target.value)} maxLength={40}
-          placeholder="Type anything to preview all fonts..."
-          style={{ background:'transparent', border:'none', outline:'none', color:'var(--white)', fontFamily:det, fontSize:sz+'rem', width:'100%', caretColor:'var(--blue)', minWidth:0 }}
-        />
-        <div style={{ display:'flex', gap:3, flexShrink:0 }}>
-          {['A−','A+'].map((l,i)=>(
-            <button key={l} onClick={()=>setSz(s=>Math.max(.7,Math.min(5,s+(i?+.3:-.3))))} style={{ fontFamily:dd, fontSize:'clamp(.32rem,.8vw,.46rem)', color:'var(--dim)', border:border, padding:'3px 7px', background:'transparent', letterSpacing:'.1em', transition:'all .12s' }}
-              onMouseEnter={e=>{e.target.style.color='var(--white)';e.target.style.borderColor='var(--blue)'}} onMouseLeave={e=>{e.target.style.color='var(--dim)';e.target.style.borderColor='var(--border)'}}>
-              {l}
-            </button>
-          ))}
+        {/* Massive background glyph — parallax */}
+        <div className="hero-bg-glyph"
+          style={{
+            fontFamily: `'${HERO_FONT.name}', monospace`,
+            transform: `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`,
+          }}>
+          N
         </div>
-      </div>
 
-      {/* GRID HEADER */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', borderBottom:border }}>
-        {['Typeface · A → Z','Typeface · Series'].map((t,i)=>(
-          <div key={i} style={{ fontFamily:dd, fontSize:'clamp(.28rem,.7vw,.4rem)', letterSpacing:'.2em', textTransform:'uppercase', color:'#2c2c2c', padding:'5px 1rem', display:'flex', justifyContent:'space-between', borderRight:i===0?border:'none' }}>
-            <span>{t.split(' · ')[0]}</span><span>{t.split(' · ')[1]}</span>
+        {/* Preview bar just below nav */}
+        <div className="preview-overlay">
+          <span className="preview-label">Preview</span>
+          <input
+            className="preview-input"
+            value={preview}
+            onChange={e => setPreview(e.target.value)}
+            maxLength={40}
+            placeholder="Type to preview all fonts below..."
+          />
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '10px', color: 'rgba(255,255,255,0.12)', letterSpacing: '.1em', flexShrink: 0 }}>
+            {clock}
+          </span>
+        </div>
+
+        {/* Hero content — bottom anchored */}
+        <div className="hero-content">
+          <div className="hero-eyebrow">
+            <span>Independent Type Foundry</span>
+            <div className="dot" />
+            <span>London</span>
+            <div className="dot" />
+            <span>Est. 2024</span>
+          </div>
+
+          <h1 className="hero-headline"
+            style={{ fontFamily: `'${HERO_FONT.name}', monospace` }}>
+            {heroText}
+          </h1>
+
+          <div className="hero-bottom">
+            <p className="hero-desc">
+              28 distinctive typefaces for designers, brands and studios.
+              Display, Japanese, Handmade and Pro families.
+              Desktop · Web · App · Broadcast licenses.
+            </p>
+            <div className="hero-actions">
+              <a href="#typefaces" className="btn-primary">Browse Typefaces →</a>
+              <Link href="/typefaces/nanami" className="btn-ghost">Try Nanami Free</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────── STATS ────────────────────── */}
+      <div className="stats-bar">
+        {[
+          ['28',     'Typefaces'],
+          ['£25',    'Starting price'],
+          ['4',      'License types'],
+          ['Instant','Download'],
+        ].map(([n, l]) => (
+          <div key={l} className="stat-cell">
+            <div className="stat-num">{n}</div>
+            <div className="stat-label">{l}</div>
           </div>
         ))}
       </div>
 
-      {/* FONT GRID */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)' }}>
-        {fonts.map((f, i) => (
-          <Link key={f.slug} href={`/typefaces/${f.slug}`}
-            style={{ borderBottom:border, borderRight:i%2===0?border:'none', padding:0, cursor:'pointer', position:'relative', overflow:'hidden', display:'block', textDecoration:'none', borderLeft:accentSet.has(i)?'2px solid rgba(68,85,255,0.45)':'none' }}
-            onMouseEnter={e=>{e.currentTarget.style.background='#111';e.currentTarget.querySelector('.fc-name').style.color='var(--white)'}}
-            onMouseLeave={e=>{e.currentTarget.style.background='var(--bg)';e.currentTarget.querySelector('.fc-name').style.color='#aaa'}}>
-            <div style={{ padding:'4px .9rem 3px', borderBottom:'1px solid #141414', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <span style={{ fontFamily:dd, fontSize:'clamp(.26rem,.65vw,.36rem)', color:'#272727', letterSpacing:'.12em' }}>{f.idx}</span>
-              <div style={{ display:'flex', gap:3 }}>
-                {f.hot && <span style={{ fontFamily:dd, fontSize:'clamp(.24rem,.6vw,.34rem)', letterSpacing:'.08em', textTransform:'uppercase', padding:'1px 4px', border:'1px solid var(--blue-brd)', color:'var(--blue)', background:'var(--blue-dim)' }}>New</span>}
-                {f.pro && <span style={{ fontFamily:dd, fontSize:'clamp(.24rem,.6vw,.34rem)', letterSpacing:'.08em', textTransform:'uppercase', padding:'1px 4px', border:'1px solid #2e2e2e', color:'#424242' }}>Pro</span>}
-              </div>
-            </div>
-            <div style={{ padding:'clamp(.45rem,1.5vw,.7rem) .9rem clamp(.4rem,1.2vw,.65rem)', display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
-              <div className="fc-name" style={{ fontFamily:`'${f.name}', monospace`, fontSize:'clamp(.95rem,2.2vw,1.85rem)', lineHeight:1, color:'#aaa', letterSpacing:'.02em', flex:1, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', paddingRight:'.5rem', transition:'color .1s' }}>
+      {/* ─────────────────────── TICKER ───────────────────── */}
+      <div className="ticker-wrap">
+        <div className="ticker-track">
+          {[...Array(6)].map((_, i) => (
+            <span key={i} className="ticker-item">
+              28 Typefaces &nbsp;·&nbsp; Display &nbsp;·&nbsp; Japanese &nbsp;·&nbsp; Handmade &nbsp;·&nbsp; Desktop License &nbsp;·&nbsp; Web License &nbsp;·&nbsp; App License &nbsp;·&nbsp; Broadcast &nbsp;·&nbsp; Instant Download &nbsp;·&nbsp; PayPal Secure &nbsp;·&nbsp;
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ─────────────────────── GRID ─────────────────────── */}
+      <section id="typefaces">
+
+        {/* Filter bar */}
+        <div className="filter-bar">
+          <div className="filter-pills">
+            {FILTERS.map(f => (
+              <button key={f} className={`pill${filter === f ? ' active' : ''}`} onClick={() => setFilter(f)}>
+                {f}
+              </button>
+            ))}
+          </div>
+          <span className="filter-count">{filtered.length} typeface{filtered.length !== 1 ? 's' : ''}</span>
+        </div>
+
+        {/* Column headers */}
+        <div className="grid-head">
+          <span>No.</span>
+          <span>Typeface</span>
+          <span>Category</span>
+          <span>Styles</span>
+          <span>Price</span>
+        </div>
+
+        {/* Font rows */}
+        {filtered.map(f => (
+          <Link key={f.slug} href={`/typefaces/${f.slug}`} className="font-row">
+
+            <span className="row-idx">{f.idx}</span>
+
+            <div className="row-name-wrap">
+              <div className="row-name" style={{ fontFamily: `'${f.name}', monospace` }}>
                 {preview.trim() || f.name}
               </div>
-              <div style={{ textAlign:'right', flexShrink:0 }}>
-                <span style={{ display:'block', fontFamily:dd, fontSize:'clamp(.24rem,.6vw,.34rem)', color:'#2a2a2a', letterSpacing:'.1em', textTransform:'uppercase', lineHeight:1.9 }}>{f.tags.join(' · ')}</span>
-                <span style={{ display:'block', fontFamily:dd, fontSize:'clamp(.24rem,.6vw,.34rem)', color:'#232323', letterSpacing:'.1em', textTransform:'uppercase' }}>{f.styles.length} {f.styles.length===1?'style':'styles'}</span>
+              <div className="row-meta">
+                {f.hot && <span className="badge-new">New</span>}
+                {f.pro && <span className="badge-pro">Pro</span>}
+                <span className="row-styles">{f.styles.length} {f.styles.length === 1 ? 'style' : 'styles'}</span>
               </div>
             </div>
+
+            <span className="row-cat">{f.tags[0]}</span>
+
+            <span className="row-styles" style={{ color: 'rgba(255,255,255,0.18)' }}>
+              {f.styles.length} {f.styles.length === 1 ? 'style' : 'styles'}
+            </span>
+
+            <div className="row-cta-wrap">
+              <span className="row-price">from £{startPrice(f)}</span>
+              <div style={{ width: '1rem' }} />
+              <button className="row-cta">Buy →</button>
+            </div>
+
           </Link>
         ))}
-      </div>
+      </section>
 
-      {/* DATA STRIP */}
-      <div style={{ borderTop:border, padding:'5px 1.2rem', display:'flex', gap:'2rem', background:'var(--bg2)', flexWrap:'wrap' }}>
-        {[['Typefaces','28'],['Families','Headlined · Nanami · BAQ · Yuki'],['Updated',dateStr],['Payments','PayPal Secure']].map(([l,v])=>(
-          <div key={l} style={{ display:'flex', gap:5, alignItems:'center' }}>
-            <span style={{ fontFamily:dd, fontSize:'clamp(.24rem,.6vw,.34rem)', color:'#272727', letterSpacing:'.12em', textTransform:'uppercase' }}>{l}</span>
-            <span style={{ fontFamily:det, fontSize:'clamp(.28rem,.7vw,.4rem)', color:'#404040', letterSpacing:'.04em' }}>{v}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* FOOTER */}
-      <footer style={{ borderTop:border, display:'grid', gridTemplateColumns:'1fr auto 1fr', background:'var(--bg2)' }}>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.24rem,.65vw,.36rem)', color:'#272727', letterSpacing:'.12em', textTransform:'uppercase', padding:'.8rem 1rem' }}>© 2026 HypeForType — All rights reserved</span>
-        <div style={{ borderLeft:border, borderRight:border, display:'flex', gap:'1rem', alignItems:'center', padding:'.8rem 1.2rem', flexWrap:'wrap' }}>
-          {['Licensing','FAQ','Privacy','Contact'].map(t=>(
-            <Link key={t} href={'/'+t.toLowerCase()} style={{ fontFamily:dd, fontSize:'clamp(.24rem,.65vw,.36rem)', color:'#2e2e2e', letterSpacing:'.14em', textTransform:'uppercase', transition:'color .12s' }}
-              onMouseEnter={e=>e.target.style.color='var(--blue)'} onMouseLeave={e=>e.target.style.color='#2e2e2e'}>
-              {t}
-            </Link>
+      {/* ─────────────────────── FOOTER ───────────────────── */}
+      <footer className="site-footer">
+        <span className="footer-copy">© 2026 HypeForType</span>
+        <div className="footer-links">
+          {['Licensing','FAQ','Privacy','Contact'].map(t => (
+            <Link key={t} href={'/' + t.toLowerCase()} className="footer-link">{t}</Link>
           ))}
         </div>
-        <span style={{ fontFamily:dd, fontSize:'clamp(.24rem,.65vw,.36rem)', color:'#272727', letterSpacing:'.12em', textTransform:'uppercase', padding:'.8rem 1rem', textAlign:'right' }}>London · Online</span>
+        <span className="footer-loc">London · Online</span>
       </footer>
     </>
   );
