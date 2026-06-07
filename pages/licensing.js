@@ -1,3 +1,13 @@
+git add pages/licensing.js
+git commit -m "new licensing page"
+git push
+git add pages/licensing.js
+git commit -m "new licensing page"
+git push
+git add pages/licensing.js
+git commit -m "new licensing page"
+git push
+ls pages/licensing.js
 import Head from 'next/head';
 import Link from 'next/link';
 import Nav from '../components/Nav';
