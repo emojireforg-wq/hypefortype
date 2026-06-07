@@ -1,4 +1,49 @@
-git add pages/licensing.js
+import Head from 'next/head';
+import Link from 'next/link';
+import Nav from '../components/Nav';
+import { useState } from 'react';
+
+const LICENSES = [
+  { key: 'desktop', label: 'Desktop', price: 'From £25', icon: '/icons/other' },
+  { key: 'webfont', label: 'Webfont', price: 'From £45', icon: '/icons/phone' },
+  { key: 'webapp', label: 'Web App', price: 'From £35', icon: '/icons/grid' },
+  { key: 'digitalads', label: 'Digital Ads', price: 'From £35', icon: '/icons/tech' },
+  { key: 'app', label: 'App', price: 'From £55', icon: '/icons/tech' },
+  { key: 'server', label: 'Server', price: 'From £75', icon: '/icons/grid' },
+  { key: 'broadcast', label: 'Broadcast', price: 'From £85', icon: '/icons/phone' },
+  { key: 'brand', label: 'Brand Font', price: 'From £95', icon: '/icons/other' },
+  { key: 'enterprise', label: 'Corporate', price: 'POA', icon: '/icons/other' },
+  { key: 'trial', label: 'Trial', price: 'Free', icon: '/icons/photo' },
+];
+
+const TABLE_ROWS = [
+  { label: 'Commercial use', values: [true, true, true, true, true, true, true, true, true, true] },
+  { label: 'Perpetual license', values: [true, true, true, true, true, true, true, true, true, true] },
+  { label: 'Print & static image', values: [true, false, false, false, false, false, false, false, false, false] },
+];
+
+export default function Licensing() {
+  return (
+    <div className="min-h-screen bg-black text-white p-8">
+      <Head>
+        <title>Licensing | HypeForType</title>
+      </Head>
+      <Nav />
+      <main className="max-w-4xl mx-auto mt-12">
+        <h1 className="text-4xl font-bold mb-8">Licensing Structure</h1>
+        {/* Your component UI implementation goes here */}
+        <div className="grid gap-4">
+          {LICENSES.map((l) => (
+            <div key={l.key} className="border border-white/20 p-4 flex justify-between">
+              <span>{l.label}</span>
+              <span>{l.price}</span>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}git add pages/licensing.js
 git commit -m "new licensing page"
 git push
 git add pages/licensing.js
