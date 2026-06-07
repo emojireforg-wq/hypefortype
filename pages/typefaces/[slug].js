@@ -421,6 +421,7 @@ export default function FontPage({ font }) {
           .sticky-trial:hover{border-color:#1b1aff;color:#1b1aff;}
           .sticky-cta{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#1b1aff;border:none;padding:12px 24px;cursor:pointer;transition:opacity .15s;white-space:nowrap;box-shadow:0 0 20px rgba(27,26,255,0.4);}
           .sticky-cta:hover{opacity:.85;}
+      </div></div></div></div></div>{/* close left, page-wrap */}
           .page-bottom-pad{height:72px;}
           .fp-ft{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.2rem;border-top:1px solid #0e0f28;background:#06060f;}
           .fp-ft-hft{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#4a5488;letter-spacing:.1em;}
