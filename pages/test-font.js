@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { fonts, pricing } from '../../lib/fonts';
+import { fonts, pricing } from '../lib/fonts';
 import { useState, useRef, useEffect } from 'react';
 import Script from 'next/script';
 
