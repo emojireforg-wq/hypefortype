@@ -287,7 +287,7 @@ export default function FontPage({ font }) {
           .nav-buy{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#1b1aff;padding:0 1.4rem;display:flex;align-items:center;transition:opacity .15s;box-shadow:0 0 20px rgba(27,26,255,0.4);}
           .nav-buy:hover{opacity:.85;}
 
-          .page-wrap{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 44px);}
+          .page-wrap{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 48px);align-items:start;}
 
           .left{border-right:1px solid #0e0f28;display:flex;flex-direction:column;}
 
@@ -323,7 +323,7 @@ export default function FontPage({ font }) {
           .g-code{font-family:'Space Mono',monospace;font-size:8px;color:#282c52;margin-top:3px;letter-spacing:.04em;}
           .g-hint{font-family:'Space Mono',monospace;font-size:9px;color:#282c52;padding:4px 1rem 8px;letter-spacing:.06em;}
 
-          .panel{background:#06060f;display:flex;flex-direction:column;overflow-y:auto;position:sticky;top:44px;height:calc(100vh - 44px);}
+          .panel{background:#06060f;display:flex;flex-direction:column;overflow-y:auto;position:sticky;top:48px;height:calc(100vh - 48px);}
           .panel-row{padding:10px 16px;border-bottom:1px solid #0e0f28;}
           .panel-lbl{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#e8e8ff;margin-bottom:8px;}
           .panel-sublbl{font-family:'Space Grotesk',sans-serif;font-size:11px;color:#4a5488;margin-bottom:6px;}
