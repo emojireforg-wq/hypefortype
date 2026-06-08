@@ -1,0 +1,1 @@
+Master Licensing Matrix: Multiplier (x1, x3, x9, x27, x81). Base Prices (Single/Family): STARTER/WEB 30/150, SOCIAL/APP 90/450, LOGO/PUB 250/1250, BROADCAST 85/425, GAMING/SERVER 500/2500, CORP 1000/5000, BRAND 5000/25000. Rules: Nanami 50% off, Standard 20% off.
